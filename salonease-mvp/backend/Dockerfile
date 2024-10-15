@@ -1,20 +1,18 @@
 # Backend Dockerfile
-FROM node:24
+FROM node:18
 
 # Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package.json package-lock.json ./
-
 # Install dependencies
+COPY package*.json ./
 RUN npm install
 
-# Copy the rest of the application code
+# Copy app files
 COPY . .
 
-# Expose the port the app runs on
-EXPOSE 3000
+# Expose port
+EXPOSE 5000
 
-# Start the application
+# Run the application
 CMD ["npm", "start"]

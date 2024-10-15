@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../src/config/db');
 const User = require('../../src/models/User');
+const bcrypt = require('bcrypt');
 
 describe('User Model', () => {
   let createdUsers = [];
@@ -22,15 +23,20 @@ describe('User Model', () => {
   });
 
   it('should create a user with valid attributes', async () => {
+    
     const user = await User.create({
       fullName: 'Test User',
-      email: 'testuser@example.com',
-      password: 'Password123!',
+      email: `testuser_${Date.now()}@example.com`, // Ensure unique email
+      password: await bcrypt.hash('Password123!', 10),
     });
 
+    // Fetch the user again to ensure the password is hashed
+    const fetchedUser = await User.findByPk(user.id);
+    const isPasswordValid = await bcrypt.compare('Password123!', fetchedUser.password);
+
     expect(user.fullName).toBe('Test User');
-    expect(user.email).toBe('testuser@example.com');
-    expect(user.password).toBe('Password123!');
+    expect(user.email).toMatch(/testuser_\d+@example.com/);
+    expect(isPasswordValid).toBe(true);
     expect(user.role).toBe('SalonOwner');
     expect(user.isEmailVerified).toBe(false);
 

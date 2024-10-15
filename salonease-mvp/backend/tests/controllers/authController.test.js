@@ -5,20 +5,21 @@ const sequelize = require('../../src/config/db');
 const jwt = require('jsonwebtoken');
 const request = require('supertest');
 const app = require('../../src/server');
+const bcrypt = require('bcrypt');
 
-describe('Auth Controller - Register', () => {
+describe('Auth Controller', () => {
   let req, res, next;
   let createdUsers = [];
 
   beforeAll(async () => {
-    await sequelize.sync(); // Ensure sync does not use force: true
+    await sequelize.sync({ force: true });
   });
 
   beforeEach(() => {
     req = httpMocks.createRequest();
     res = httpMocks.createResponse();
     next = jest.fn();
-    process.env.JWT_SECRET = 'testsecret'; // Ensure JWT_SECRET is set
+    process.env.JWT_SECRET = 'testsecret';
   });
 
   afterEach(async () => {
@@ -30,29 +31,26 @@ describe('Auth Controller - Register', () => {
   });
 
   afterAll(async () => {
-    await sequelize.close(); // Close the database connection
+    await sequelize.close();
   });
 
   it('should register a new user successfully', async () => {
     req.body = {
       fullName: 'Test User',
-      email: 'testuser@example.com',
+      email: 'uniqueuser@example.com', // Ensure unique email
       password: 'Password123!',
     };
 
-    const existingUser = await User.findOne({ where: { email: req.body.email } });
-    if (existingUser) {
-      await existingUser.destroy();
-    }
-
     await register(req, res, next);
+
+    console.log('Response Status:', res.statusCode);
+    console.log('Response Data:', res._getJSONData());
 
     expect(res.statusCode).toBe(201);
     expect(res._getJSONData()).toEqual({
       message: 'Registration successful. Please check your email to verify your account.',
     });
 
-    // Track created user for cleanup
     const newUser = await User.findOne({ where: { email: req.body.email } });
     createdUsers.push(newUser);
   });
@@ -65,9 +63,13 @@ describe('Auth Controller - Register', () => {
     };
 
     const existingUser = await User.create(req.body);
+    console.log(existingUser);
     createdUsers.push(existingUser);
 
     await register(req, res, next);
+
+    console.log('Response Status:', res.statusCode);
+    console.log('Response Data:', res._getJSONData());
 
     expect(res.statusCode).toBe(400);
     expect(res._getJSONData()).toEqual({ message: 'Email already exists' });
@@ -76,11 +78,14 @@ describe('Auth Controller - Register', () => {
   it('should not register a user with a weak password', async () => {
     req.body = {
       fullName: 'Test User',
-      email: 'newuser@example.com',
-      password: 'weakpass', // Weak password
+      email: 'anotheruniqueuser@example.com', // Ensure unique email
+      password: 'weakpass',
     };
 
     await register(req, res, next);
+
+    console.log('Response Status:', res.statusCode);
+    console.log('Response Data:', res._getJSONData());
 
     expect(res.statusCode).toBe(400);
     expect(res._getJSONData()).toEqual({
@@ -89,27 +94,27 @@ describe('Auth Controller - Register', () => {
   });
 
   it('should verify email with valid token', async () => {
-    const user = await User.create({
+    const myuser = await User.create({
       fullName: 'Test User',
-      email: 'testuser@example.com',
+      email: 'verifyuser@example.com', // Ensure unique email
       password: 'Test@1234',
       isEmailVerified: false,
     });
 
-    // Generate a valid token
-    token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: myuser.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     const response = await request(app)
       .get(`/api/auth/verify-email?token=${token}`)
       .expect(200);
 
+    console.log('Response Status:', response.status);
+    console.log('Response Data:', response.body);
+
     expect(response.body.message).toBe('Email verified successfully. You can now log in.');
 
-    // Check if the user's email is marked as verified
-    const updatedUser = await User.findByPk(user.id);
+    const updatedUser = await User.findByPk(myuser.id);
     expect(updatedUser.isEmailVerified).toBe(true);
 
-    // Cleanup: Remove the user created during the test
     createdUsers.push(updatedUser);
   });
 
@@ -118,6 +123,85 @@ describe('Auth Controller - Register', () => {
       .get('/api/auth/verify-email?token=invalidtoken')
       .expect(400);
 
+    console.log('Response Status:', response.status);
+    console.log('Response Data:', response.body);
+
     expect(response.body.message).toBe('Invalid or expired token');
+  });
+
+  it('should login successfully with valid credentials', async () => {
+    const password = await bcrypt.hash('Test@1234', 10);
+    const user = await User.create({
+      fullName: 'Test User',
+      email: 'loginuser@example.com', // Ensure unique email
+      password,
+      isEmailVerified: true,
+    });
+
+    const response = await request(app)
+      .post('/api/auth/login')
+      .send({
+        email: 'loginuser@example.com',
+        password: 'Test@1234',
+      });
+
+    console.log('Response Status:', response.status);
+    console.log('Response Data:', response.body);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('token');
+    expect(response.body.user).toHaveProperty('id');
+    expect(response.body.user).toHaveProperty('fullName', 'Test User');
+
+    createdUsers.push(user);
+  });
+
+  it('should fail login with invalid credentials', async () => {
+    const password = await bcrypt.hash('Test@1234', 10);
+    const user = await User.create({
+      fullName: 'Test User',
+      email: 'invalidlogin@example.com', // Ensure unique email
+      password,
+      isEmailVerified: true,
+    });
+
+    const response = await request(app)
+      .post('/api/auth/login')
+      .send({
+        email: 'invalidlogin@example.com',
+        password: 'WrongPassword',
+      });
+
+    console.log('Response Status:', response.status);
+    console.log('Response Data:', response.body);
+
+    expect(response.status).toBe(401);
+    expect(response.body).toHaveProperty('message', 'Invalid email or password');
+
+    createdUsers.push(user);
+  });
+
+  it('should fail login if email is not verified', async () => {
+    const password = await bcrypt.hash('Test@1234', 10);
+    const user = await User.create({
+      fullName: 'Non Verified User',
+      email: 'nonverified@example.com', // Ensure unique email
+      password,
+      isEmailVerified: false,
+    });
+    createdUsers.push(user);
+
+    const response = await request(app)
+      .post('/api/auth/login')
+      .send({
+        email: 'nonverified@example.com',
+        password: 'Test@1234',
+      });
+
+    console.log('Response Status:', response.status);
+    console.log('Response Data:', response.body);
+
+    expect(response.status).toBe(403);
+    expect(response.body).toHaveProperty('message', 'Please verify your email before logging in');
   });
 });
