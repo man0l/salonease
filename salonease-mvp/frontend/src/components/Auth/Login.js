@@ -1,18 +1,17 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from '../../utils/api';
 
 function Login() {
   const { register, handleSubmit, errors } = useForm();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const onSubmit = async (data) => {
     try {
       const response = await axios.post('/api/auth/login', data);
-      // Assuming the token is returned in the response
       document.cookie = `token=${response.data.token}; HttpOnly`;
-      history.push('/dashboard');
+      navigate('/dashboard');
     } catch (error) {
       console.error('Login failed:', error);
     }

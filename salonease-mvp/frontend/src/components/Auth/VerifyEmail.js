@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 const VerifyEmail = () => {
   const [message, setMessage] = useState('');
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
@@ -17,7 +17,7 @@ const VerifyEmail = () => {
           const response = await axios.get(`/api/auth/verify-email?token=${token}`);
           setMessage(response.data.message);
           setTimeout(() => {
-            history.push('/login');
+            navigate('/login');
           }, 3000);
         } catch (error) {
           setMessage(error.response?.data?.message || 'Verification failed. Please try again.');
@@ -28,7 +28,7 @@ const VerifyEmail = () => {
     };
 
     verifyEmail();
-  }, [history, location]);
+  }, [navigate, location]);
 
   return (
     <div className="verify-email">
