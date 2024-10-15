@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./salonease-mvp/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./salonease-mvp/frontend:/app
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./salonease-mvp/backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./salonease-mvp/backend:/app
+    environment:
+      - DATABASE_URL=postgres://postgres:password@db:5432/salonease
+      - TEST_DATABASE_URL=postgres://postgres:password@db_test:5432/salonease_test
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - DB_NAME=salonease
+      - DB_HOST=db
+    command: sh -c "NODE_ENV=test npm test"
+    depends_on:
+      - db
+      - db_test
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: salonease
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  db_test:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: salonease_test
+    volumes:
+      - db_test_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
+  db_test_data:
