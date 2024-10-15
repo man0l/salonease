@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { HomeIcon, CalendarDaysIcon, ClipboardDocumentListIcon, UserGroupIcon, CreditCardIcon, ChartBarIcon, Cog6ToothIcon, Bars3Icon } from '@heroicons/react/24/outline';
+import { HomeIcon, CalendarDaysIcon, ClipboardDocumentListIcon, UserGroupIcon, CreditCardIcon, ChartBarIcon, Cog6ToothIcon, Bars3Icon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 
 const navigation = [
   { name: 'Dashboard', icon: HomeIcon, route: '/dashboard' },
@@ -20,11 +20,11 @@ function Sidebar() {
   return (
     <div>
       <button className="md:hidden p-4" onClick={() => setIsOpen(!isOpen)}>
-        <Bars3Icon className="h-6 w-6" />
+        <Bars3Icon className="h-6 w-6 text-text" />
       </button>
-      <div className={`h-full ${isOpen ? 'block' : 'hidden'} md:block`}>
-        <div className="p-4">
-          <h2 className="text-primary font-bold">Menu</h2>
+      <div className={`h-full ${isOpen ? 'block' : 'hidden'} md:block bg-white shadow-md md:w-80`}>
+        <div className="p-6">
+          <h2 className="text-primary font-bold text-lg">Menu</h2>
         </div>
         <nav>
           {navigation.map((item) => (
@@ -32,7 +32,7 @@ function Sidebar() {
               key={item.name}
               to={item.route}
               className={({ isActive }) =>
-                `flex items-center p-2 text-gray-700 hover:bg-gray-100 ${isActive ? 'bg-gray-200 text-primary' : ''}`
+                `flex items-center p-3 text-text hover:bg-gray-100 hover:text-primary transition-colors duration-200 ${isActive ? 'bg-primary text-white' : ''}`
               }
             >
               <item.icon className="h-6 w-6 mr-3" />

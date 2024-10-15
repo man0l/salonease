@@ -35,33 +35,33 @@ const Register = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div>
-        <label>Full Name</label>
-        <input type="text" {...register('fullName')} />
-        <p>{errors.fullName?.message}</p>
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-md mx-auto p-8 bg-white shadow-lg rounded-lg">
+      <div className="mb-4">
+        <label htmlFor="fullName" className="block text-gray-700">Full Name</label>
+        <input id="fullName" type="text" {...register('fullName')} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+        <p className="text-red-500 text-sm">{errors.fullName?.message}</p>
       </div>
-      <div>
-        <label>Email</label>
-        <input type="email" {...register('email')} />
-        <p>{errors.email?.message}</p>
+      <div className="mb-4">
+        <label htmlFor="email" className="block text-gray-700">Email</label>
+        <input id="email" type="email" {...register('email')} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+        <p className="text-red-500 text-sm">{errors.email?.message}</p>
       </div>
-      <div>
-        <label>Password</label>
-        <input type="password" {...register('password')} />
-        <p>{errors.password?.message}</p>
+      <div className="mb-4">
+        <label htmlFor="password" className="block text-gray-700">Password</label>
+        <input id="password" type="password" {...register('password')} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+        <p className="text-red-500 text-sm">{errors.password?.message}</p>
       </div>
-      <div>
-        <label>Confirm Password</label>
-        <input type="password" {...register('confirmPassword')} />
-        <p>{errors.confirmPassword?.message}</p>
+      <div className="mb-4">
+        <label htmlFor="confirmPassword" className="block text-gray-700">Confirm Password</label>
+        <input id="confirmPassword" type="password" {...register('confirmPassword')} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+        <p className="text-red-500 text-sm">{errors.confirmPassword?.message}</p>
       </div>
-      <div>
-        <input type="checkbox" {...register('acceptTerms')} />
-        <label>Accept Terms and Conditions</label>
-        <p>{errors.acceptTerms?.message}</p>
+      <div className="mb-4">
+        <input id="acceptTerms" type="checkbox" {...register('acceptTerms')} className="mr-2 leading-tight" />
+        <label htmlFor="acceptTerms" className="text-gray-700">Accept Terms and Conditions</label>
+        <p className="text-red-500 text-sm">{errors.acceptTerms?.message}</p>
       </div>
-      <button type="submit">Register</button>
+      <button type="submit" className="w-full bg-primary text-white py-2 px-4 rounded hover:bg-secondary focus:outline-none focus:bg-secondary">Register</button>
     </form>
   );
 };
