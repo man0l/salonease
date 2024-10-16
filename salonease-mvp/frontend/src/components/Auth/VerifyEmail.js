@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import { authApi } from '../../utils/api';
 
 const VerifyEmail = () => {
   const [message, setMessage] = useState('');
@@ -14,7 +14,7 @@ const VerifyEmail = () => {
 
       if (token) {
         try {
-          const response = await axios.get(`/api/auth/verify-email?token=${token}`);
+          const response = await authApi.verifyEmail(token);
           setMessage(response.data.message);
           setTimeout(() => {
             navigate('/login');

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { authApi } from '../../utils/api';
 
 function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -11,8 +12,9 @@ function Login() {
 
   const onSubmit = async (data) => {
     try {
-      const success = await login(data.email, data.password);
-      if (success) {
+      const response = await authApi.login(data);
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
         navigate('/dashboard');
       } else {
         setLoginError('Invalid email or password');

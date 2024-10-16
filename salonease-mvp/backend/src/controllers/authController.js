@@ -3,6 +3,12 @@ const jwt = require('jsonwebtoken');
 const { User } = require('../config/db');
 const emailHelper = require('../utils/helpers/emailHelper');
 
+// Add this at the beginning of the file
+if (!process.env.JWT_SECRET) {
+  console.error('JWT_SECRET is not set in the environment variables');
+  process.exit(1);
+}
+
 exports.register = async (req, res) => {
   const { fullName, email, password } = req.body;
   console.log('Registering user:', { fullName, email });
@@ -15,11 +21,11 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'Email is invalid' });
     }
 
-    // Password strength validation
-    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    // Improved password strength validation
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if (!passwordRegex.test(password)) {
       console.log('Weak password:', password);
-      return res.status(400).json({ message: 'Password must be at least 8 characters long and include uppercase letters, numbers, and special characters.' });
+      return res.status(400).json({ message: 'Password must be at least 8 characters long and include lowercase and uppercase letters, numbers, and special characters.' });
     }
 
     // Check if the email already exists

@@ -1,3 +1,5 @@
+require('dotenv').config();  // Add this line at the top of the file
+
 const express = require('express');
 const cors = require('cors');
 const { connectToDatabase } = require('./config/db');

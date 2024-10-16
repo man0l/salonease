@@ -3,9 +3,14 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { act } from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import Register from './Register';
-import axios from 'axios';
+import { authApi } from '../../utils/api';
 
-jest.mock('axios');
+jest.mock('../../utils/api', () => ({
+  authApi: {
+    register: jest.fn(),
+  },
+}));
+
 window.alert = jest.fn();
 
 describe('Register Component', () => {
@@ -35,7 +40,7 @@ describe('Register Component', () => {
   });
 
   test('submits form with valid inputs', async () => {
-    axios.post.mockResolvedValueOnce({ data: { message: 'Registration successful. Please check your email to verify your account.' } });
+    authApi.register.mockResolvedValueOnce({ data: { message: 'Registration successful. Please check your email to verify your account.' } });
 
     render(<Register />);
     
@@ -50,7 +55,7 @@ describe('Register Component', () => {
     });
     
     await waitFor(() => {
-      expect(axios.post).toHaveBeenCalledWith('/api/auth/register', {
+      expect(authApi.register).toHaveBeenCalledWith({
         fullName: 'Test User',
         email: 'testuser@example.com',
         password: 'Password123!',

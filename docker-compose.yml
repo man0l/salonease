@@ -29,6 +29,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    command: sh -c "npm install && npx sequelize-cli db:migrate && npm start"
+
   db:
     image: postgres:13
     environment:
