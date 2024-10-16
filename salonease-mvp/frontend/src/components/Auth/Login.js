@@ -1,19 +1,24 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import axios from '../../utils/api';
+import { useAuth } from '../../hooks/useAuth';
 
 function Login() {
-  const { register, handleSubmit, errors } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm();
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post('/api/auth/login', data);
-      document.cookie = `token=${response.data.token}; HttpOnly`;
-      navigate('/dashboard');
+      const success = await login(data.email, data.password);
+      if (success) {
+        navigate('/dashboard');
+      } else {
+        // Handle login failure (e.g., show an error message)
+        console.error('Login failed');
+      }
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('Login error:', error);
     }
   };
 
@@ -25,7 +30,7 @@ function Login() {
           <label>Email</label>
           <input
             name="email"
-            ref={register({ required: 'Email is required' })}
+            {...register("email", { required: "Email is required" })}
           />
           {errors.email && <p>{errors.email.message}</p>}
         </div>
@@ -34,7 +39,7 @@ function Login() {
           <input
             type="password"
             name="password"
-            ref={register({ required: 'Password is required' })}
+            {...register("password", { required: "Password is required" })}
           />
           {errors.password && <p>{errors.password.message}</p>}
         </div>
