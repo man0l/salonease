@@ -22,7 +22,7 @@ services:
       - ./salonease-mvp/backend:/app
     environment:
       - DATABASE_URL=postgres://postgres:password@db:5432/salonease
-      - TEST_DATABASE_URL=postgres://postgres:password@db_test:5433/salonease_test
+      - TEST_DATABASE_URL=postgres://postgres:password@db_test:5432/salonease_test
       - DB_USER=postgres
       - DB_PASSWORD=password
       - DB_NAME=salonease
