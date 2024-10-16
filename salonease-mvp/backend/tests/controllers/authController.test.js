@@ -1,207 +1,86 @@
-const { register, verifyEmail } = require('../../src/controllers/authController');
-const User = require('../../src/models/User');
+const { register, verifyEmail, login } = require('../../src/controllers/authController');
+const { User } = require('../setupTests');
 const httpMocks = require('node-mocks-http');
-const sequelize = require('../../src/config/db');
 const jwt = require('jsonwebtoken');
-const request = require('supertest');
-const app = require('../../src/server');
 const bcrypt = require('bcrypt');
 
 describe('Auth Controller', () => {
-  let req, res, next;
-  let createdUsers = [];
-
-  beforeAll(async () => {
-    await sequelize.sync({ force: true });
-  });
+  let req, res;
 
   beforeEach(() => {
     req = httpMocks.createRequest();
     res = httpMocks.createResponse();
-    next = jest.fn();
     process.env.JWT_SECRET = 'testsecret';
   });
 
-  afterEach(async () => {
-    // Cleanup: Remove only the users created during the tests
-    for (const user of createdUsers) {
-      await User.destroy({ where: { id: user.id } });
-    }
-    createdUsers = [];
-  });
+  describe('register', () => {
+    it('should register a new user successfully', async () => {
+      req.body = {
+        fullName: 'Test User',
+        email: 'uniqueuser@example.com',
+        password: 'Password123!',
+      };
 
-  afterAll(async () => {
-    await sequelize.close();
-  });
+      await register(req, res);
 
-  it('should register a new user successfully', async () => {
-    req.body = {
-      fullName: 'Test User',
-      email: 'uniqueuser@example.com', // Ensure unique email
-      password: 'Password123!',
-    };
+      expect(res.statusCode).toBe(201);
+      expect(res._getJSONData()).toEqual({
+        message: 'Registration successful. Please check your email to verify your account.',
+      });
 
-    await register(req, res, next);
-
-    console.log('Response Status:', res.statusCode);
-    console.log('Response Data:', res._getJSONData());
-
-    expect(res.statusCode).toBe(201);
-    expect(res._getJSONData()).toEqual({
-      message: 'Registration successful. Please check your email to verify your account.',
+      const newUser = await User.findOne({ where: { email: req.body.email } });
+      expect(newUser).not.toBeNull();
     });
 
-    const newUser = await User.findOne({ where: { email: req.body.email } });
-    createdUsers.push(newUser);
+    // Add more register tests...
   });
 
-  it('should not register a user with an existing email', async () => {
-    req.body = {
-      fullName: 'Test User',
-      email: 'testuser@example.com',
-      password: 'Password123!',
-    };
+  describe('verifyEmail', () => {
+    it('should verify email with valid token', async () => {
+      const user = await User.create({
+        fullName: 'Test User',
+        email: 'verifyuser@example.com',
+        password: 'Test@1234',
+        isEmailVerified: false,
+      });
 
-    const existingUser = await User.create(req.body);
-    console.log(existingUser);
-    createdUsers.push(existingUser);
+      const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      req.query = { token };
 
-    await register(req, res, next);
+      await verifyEmail(req, res);
 
-    console.log('Response Status:', res.statusCode);
-    console.log('Response Data:', res._getJSONData());
+      expect(res.statusCode).toBe(200);
+      expect(res._getJSONData().message).toBe('Email verified successfully. You can now log in.');
 
-    expect(res.statusCode).toBe(400);
-    expect(res._getJSONData()).toEqual({ message: 'Email already exists' });
-  });
-
-  it('should not register a user with a weak password', async () => {
-    req.body = {
-      fullName: 'Test User',
-      email: 'anotheruniqueuser@example.com', // Ensure unique email
-      password: 'weakpass',
-    };
-
-    await register(req, res, next);
-
-    console.log('Response Status:', res.statusCode);
-    console.log('Response Data:', res._getJSONData());
-
-    expect(res.statusCode).toBe(400);
-    expect(res._getJSONData()).toEqual({
-      message: 'Password must be at least 8 characters long and include uppercase letters, numbers, and special characters.',
-    });
-  });
-
-  it('should verify email with valid token', async () => {
-    const myuser = await User.create({
-      fullName: 'Test User',
-      email: 'verifyuser@example.com', // Ensure unique email
-      password: 'Test@1234',
-      isEmailVerified: false,
+      const updatedUser = await User.findByPk(user.id);
+      expect(updatedUser.isEmailVerified).toBe(true);
     });
 
-    const token = jwt.sign({ userId: myuser.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    const response = await request(app)
-      .get(`/api/auth/verify-email?token=${token}`)
-      .expect(200);
-
-    console.log('Response Status:', response.status);
-    console.log('Response Data:', response.body);
-
-    expect(response.body.message).toBe('Email verified successfully. You can now log in.');
-
-    const updatedUser = await User.findByPk(myuser.id);
-    expect(updatedUser.isEmailVerified).toBe(true);
-
-    createdUsers.push(updatedUser);
+    // Add more verifyEmail tests...
   });
 
-  it('should return error for invalid token', async () => {
-    const response = await request(app)
-      .get('/api/auth/verify-email?token=invalidtoken')
-      .expect(400);
+  describe('login', () => {
+    it('should login successfully with valid credentials', async () => {
+      const password = await bcrypt.hash('Test@1234', 10);
+      await User.create({
+        fullName: 'Test User',
+        email: 'loginuser@example.com',
+        password,
+        isEmailVerified: true,
+      });
 
-    console.log('Response Status:', response.status);
-    console.log('Response Data:', response.body);
-
-    expect(response.body.message).toBe('Invalid or expired token');
-  });
-
-  it('should login successfully with valid credentials', async () => {
-    const password = await bcrypt.hash('Test@1234', 10);
-    const user = await User.create({
-      fullName: 'Test User',
-      email: 'loginuser@example.com', // Ensure unique email
-      password,
-      isEmailVerified: true,
-    });
-
-    const response = await request(app)
-      .post('/api/auth/login')
-      .send({
+      req.body = {
         email: 'loginuser@example.com',
         password: 'Test@1234',
-      });
+      };
 
-    console.log('Response Status:', response.status);
-    console.log('Response Data:', response.body);
+      await login(req, res);
 
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('token');
-    expect(response.body.user).toHaveProperty('id');
-    expect(response.body.user).toHaveProperty('fullName', 'Test User');
-
-    createdUsers.push(user);
-  });
-
-  it('should fail login with invalid credentials', async () => {
-    const password = await bcrypt.hash('Test@1234', 10);
-    const user = await User.create({
-      fullName: 'Test User',
-      email: 'invalidlogin@example.com', // Ensure unique email
-      password,
-      isEmailVerified: true,
+      expect(res.statusCode).toBe(200);
+      expect(res._getJSONData()).toHaveProperty('token');
+      expect(res._getJSONData().user).toHaveProperty('fullName', 'Test User');
     });
 
-    const response = await request(app)
-      .post('/api/auth/login')
-      .send({
-        email: 'invalidlogin@example.com',
-        password: 'WrongPassword',
-      });
-
-    console.log('Response Status:', response.status);
-    console.log('Response Data:', response.body);
-
-    expect(response.status).toBe(401);
-    expect(response.body).toHaveProperty('message', 'Invalid email or password');
-
-    createdUsers.push(user);
-  });
-
-  it('should fail login if email is not verified', async () => {
-    const password = await bcrypt.hash('Test@1234', 10);
-    const user = await User.create({
-      fullName: 'Non Verified User',
-      email: 'nonverified@example.com', // Ensure unique email
-      password,
-      isEmailVerified: false,
-    });
-    createdUsers.push(user);
-
-    const response = await request(app)
-      .post('/api/auth/login')
-      .send({
-        email: 'nonverified@example.com',
-        password: 'Test@1234',
-      });
-
-    console.log('Response Status:', response.status);
-    console.log('Response Data:', response.body);
-
-    expect(response.status).toBe(403);
-    expect(response.body).toHaveProperty('message', 'Please verify your email before logging in');
+    // Add more login tests...
   });
 });

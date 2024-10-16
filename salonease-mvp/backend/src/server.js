@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const { connectToDatabase } = require('./config/db');
 const app = express();
 const PORT = process.env.PORT || 5000;  // Changed to 5000
 
@@ -19,11 +20,13 @@ app.get('/', (req, res) => {
   res.send('Welcome to SalonEase API');
 });
 
-// Start the server only if not in test environment
-if (process.env.NODE_ENV !== 'test') {
+// Connect to the database and start the server
+connectToDatabase().then(() => {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
-}
+}).catch(err => {
+  console.error('Failed to start server:', err);
+});
 
 module.exports = app;

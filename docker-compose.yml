@@ -21,16 +21,14 @@ services:
     volumes:
       - ./salonease-mvp/backend:/app
     environment:
-      - DATABASE_URL=postgres://postgres:password@db:5432/salonease
-      - TEST_DATABASE_URL=postgres://postgres:password@db_test:5432/salonease_test
+      - NODE_ENV=development
       - DB_USER=postgres
       - DB_PASSWORD=password
       - DB_NAME=salonease
       - DB_HOST=db
     depends_on:
-      - db
-      - db_test
-
+      db:
+        condition: service_healthy
   db:
     image: postgres:13
     environment:
@@ -39,18 +37,11 @@ services:
       POSTGRES_DB: salonease
     volumes:
       - db_data:/var/lib/postgresql/data
-
-  db_test:
-    image: postgres:13
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: salonease_test
-    ports:
-      - "5433:5432"
-    volumes:
-      - db_test_data:/var/lib/postgresql/data
-
+      - ./init-test-db.sh:/docker-entrypoint-initdb.d/init-test-db.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 volumes:
   db_data:
-  db_test_data:
