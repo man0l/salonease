@@ -3,8 +3,11 @@ import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { authApi } from '../../utils/api';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
+  const navigate = useNavigate();
   const validationSchema = Yup.object().shape({
     fullName: Yup.string().required('Full Name is required'),
     email: Yup.string().email('Email is invalid').required('Email is required'),
@@ -28,10 +31,11 @@ const Register = () => {
   const onSubmit = async (data) => {
     try {
       const response = await authApi.register(data);
-      alert(response.data.message);
+      toast.success(response.data.message);
       // Redirect to email verification notice page
+      navigate('/verify-email');
     } catch (error) {
-      alert(error.response?.data?.message || 'Registration failed');
+      toast.error(error.response?.data?.message || 'Registration failed');
     }
   };
 

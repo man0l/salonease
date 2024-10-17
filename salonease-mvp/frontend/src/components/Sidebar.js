@@ -18,11 +18,17 @@ function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="bg-white shadow-md">
-      <button className="md:hidden p-4 text-text hover:text-primary transition-colors" onClick={() => setIsOpen(!isOpen)}>
+    <div className="bg-white shadow-md lg:h-full">
+      <button className="lg:hidden p-4 text-text hover:text-primary transition-colors" onClick={() => setIsOpen(!isOpen)}>
         <Bars3Icon className="h-6 w-6" />
       </button>
-      <div className={`${isOpen ? 'block' : 'hidden'} md:block`}>
+      <div 
+        className={`
+          transform top-0 left-0 w-64 bg-white fixed h-full overflow-auto ease-in-out transition-all duration-300 z-30
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+          lg:relative lg:translate-x-0 lg:flex lg:flex-col
+        `}
+      >
         <div className="p-6">
           <h2 className="text-primary font-bold text-xl">Menu</h2>
         </div>
@@ -38,6 +44,7 @@ function Sidebar() {
                     : 'text-text hover:bg-gray-100 hover:text-primary'
                 }`
               }
+              onClick={() => setIsOpen(false)}
             >
               <item.icon className="h-5 w-5 mr-3" />
               <span>{item.name}</span>
@@ -45,6 +52,12 @@ function Sidebar() {
           ))}
         </nav>
       </div>
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+          onClick={() => setIsOpen(false)}
+        ></div>
+      )}
     </div>
   );
 }

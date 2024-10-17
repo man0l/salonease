@@ -11,6 +11,8 @@ import Dashboard from './components/Dashboard';
 import Terms from './components/Terms';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import { useAuth } from './hooks/useAuth';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -26,12 +28,15 @@ function AppContent() {
   const { user } = useAuth();
 
   return (
-    <div className="flex flex-col min-h-screen bg-background text-text">
+    <div className="flex flex-col min-h-screen bg-white text-gray-800">
       <Header />
-      <div className="flex flex-1">
-        {user && <Sidebar className="hidden md:block w-64 flex-shrink-0" />}
-        <main className="flex-1 p-4 md:p-8">
-          <div className="max-w-7xl mx-auto">
+      <div className="flex-1 flex">
+        {user && (
+          <Sidebar className="w-64 flex-shrink-0 bg-gray-100 border-r border-gray-200" />
+        )}
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
+          <div className="container mx-auto px-6 py-8">
+            <ToastContainer />
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />

@@ -12,16 +12,19 @@ function Login() {
 
   const onSubmit = async (data) => {
     try {
-      const response = await authApi.login(data);
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
+      const success = await login(data.email, data.password);
+      if (success) {
         navigate('/dashboard');
       } else {
         setLoginError('Invalid email or password');
       }
     } catch (error) {
       console.error('Login error:', error);
-      setLoginError('An error occurred. Please try again.');
+      if (error.response && error.response.data && error.response.data.message) {
+        setLoginError(error.response.data.message);
+      } else {
+        setLoginError('An error occurred. Please try again.');
+      }
     }
   };
 

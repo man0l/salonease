@@ -45,5 +45,20 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    ports:
+      - "5432:5432"
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@local.net
+      PGADMIN_DEFAULT_PASSWORD: secret
+      PGADMIN_SERVER_JSON_FILE: /pgadmin4/servers.json
+    volumes:
+      - ./salonease-mvp/pgadmin/servers.json:/pgadmin4/servers.json
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+
 volumes:
   db_data:
