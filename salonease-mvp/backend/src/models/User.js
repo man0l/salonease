@@ -3,6 +3,7 @@ const { Model, DataTypes } = require('sequelize');
 class User extends Model {
   static associate(models) {
     // define associations here
+    this.hasMany(models.Salon, { foreignKey: 'ownerId', as: 'salons' });
   }
 }
 
@@ -29,7 +30,6 @@ module.exports = (sequelize) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    // Add the following new fields
     resetToken: {
       type: DataTypes.STRING,
       allowNull: true,

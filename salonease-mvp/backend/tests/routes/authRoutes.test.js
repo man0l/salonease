@@ -20,7 +20,6 @@ afterAll(async () => {
 });
 
 beforeEach(async () => {
-  await User.destroy({ where: {}, truncate: true });
   jest.clearAllMocks();
 });
 

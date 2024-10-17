@@ -16,6 +16,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import ForgotPassword from './components/Auth/ForgotPassword';
 import ResetPassword from './components/Auth/ResetPassword';
 import SuperAdminDashboard from './components/Dashboard/SuperAdminDashboard';
+import SalonManagement from './components/Salon/SalonManagement';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -81,6 +82,14 @@ function AppContent() {
               />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route 
+                path="/salons" 
+                element={
+                  <PrivateRoute>
+                    <SalonManagement />
+                  </PrivateRoute>
+                } 
+              />
             </Routes>
           </div>
         </main>
