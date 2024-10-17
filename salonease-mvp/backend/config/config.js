@@ -24,6 +24,3 @@ module.exports = {
     logging: false,
   },
 };
-
-console.log('Current environment:', process.env.NODE_ENV);
-console.log('Database config:', module.exports[process.env.NODE_ENV || 'development']);

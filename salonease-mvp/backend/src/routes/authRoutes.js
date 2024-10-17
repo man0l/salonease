@@ -15,4 +15,8 @@ router.post('/login', authController.login);
 // Add this new route
 router.get('/me', authMiddleware, authController.me);
 
+// New routes for forgot password and reset password
+router.post('/forgot-password', authController.forgotPassword);
+router.post('/reset-password', authController.resetPassword);
+
 module.exports = router;

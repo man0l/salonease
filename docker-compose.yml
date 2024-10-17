@@ -26,6 +26,7 @@ services:
       - DB_PASSWORD=password
       - DB_NAME=salonease
       - DB_HOST=db
+      - JWT_SECRET=the key is used mostly for testing
     depends_on:
       db:
         condition: service_healthy

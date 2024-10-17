@@ -118,7 +118,7 @@ const Register = () => {
                 className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
               <label htmlFor="acceptTerms" className="ml-2 block text-sm text-gray-900">
-                I accept the Terms and Conditions
+                Accept Terms and Conditions
               </label>
             </div>
             <p className="mt-2 text-sm text-red-600">{errors.acceptTerms?.message}</p>
