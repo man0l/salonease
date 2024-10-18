@@ -85,7 +85,7 @@ function AppContent() {
               <Route 
                 path="/salons" 
                 element={
-                  <PrivateRoute>
+                  <PrivateRoute allowedRoles={['SalonOwner']}>
                     <SalonManagement />
                   </PrivateRoute>
                 } 

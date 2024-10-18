@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { HomeIcon, CalendarDaysIcon, ClipboardDocumentListIcon, UserGroupIcon, CreditCardIcon, ChartBarIcon, Cog6ToothIcon, Bars3Icon } from '@heroicons/react/24/outline';
+import { HomeIcon, CalendarDaysIcon, ClipboardDocumentListIcon, UserGroupIcon, CreditCardIcon, ChartBarIcon, Cog6ToothIcon, Bars3Icon, BuildingStorefrontIcon } from '@heroicons/react/24/outline';
+import { useAuth } from '../hooks/useAuth';
 
 const navigation = [
   { name: 'Dashboard', icon: HomeIcon, route: '/dashboard' },
@@ -16,6 +17,13 @@ const navigation = [
 
 function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { user } = useAuth();
+
+  const isSalonOwnerOrSuperAdmin = user && (user.role === 'SalonOwner' || user.role === 'SuperAdmin');
+
+  const fullNavigation = isSalonOwnerOrSuperAdmin
+    ? [{ name: 'Salon Management', icon: BuildingStorefrontIcon, route: '/salons' }, ...navigation]
+    : navigation;
 
   return (
     <div className="bg-white shadow-md lg:h-full">
@@ -33,7 +41,7 @@ function Sidebar() {
           <h2 className="text-primary font-bold text-xl">Menu</h2>
         </div>
         <nav className="space-y-1">
-          {navigation.map((item) => (
+          {fullNavigation.map((item) => (
             <NavLink
               key={item.name}
               to={item.route}

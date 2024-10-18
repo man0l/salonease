@@ -1,9 +1,10 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { User, sequelize } = require('../config/db');
+const { User, RefreshToken: RefreshTokenModel, sequelize } = require('../config/db');
 const { Op } = require('sequelize');
 const emailHelper = require('../utils/helpers/emailHelper');
 const crypto = require('crypto');
+const { v4: uuidv4 } = require('uuid');
 
 // Add this at the beginning of the file
 if (!process.env.JWT_SECRET) {
@@ -119,10 +120,23 @@ exports.login = async (req, res) => {
     }
 
     // Generate a JWT token
-    const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    console.log('Login successful, token generated for user:', email);
+    const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '15m' });
 
-    res.status(200).json({ token, user: { id: user.id, fullName: user.fullName, role: user.role } });
+    // Generate a refresh token
+    const refreshToken = uuidv4();
+    await RefreshTokenModel.create({
+      token: refreshToken,
+      userId: user.id,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+    });
+
+    console.log('Login successful, tokens generated for user:', email);
+
+    res.status(200).json({
+      token,
+      refreshToken,
+      user: { id: user.id, fullName: user.fullName, role: user.role }
+    });
   } catch (error) {
     console.error('Login failed:', error);
     res.status(500).json({ message: 'Login failed', error: error.message });
@@ -218,5 +232,45 @@ exports.resetPassword = async (req, res) => {
   } catch (error) {
     console.error('Reset password error:', error);
     res.status(500).json({ message: 'Error resetting password', error: error.message });
+  }
+};
+
+// Add a new function to refresh the token
+exports.refreshToken = async (req, res) => {
+  const { refreshToken } = req.body;
+
+  try {
+    const storedToken = await RefreshTokenModel.findOne({ where: { token: refreshToken } });
+
+    if (!storedToken || storedToken.expiresAt < new Date()) {
+      return res.status(401).json({ message: 'Invalid or expired refresh token' });
+    }
+
+    const user = await User.findByPk(storedToken.userId);
+
+    if (!user) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+
+    // Generate a new JWT token
+    const newToken = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '15m' });
+
+    res.status(200).json({ token: newToken });
+  } catch (error) {
+    console.error('Token refresh failed:', error);
+    res.status(500).json({ message: 'Token refresh failed', error: error.message });
+  }
+};
+
+// Add a logout function to invalidate the refresh token
+exports.logout = async (req, res) => {
+  const { refreshToken } = req.body;
+
+  try {
+    await RefreshTokenModel.destroy({ where: { token: refreshToken } });
+    res.status(200).json({ message: 'Logged out successfully' });
+  } catch (error) {
+    console.error('Logout failed:', error);
+    res.status(500).json({ message: 'Logout failed', error: error.message });
   }
 };

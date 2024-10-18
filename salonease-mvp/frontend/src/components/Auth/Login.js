@@ -2,29 +2,29 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { authApi } from '../../utils/api';
+import { toast } from 'react-toastify';
 
 function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [loginError, setLoginError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (data) => {
+    setIsSubmitting(true);
     try {
       const success = await login(data.email, data.password);
       if (success) {
+        toast.success('Login successful');
         navigate('/dashboard');
       } else {
-        setLoginError('Invalid email or password');
+        toast.error('Invalid email or password');
       }
     } catch (error) {
       console.error('Login error:', error);
-      if (error.response && error.response.data && error.response.data.message) {
-        setLoginError(error.response.data.message);
-      } else {
-        setLoginError('An error occurred. Please try again.');
-      }
+      toast.error(error.response?.data?.message || 'An error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -71,14 +71,13 @@ function Login() {
             </div>
           </div>
 
-          {loginError && <p className="mt-2 text-sm text-red-600">{loginError}</p>}
-
           <div>
             <button
               type="submit"
+              disabled={isSubmitting}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              Sign in
+              {isSubmitting ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
 

@@ -2,6 +2,7 @@ const { Sequelize } = require('sequelize');
 const config = require('../../config/config.js')[process.env.NODE_ENV || 'development'];
 const UserModel = require('../models/User');
 const SalonModel = require('../models/Salon');
+const RefreshTokenModel = require('../models/RefreshToken');
 
 console.log('Using database config:', config);
 
@@ -14,10 +15,12 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
 // Initialize models
 const User = UserModel(sequelize);
 const Salon = SalonModel(sequelize);
+const RefreshToken = RefreshTokenModel(sequelize);
 
 // Add models to sequelize.models
 sequelize.models.User = User;
 sequelize.models.Salon = Salon;
+sequelize.models.RefreshToken = RefreshToken;
 
 // Run associations if any
 Object.values(sequelize.models).forEach((model) => {
@@ -44,4 +47,4 @@ const connectToDatabase = async () => {
   }
 };
 
-module.exports = { sequelize, connectToDatabase, User, Salon };
+module.exports = { sequelize, connectToDatabase, User, Salon, RefreshToken };

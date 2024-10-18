@@ -2,6 +2,7 @@ const { Sequelize } = require('sequelize');
 const config = require('../config/config.js')[process.env.NODE_ENV || 'test'];
 const UserModel = require('../src/models/User');
 const SalonModel = require('../src/models/Salon');
+const RefreshTokenModel = require('../src/models/RefreshToken');
 
 const sequelize = new Sequelize(config.database, config.username, config.password, {
   host: config.host,
@@ -12,14 +13,17 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
 // Initialize models
 const User = UserModel(sequelize);
 const Salon = SalonModel(sequelize);
+const RefreshToken = RefreshTokenModel(sequelize);
 
 // Add models to sequelize.models
 sequelize.models.User = User;
 sequelize.models.Salon = Salon;
+sequelize.models.RefreshToken = RefreshToken;
 
 // Run associations
 User.associate(sequelize.models);
 Salon.associate(sequelize.models);
+RefreshToken.associate(sequelize.models);
 
 beforeAll(async () => {
   try {
@@ -40,7 +44,7 @@ beforeEach(async () => {
   try {
     // Use a single query to truncate all tables at once
     await sequelize.query(`
-      TRUNCATE TABLE "Salons", "Users"
+      TRUNCATE TABLE "Salons", "Users", "RefreshTokens"
       RESTART IDENTITY
       CASCADE;
     `);
@@ -52,4 +56,4 @@ beforeEach(async () => {
   }
 });
 
-module.exports = { sequelize, User, Salon };
+module.exports = { sequelize, User, Salon, RefreshToken };

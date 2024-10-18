@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BellIcon, ChevronDownIcon, Bars3Icon } from '@heroicons/react/24/outline';
+import { BellIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../hooks/useAuth';
 import { useDebounce } from '../hooks/useDebounce';
+import SalonSelector from './SalonSelector';
 
 function Header() {
   const { user, logout } = useAuth();
@@ -80,6 +81,11 @@ function Header() {
           <div className="flex-shrink-0">
             <Link to="/" className="text-2xl font-bold text-primary">SalonEase</Link>
           </div>
+          {user && user.role === 'SalonOwner' && (
+            <div className="flex-grow flex justify-center">
+              <SalonSelector />
+            </div>
+          )}
           <div className="flex items-center space-x-4">
             {user ? (
               renderUserMenu()

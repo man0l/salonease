@@ -17,6 +17,7 @@ export const AuthProvider = ({ children }) => {
       } catch (error) {
         console.error('Error loading user', error);
         localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
         delete api.defaults.headers.common['Authorization'];
       }
     }
@@ -31,6 +32,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authApi.login({ email, password });
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
       api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       await loadUser();
       return true;
@@ -40,16 +42,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    delete api.defaults.headers.common['Authorization'];
-    setUser(null);
+  const logout = async () => {
+    try {
+      const refreshToken = localStorage.getItem('refreshToken');
+      await authApi.logout(refreshToken);
+    } catch (error) {
+      console.error('Logout error', error);
+    } finally {
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      delete api.defaults.headers.common['Authorization'];
+      setUser(null);
+    }
   };
 
   const register = async (userData) => {
     try {
       const response = await authApi.register(userData);
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
       api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       await loadUser();
       return true;

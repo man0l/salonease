@@ -4,7 +4,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useSalon } from '../../hooks/useSalon';
 import { toast } from 'react-toastify';
-import { Dialog, Transition } from '@headlessui/react';
 
 const schema = yup.object().shape({
   name: yup.string().required('Salon name is required'),
@@ -66,6 +65,33 @@ const SalonManagement = () => {
       // The error is already handled in the useSalon hook, so we don't need to set it here
       toast.error('Failed to delete salon. Please try again.');
     }
+  };
+
+  const DeleteConfirmationDialog = ({ isOpen, onClose, onConfirm }) => {
+    if (!isOpen) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+        <div className="bg-white p-6 rounded-lg">
+          <h3 className="text-lg font-medium mb-4">Confirm Deletion</h3>
+          <p className="mb-4">Are you sure you want to delete this salon? This action cannot be undone.</p>
+          <div className="flex justify-end">
+            <button
+              onClick={onConfirm}
+              className="bg-red-500 text-white px-4 py-2 rounded mr-2"
+            >
+              Delete
+            </button>
+            <button
+              onClick={onClose}
+              className="bg-gray-300 text-black px-4 py-2 rounded"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   if (loading) return (
@@ -141,44 +167,11 @@ const SalonManagement = () => {
         </button>
       </div>
 
-      <Transition show={isDeleteDialogOpen} as={React.Fragment}>
-        <Dialog
-          as="div"
-          className="fixed inset-0 z-10 overflow-y-auto"
-          onClose={() => setIsDeleteDialogOpen(false)}
-        >
-          <div className="min-h-screen px-4 text-center">
-            <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
-            <span className="inline-block h-screen align-middle" aria-hidden="true">&#8203;</span>
-            <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
-              <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
-                Confirm Deletion
-              </Dialog.Title>
-              <div className="mt-2">
-                <p className="text-sm text-gray-500">
-                  Are you sure you want to delete this salon? This action cannot be undone.
-                </p>
-              </div>
-              <div className="mt-4">
-                <button
-                  type="button"
-                  className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500"
-                  onClick={confirmDelete}
-                >
-                  Delete
-                </button>
-                <button
-                  type="button"
-                  className="ml-3 inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
-                  onClick={() => setIsDeleteDialogOpen(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </Dialog>
-      </Transition>
+      <DeleteConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 };
