@@ -47,7 +47,7 @@ export const useSalon = () => {
       return response.data;
     } catch (err) {
       handleError(err);
-      throw err;
+      return null;
     }
   };
 
@@ -58,18 +58,23 @@ export const useSalon = () => {
       return response.data;
     } catch (err) {
       handleError(err);
-      throw err;
+      return null;
     }
   };
 
   const deleteSalon = async (salonId) => {
     try {
       await api.delete(`/salons/${salonId}`);
-      setSalons(salons.filter(salon => salon.id !== salonId));
-      await fetchSalons(); // Refetch salons after deletion
+      setSalons(prevSalons => prevSalons.filter(salon => salon.id !== salonId));
+      if (salons.length === 1 && currentPage > 1) {
+        setCurrentPage(prev => prev - 1);
+      } else {
+        await fetchSalons();
+      }
+      return true;
     } catch (err) {
       handleError(err);
-      throw err;
+      return false;
     }
   };
 

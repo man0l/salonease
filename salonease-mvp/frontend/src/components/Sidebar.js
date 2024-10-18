@@ -48,7 +48,7 @@ function Sidebar() {
               className={({ isActive }) =>
                 `flex items-center px-4 py-3 text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-primary text-white'
+                    ? 'bg-primary-100 text-primary-700 border-l-4 border-primary-500'
                     : 'text-text hover:bg-gray-100 hover:text-primary'
                 } ${
                   (!user.onboardingCompleted && !item.alwaysEnabled)
@@ -58,7 +58,7 @@ function Sidebar() {
               }
               onClick={() => setIsOpen(false)}
             >
-              <item.icon className="h-5 w-5 mr-3" />
+              <item.icon className={`h-5 w-5 mr-3 ${({ isActive }) => isActive ? 'text-primary-500' : ''}`} />
               <span>{item.name}</span>
             </NavLink>
           ))}

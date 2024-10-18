@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { useSalon } from '../../hooks/useSalon';
+import { useSalonContext } from '../../contexts/SalonContext';
 import { useAuth } from '../../hooks/useAuth';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +16,7 @@ const schema = yup.object().shape({
 });
 
 const SalonManagement = ({ isOnboarding = false }) => {
-  const { salons, loading, error, addSalon, updateSalon, deleteSalon, currentPage, totalPages, setCurrentPage, fetchSalons } = useSalon();
+  const { salons, loading, error, addSalon, updateSalon, deleteSalon, currentPage, totalPages, setCurrentPage, fetchSalons, selectedSalon } = useSalonContext();
   const { user, updateUser } = useAuth();
   const navigate = useNavigate();
   const [editingSalon, setEditingSalon] = useState(null);
@@ -37,23 +37,34 @@ const SalonManagement = ({ isOnboarding = false }) => {
   const onSubmit = async (data) => {
     try {
       if (editingSalon) {
-        await updateSalon(editingSalon.id, data);
-        toast.success('Salon updated successfully');
+        const updatedSalon = await updateSalon(editingSalon.id, data);
+        if (updatedSalon) {
+          toast.success('Salon updated successfully');
+          reset();
+          setEditingSalon(null);
+          await fetchSalons();
+          setShowForm(false);
+        } else {
+          throw new Error('Failed to update salon');
+        }
       } else {
-        await addSalon(data);
-        toast.success('Salon added successfully');
-        if (isOnboarding) {
-          await updateUser({ ...user, onboardingCompleted: true });
-          toast.success('Onboarding completed successfully!');
-          navigate('/dashboard');
+        const newSalon = await addSalon(data);
+        if (newSalon) {
+          toast.success('Salon added successfully');
+          reset();
+          await fetchSalons();
+          setShowForm(false);
+          if (isOnboarding) {
+            await updateUser({ ...user, onboardingCompleted: true });
+            toast.success('Onboarding completed successfully!');
+            navigate('/dashboard');
+          }
+        } else {
+          throw new Error('Failed to add salon');
         }
       }
-      reset();
-      setEditingSalon(null);
-      await fetchSalons(); // Refetch salons after adding or updating
-      setShowForm(false);
     } catch (err) {
-      toast.error('Failed to save salon. Please try again.');
+      toast.error(err.message || 'Failed to save salon. Please try again.');
     }
   };
 
@@ -62,20 +73,22 @@ const SalonManagement = ({ isOnboarding = false }) => {
     reset(salon);
   };
 
-  const handleDelete = async (salonId) => {
+  const handleDelete = (salonId) => {
     setSalonToDelete(salonId);
     setIsDeleteDialogOpen(true);
   };
 
   const confirmDelete = useCallback(async () => {
+    if (!salonToDelete) return;
+    
     try {
       await deleteSalon(salonToDelete);
       toast.success('Salon deleted successfully');
       setIsDeleteDialogOpen(false);
       setSalonToDelete(null);
-      await fetchSalons(); // Refetch salons after deletion
+      await fetchSalons();
     } catch (err) {
-      toast.error('Failed to delete salon. Please try again.');
+      toast.error(err.message || 'Failed to delete salon. Please try again.');
     }
   }, [deleteSalon, salonToDelete, fetchSalons]);
 
@@ -84,12 +97,15 @@ const SalonManagement = ({ isOnboarding = false }) => {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-        <div className="bg-white p-6 rounded-lg shadow-lg animate-fade-in">
+        <div className="bg-white p-6 rounded-lg shadow-lg">
           <h3 className="text-lg font-medium mb-4">Confirm Deletion</h3>
           <p className="mb-4">Are you sure you want to delete this salon? This action cannot be undone.</p>
           <div className="flex justify-end">
             <button
-              onClick={onConfirm}
+              onClick={() => {
+                onConfirm();
+                onClose();
+              }}
               className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mr-2 transition duration-300"
             >
               Delete
