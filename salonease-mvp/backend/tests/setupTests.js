@@ -1,21 +1,24 @@
 const { Sequelize } = require('sequelize');
-const config = require('../config/config.js')[process.env.NODE_ENV || 'test'];
-const UserModel = require('../src/models/User');
-const SalonModel = require('../src/models/Salon');
-const RefreshTokenModel = require('../src/models/RefreshToken');
-const StaffModel = require('../src/models/Staff');
+const config = require('../config/config.js');
 
-const sequelize = new Sequelize(config.database, config.username, config.password, {
-  host: config.host,
-  dialect: config.dialect,
-  logging: false,
+// Check if we're in the test environment
+if (process.env.NODE_ENV !== 'test') {
+  process.exit(1);
+}
+
+const testConfig = config.test;
+
+const sequelize = new Sequelize(testConfig.database, testConfig.username, testConfig.password, {
+  host: testConfig.host,
+  dialect: testConfig.dialect,
+  logging: testConfig.logging,
 });
 
 // Initialize models
-const User = UserModel(sequelize);
-const Salon = SalonModel(sequelize);
-const RefreshToken = RefreshTokenModel(sequelize);
-const Staff = StaffModel(sequelize);
+const User = require('../src/models/User')(sequelize);
+const Salon = require('../src/models/Salon')(sequelize);
+const RefreshToken = require('../src/models/RefreshToken')(sequelize);
+const Staff = require('../src/models/Staff')(sequelize);
 
 // Add models to sequelize.models
 sequelize.models.User = User;
@@ -32,10 +35,8 @@ Staff.associate(sequelize.models);
 beforeAll(async () => {
   try {
     await sequelize.authenticate();
-    await sequelize.sync({ force: true }); // This will drop and recreate all tables
-    console.log('Database synced successfully');
+    await sequelize.sync({ force: true });
   } catch (error) {
-    console.error('Unable to connect to the database or sync schema:', error);
     throw error;
   }
 });
@@ -52,10 +53,7 @@ beforeEach(async () => {
       RESTART IDENTITY
       CASCADE;
     `);
-    
-    console.log('Database cleaned successfully');
   } catch (error) {
-    console.error('Error cleaning database:', error);
     throw error;
   }
 });

@@ -5,8 +5,6 @@ const SalonModel = require('../models/Salon');
 const RefreshTokenModel = require('../models/RefreshToken');
 const StaffModel = require('../models/Staff');
 
-console.log('Using database config:', config);
-
 const sequelize = new Sequelize(config.database, config.username, config.password, {
   host: config.host,
   dialect: config.dialect,
@@ -35,17 +33,12 @@ Object.values(sequelize.models).forEach((model) => {
 const connectToDatabase = async () => {
   try {
     await sequelize.authenticate();
-    console.log('Database connection has been established successfully.');
-    
-    // Sync all models with the database
     await sequelize.sync();
-    console.log('All models were synchronized successfully.');
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
     if (process.env.NODE_ENV === 'test') {
-      throw error; // Throw error in test environment
+      throw error;
     } else {
-      process.exit(1); // Exit in non-test environments
+      process.exit(1);
     }
   }
 };

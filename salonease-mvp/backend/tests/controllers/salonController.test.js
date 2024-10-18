@@ -36,8 +36,6 @@ describe('Salon Controller', () => {
 
       await createSalon(req, res);
 
-      console.log('Response JSON:', res._getJSONData()); // Add this line
-
       expect(res.statusCode).toBe(201);
       expect(res._getJSONData()).toHaveProperty('name', 'Test Salon');
       expect(res._getJSONData()).toHaveProperty('ownerId', user.id);

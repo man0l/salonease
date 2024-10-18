@@ -20,6 +20,17 @@ exports.inviteStaff = async (req, res) => {
     const { salonId } = req.params;
     const { email, fullName } = req.body;
 
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: 'Validation error', errors: ['Invalid email format'] });
+    }
+
+    // Validate fullName
+    if (!fullName || fullName.trim() === '') {
+      return res.status(400).json({ message: 'Validation error', errors: ['Full name is required'] });
+    }
+
     const salon = await Salon.findByPk(salonId);
     if (!salon) {
       return res.status(404).json({ message: 'Salon not found' });
@@ -32,6 +43,10 @@ exports.inviteStaff = async (req, res) => {
 
     res.status(201).json(newStaff);
   } catch (error) {
+    if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).json({ message: 'Validation error', errors: error.errors.map(e => e.message) });
+    }
+    console.error('Error inviting staff:', error);
     res.status(500).json({ message: 'Error inviting staff', error: error.message });
   }
 };

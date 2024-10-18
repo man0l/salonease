@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "NODE_ENV=test sequelize-cli db:migrate && jest --forceExit --detectOpenHandles"
+    "test": "NODE_ENV=test sequelize-cli db:migrate && NODE_ENV=test jest --forceExit --detectOpenHandles"
   },
   "jest": {
     "setupFilesAfterEnv": [
