@@ -21,7 +21,11 @@ module.exports = (sequelize) => {
     },
     isActive: {
       type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      defaultValue: false,
+    },
+    invitationToken: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   });
 

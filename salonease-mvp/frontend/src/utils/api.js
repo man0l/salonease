@@ -95,6 +95,7 @@ const staffApi = {
   inviteStaff: (salonId, staffData) => api.post(`/salons/${salonId}/staff/invite`, staffData),
   updateStaff: (salonId, staffId, staffData) => api.put(`/salons/${salonId}/staff/${staffId}`, staffData),
   deleteStaff: (salonId, staffId) => api.delete(`/salons/${salonId}/staff/${staffId}`),
+  acceptInvitation: (data) => axios.post(`${api.defaults.baseURL}/staff/accept-invitation`, data),
 };
 
 export { api, authApi, staffApi };

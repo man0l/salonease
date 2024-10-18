@@ -20,6 +20,9 @@ const StaffManagement = () => {
   const [editingStaff, setEditingStaff] = useState(null);
   const { selectedSalon } = useSalonContext();
 
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [staffToDelete, setStaffToDelete] = useState(null);
+
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
   });
@@ -45,7 +48,8 @@ const StaffManagement = () => {
   const onSubmit = async (data) => {
     try {
       if (editingStaff) {
-        await staffApi.updateStaff(selectedSalon.id, editingStaff.id, data);
+        const { id, ...updateData } = data;
+        await staffApi.updateStaff(selectedSalon.id, editingStaff.id, updateData);
         toast.success('Staff updated successfully');
       } else {
         await staffApi.inviteStaff(selectedSalon.id, data);
@@ -56,7 +60,16 @@ const StaffManagement = () => {
       setShowForm(false);
       fetchStaff();
     } catch (err) {
-      toast.error(err.message || 'Failed to save staff. Please try again.');
+      if (err.response && err.response.data) {
+        const { message, errors } = err.response.data;
+        if (errors && errors.length > 0) {
+          errors.forEach(errorMsg => toast.error(errorMsg));
+        } else if (message) {
+          toast.error(message);
+        }
+      } else {
+        toast.error('Failed to save staff. Please try again.');
+      }
     }
   };
 
@@ -66,16 +79,53 @@ const StaffManagement = () => {
     setShowForm(true);
   };
 
-  const handleDelete = async (staffId) => {
-    if (window.confirm('Are you sure you want to delete this staff member?')) {
-      try {
-        await staffApi.deleteStaff(selectedSalon.id, staffId);
-        toast.success('Staff deleted successfully');
-        fetchStaff();
-      } catch (err) {
-        toast.error('Failed to delete staff');
-      }
+  const handleDelete = (staffId) => {
+    setStaffToDelete(staffId);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = useCallback(async () => {
+    if (!staffToDelete) return;
+    
+    try {
+      await staffApi.deleteStaff(selectedSalon.id, staffToDelete);
+      toast.success('Staff deleted successfully');
+      setIsDeleteDialogOpen(false);
+      setStaffToDelete(null);
+      await fetchStaff();
+    } catch (err) {
+      toast.error('Failed to delete staff');
     }
+  }, [staffToDelete, selectedSalon, fetchStaff]);
+
+  const DeleteConfirmationDialog = ({ isOpen, onClose, onConfirm }) => {
+    if (!isOpen) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <h3 className="text-lg font-medium mb-4">Confirm Deletion</h3>
+          <p className="mb-4">Are you sure you want to delete this staff member? This action cannot be undone.</p>
+          <div className="flex justify-end">
+            <button
+              onClick={() => {
+                onConfirm();
+                onClose();
+              }}
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mr-2 transition duration-300"
+            >
+              Delete
+            </button>
+            <button
+              onClick={onClose}
+              className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded transition duration-300"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -144,12 +194,14 @@ const StaffManagement = () => {
                   <button
                     onClick={() => handleEdit(member)}
                     className="bg-secondary-500 hover:bg-secondary-600 text-white py-1 px-3 rounded-md text-sm transition duration-300"
+                    aria-label="Edit"
                   >
                     <FaEdit />
                   </button>
                   <button
                     onClick={() => handleDelete(member.id)}
                     className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md text-sm transition duration-300"
+                    aria-label="Delete"
                   >
                     <FaTrash />
                   </button>
@@ -159,6 +211,12 @@ const StaffManagement = () => {
           </ul>
         )}
       </div>
+
+      <DeleteConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 };

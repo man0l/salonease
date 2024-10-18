@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { act } from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthProvider } from '../../contexts/AuthContext';
 import Login from './Login';
 import { toast } from 'react-toastify';
-import { act } from 'react'; // Update this line
 
 // Mock the useNavigate hook
 jest.mock('react-router-dom', () => ({

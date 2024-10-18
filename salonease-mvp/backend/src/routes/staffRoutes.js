@@ -4,15 +4,17 @@ const staffController = require('../controllers/staffController');
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
 
-// Apply authMiddleware to all routes
-router.use(authMiddleware);
-
 // Define allowed roles for staff management
 const allowedRoles = ['SuperAdmin', 'SalonOwner'];
 
-// Apply roleMiddleware to all staff routes
+// Public route for accepting invitations
+router.post('/accept-invitation', staffController.acceptInvitation);
+
+// Apply authMiddleware and roleMiddleware to protected routes
+router.use(authMiddleware);
 router.use(roleMiddleware(allowedRoles));
 
+// Protected routes
 router.get('/:salonId/staff', staffController.getStaff);
 router.post('/:salonId/staff/invite', staffController.inviteStaff);
 router.put('/:salonId/staff/:staffId', staffController.updateStaff);
