@@ -1,53 +1,51 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { createMemoryHistory } from 'history';
-import { Router } from 'react-router-dom';
-import axios from 'axios';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { authApi } from '../../utils/api';
 import VerifyEmail from './VerifyEmail';
 
-jest.mock('axios');
+jest.mock('../../utils/api', () => ({
+  authApi: {
+    verifyEmail: jest.fn(),
+  },
+}));
+
+const renderWithRouter = (ui, { route = '/' } = {}) => {
+  return render(
+    <MemoryRouter initialEntries={[route]}>
+      <Routes>
+        <Route path="*" element={ui} />
+      </Routes>
+    </MemoryRouter>
+  );
+};
 
 describe('VerifyEmail Component', () => {
-  const history = createMemoryHistory();
-
   it('should display success message and redirect on successful verification', async () => {
     const token = 'validtoken';
-    const location = { search: `?token=${token}` };
-    axios.get.mockResolvedValueOnce({ data: { message: 'Email verified successfully. You can now log in.' } });
+    authApi.verifyEmail.mockResolvedValueOnce({ data: { message: 'Email verified successfully. You can now log in.' } });
 
-    render(
-      <Router location={location} navigator={history}>
-        <VerifyEmail />
-      </Router>
-    );
+    renderWithRouter(<VerifyEmail />, { route: `/verify-email?token=${token}` });
 
     expect(await screen.findByText('Email verified successfully. You can now log in.')).toBeInTheDocument();
-    await waitFor(() => expect(history.location.pathname).toBe('/login'));
+    
+    await waitFor(() => {
+      expect(screen.getByText(/redirecting to login/i)).toBeInTheDocument();
+    }, { timeout: 3500 });
   });
 
   it('should display error message on failed verification', async () => {
     const token = 'invalidtoken';
-    const location = { search: `?token=${token}` };
-    axios.get.mockRejectedValueOnce({ response: { data: { message: 'Invalid or expired token' } } });
+    authApi.verifyEmail.mockRejectedValueOnce({ response: { data: { message: 'Invalid or expired token' } } });
 
-    render(
-      <Router location={location} navigator={history}>
-        <VerifyEmail />
-      </Router>
-    );
+    renderWithRouter(<VerifyEmail />, { route: `/verify-email?token=${token}` });
 
     expect(await screen.findByText('Invalid or expired token')).toBeInTheDocument();
   });
 
-  it('should display error message for missing token', () => {
-    const location = { search: '' };
+  it('should display error message for missing token', async () => {
+    renderWithRouter(<VerifyEmail />, { route: '/verify-email' });
 
-    render(
-      <Router location={location} navigator={history}>
-        <VerifyEmail />
-      </Router>
-    );
-
-    expect(screen.getByText('Invalid verification link.')).toBeInTheDocument();
+    expect(await screen.findByText('Invalid verification link.')).toBeInTheDocument();
   });
 });

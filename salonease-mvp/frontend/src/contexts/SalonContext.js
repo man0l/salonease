@@ -3,10 +3,16 @@ import { useSalon } from '../hooks/useSalon';
 
 const SalonContext = createContext();
 
-export const useSalonContext = () => useContext(SalonContext);
+export const useSalonContext = () => {
+  const context = useContext(SalonContext);
+  if (!context) {
+    throw new Error('useSalonContext must be used within a SalonProvider');
+  }
+  return context;
+};
 
 export const SalonProvider = ({ children }) => {
-  const { salons, loading, error, fetchSalons, addSalon, updateSalon, deleteSalon, currentPage, totalPages, setCurrentPage } = useSalon();
+  const { salons, loading, error, fetchSalons, addSalon: hookAddSalon, updateSalon, deleteSalon: hookDeleteSalon, currentPage, totalPages, setCurrentPage } = useSalon();
   const [selectedSalon, setSelectedSalon] = useState(null);
 
   useEffect(() => {
@@ -19,7 +25,7 @@ export const SalonProvider = ({ children }) => {
     } else if (salons.length === 0) {
       setSelectedSalon(null);
     }
-  }, [salons]);
+  }, [salons, selectedSalon]);
 
   const handleSetSelectedSalon = useCallback((salon) => {
     if (salon && salon.id) {
@@ -30,20 +36,23 @@ export const SalonProvider = ({ children }) => {
   }, []);
 
   const handleAddSalon = useCallback(async (salonData) => {
-    const newSalon = await addSalon(salonData);
+    const newSalon = await hookAddSalon(salonData);
     if (newSalon) {
+      // Fetch salons again to update the list
+      await fetchSalons();
+      // Set the new salon as selected after fetching
       setSelectedSalon(newSalon);
     }
     return newSalon;
-  }, [addSalon]);
+  }, [hookAddSalon, fetchSalons]);
 
   const handleDeleteSalon = useCallback(async (salonId) => {
-    const result = await deleteSalon(salonId);
+    const result = await hookDeleteSalon(salonId);
     if (result && selectedSalon && selectedSalon.id === salonId) {
       setSelectedSalon(salons.length > 0 ? salons[0] : null);
     }
     return result;
-  }, [deleteSalon, selectedSalon, salons]);
+  }, [hookDeleteSalon, selectedSalon, salons]);
 
   const value = {
     salons,

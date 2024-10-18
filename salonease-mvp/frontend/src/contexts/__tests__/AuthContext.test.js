@@ -1,9 +1,9 @@
-import React, { act } from 'react';
-import { render } from '@testing-library/react';
-import { AuthProvider, AuthContext } from './AuthContext';
-import { api, authApi } from '../utils/api';
+import React from 'react';
+import { render, act } from '@testing-library/react';
+import { AuthProvider, AuthContext } from '../AuthContext';
+import { api, authApi } from '../../utils/api';
 
-jest.mock('../utils/api', () => ({
+jest.mock('../../utils/api', () => ({
   api: {
     get: jest.fn(),
     defaults: { headers: { common: {} } },
@@ -19,23 +19,26 @@ describe('AuthContext', () => {
   beforeEach(() => {
     localStorage.clear();
     jest.clearAllMocks();
+    api.get.mockResolvedValue({ data: null });
   });
 
-  test('provides user and auth methods', () => {
+  test('provides user and auth methods', async () => {
     let contextValue;
-    render(
-      <AuthProvider>
-        <AuthContext.Consumer>
-          {(value) => {
-            contextValue = value;
-            return null;
-          }}
-        </AuthContext.Consumer>
-      </AuthProvider>
-    );
+    await act(async () => {
+      render(
+        <AuthProvider>
+          <AuthContext.Consumer>
+            {(value) => {
+              contextValue = value;
+              return null;
+            }}
+          </AuthContext.Consumer>
+        </AuthProvider>
+      );
+    });
 
     expect(contextValue).toHaveProperty('user', null);
-    expect(contextValue).toHaveProperty('loading', true);
+    expect(contextValue).toHaveProperty('loading', false);
     expect(contextValue).toHaveProperty('login');
     expect(contextValue).toHaveProperty('logout');
     expect(contextValue).toHaveProperty('register');
@@ -48,16 +51,18 @@ describe('AuthContext', () => {
     api.get.mockResolvedValue({ data: mockUser });
 
     let contextValue;
-    render(
-      <AuthProvider>
-        <AuthContext.Consumer>
-          {(value) => {
-            contextValue = value;
-            return null;
-          }}
-        </AuthContext.Consumer>
-      </AuthProvider>
-    );
+    await act(async () => {
+      render(
+        <AuthProvider>
+          <AuthContext.Consumer>
+            {(value) => {
+              contextValue = value;
+              return null;
+            }}
+          </AuthContext.Consumer>
+        </AuthProvider>
+      );
+    });
 
     await act(async () => {
       await contextValue.login('test@example.com', 'password123');
@@ -73,16 +78,18 @@ describe('AuthContext', () => {
     localStorage.setItem('refreshToken', 'mockRefreshToken');
 
     let contextValue;
-    render(
-      <AuthProvider>
-        <AuthContext.Consumer>
-          {(value) => {
-            contextValue = value;
-            return null;
-          }}
-        </AuthContext.Consumer>
-      </AuthProvider>
-    );
+    await act(async () => {
+      render(
+        <AuthProvider>
+          <AuthContext.Consumer>
+            {(value) => {
+              contextValue = value;
+              return null;
+            }}
+          </AuthContext.Consumer>
+        </AuthProvider>
+      );
+    });
 
     await act(async () => {
       await contextValue.logout();

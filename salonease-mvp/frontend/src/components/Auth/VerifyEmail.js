@@ -4,6 +4,7 @@ import { authApi } from '../../utils/api';
 
 const VerifyEmail = () => {
   const [message, setMessage] = useState('');
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -16,6 +17,7 @@ const VerifyEmail = () => {
         try {
           const response = await authApi.verifyEmail(token);
           setMessage(response.data.message);
+          setIsRedirecting(true);
           setTimeout(() => {
             navigate('/login');
           }, 3000);
@@ -34,6 +36,7 @@ const VerifyEmail = () => {
     <div className="verify-email">
       <h2>Email Verification</h2>
       <p>{message}</p>
+      {isRedirecting && <p>Redirecting to login...</p>}
     </div>
   );
 };

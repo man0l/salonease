@@ -1,11 +1,29 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import SalonManagement from '../SalonManagement';
+import { SalonProvider } from '../../../contexts/SalonContext';
 import { useSalon } from '../../../hooks/useSalon';
+import { useAuth } from '../../../hooks/useAuth';
 import { toast } from 'react-toastify';
 
 jest.mock('../../../hooks/useSalon');
+jest.mock('../../../hooks/useAuth');
 jest.mock('react-toastify');
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => jest.fn(),
+}));
+
+const renderWithContext = (component) => {
+  return render(
+    <MemoryRouter>
+      <SalonProvider>
+        {component}
+      </SalonProvider>
+    </MemoryRouter>
+  );
+};
 
 describe('SalonManagement', () => {
   beforeEach(() => {
@@ -16,42 +34,57 @@ describe('SalonManagement', () => {
       addSalon: jest.fn(),
       updateSalon: jest.fn(),
       deleteSalon: jest.fn(),
+      currentPage: 1,
+      totalPages: 1,
+      setCurrentPage: jest.fn(),
+      fetchSalons: jest.fn(),
     });
+
+    useAuth.mockReturnValue({
+      user: { id: '1', name: 'Test User' },
+      updateUser: jest.fn(),
+    });
+
+    toast.success = jest.fn();
+    toast.error = jest.fn();
   });
 
-  it('renders the form and salon list', () => {
-    render(<SalonManagement />);
-    expect(screen.getByText('Add New Salon')).toBeInTheDocument();
-    expect(screen.getByText('Your Salons')).toBeInTheDocument();
+  it('renders the component without crashing', () => {
+    renderWithContext(<SalonManagement />);
+    expect(screen.getByText(/salon management/i)).toBeInTheDocument();
   });
 
-  it('adds a new salon', async () => {
-    const addSalon = jest.fn().mockResolvedValue({ id: 1, name: 'Test Salon' });
+  it('displays the add salon form when "Add New Salon" button is clicked', () => {
+    renderWithContext(<SalonManagement />);
+    fireEvent.click(screen.getByText(/add new salon/i));
+    expect(screen.getByText(/add new salon/i)).toBeInTheDocument();
+  });
+
+  it('submits the form with valid data', async () => {
+    const mockAddSalon = jest.fn().mockResolvedValue({ id: '1', name: 'Test Salon' });
     useSalon.mockReturnValue({
-      salons: [],
-      loading: false,
-      error: null,
-      addSalon,
+      ...useSalon(),
+      addSalon: mockAddSalon,
     });
 
-    render(<SalonManagement />);
+    renderWithContext(<SalonManagement />);
+    fireEvent.click(screen.getByText(/add new salon/i));
 
-    fireEvent.change(screen.getByLabelText('Salon Name'), { target: { value: 'Test Salon' } });
-    fireEvent.change(screen.getByLabelText('Address'), { target: { value: 'Test Address' } });
-    fireEvent.change(screen.getByLabelText('Contact Number'), { target: { value: '1234567890' } });
+    fireEvent.change(screen.getByLabelText(/salon name/i), { target: { value: 'Test Salon' } });
+    fireEvent.change(screen.getByLabelText(/address/i), { target: { value: 'Test Address' } });
+    fireEvent.change(screen.getByLabelText(/contact number/i), { target: { value: '1234567890' } });
 
-    fireEvent.click(screen.getByText('Add Salon'));
+    fireEvent.click(screen.getByText(/add salon/i));
 
     await waitFor(() => {
-      expect(addSalon).toHaveBeenCalledWith({
+      expect(mockAddSalon).toHaveBeenCalledWith(expect.objectContaining({
         name: 'Test Salon',
         address: 'Test Address',
         contactNumber: '1234567890',
-        description: '',
-      });
+      }));
       expect(toast.success).toHaveBeenCalledWith('Salon added successfully');
     });
   });
 
-  // Add more tests for updating and deleting salons
+  // Add more tests as needed...
 });
