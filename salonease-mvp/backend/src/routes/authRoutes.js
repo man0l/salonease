@@ -23,4 +23,7 @@ router.post('/reset-password', authController.resetPassword);
 router.post('/refresh-token', authController.refreshToken);
 router.post('/logout', authController.logout);
 
+// Add this new route
+router.put('/update', authMiddleware, authController.updateUser);
+
 module.exports = router;

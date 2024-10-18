@@ -32,8 +32,8 @@ const Register = () => {
     try {
       const response = await authApi.register(data);
       toast.success(response.data.message);
-      // Redirect to email verification notice page
-      navigate('/verify-email');
+      // Redirect to a new page instead of the verify-email page
+      navigate('/registration-success');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Registration failed');
     }

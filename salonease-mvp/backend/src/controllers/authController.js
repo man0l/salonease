@@ -136,7 +136,12 @@ exports.login = async (req, res) => {
     res.status(200).json({
       token,
       refreshToken,
-      user: { id: user.id, fullName: user.fullName, role: user.role }
+      user: { 
+        id: user.id, 
+        fullName: user.fullName, 
+        role: user.role,
+        onboardingCompleted: user.onboardingCompleted 
+      }
     });
   } catch (error) {
     console.error('Login failed:', error);
@@ -144,7 +149,7 @@ exports.login = async (req, res) => {
   }
 };
 
-// Add this new function to the existing authController.js file
+// Add this function to the existing authController.js file
 
 exports.me = async (req, res) => {
   console.log('Fetching current user information');
@@ -164,7 +169,8 @@ exports.me = async (req, res) => {
       fullName: user.fullName,
       email: user.email,
       role: user.role,
-      isEmailVerified: user.isEmailVerified
+      isEmailVerified: user.isEmailVerified,
+      onboardingCompleted: user.onboardingCompleted,
     });
 
     console.log('User information fetched successfully for userId:', user.id);
@@ -273,5 +279,39 @@ exports.logout = async (req, res) => {
   } catch (error) {
     console.error('Logout failed:', error);
     res.status(500).json({ message: 'Logout failed', error: error.message });
+  }
+};
+
+// Add this function to the existing authController.js file
+
+exports.updateUser = async (req, res) => {
+  try {
+    const { id } = req.user; // Get the user id from the authenticated request
+    const { fullName, onboardingCompleted } = req.body; // Only allow updating these fields
+
+    const user = await User.findByPk(id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Update the user
+    if (fullName !== undefined) user.fullName = fullName;
+    if (onboardingCompleted !== undefined) user.onboardingCompleted = onboardingCompleted;
+
+    await user.save();
+
+    // Return the updated user (excluding sensitive information)
+    res.status(200).json({
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email,
+      role: user.role,
+      isEmailVerified: user.isEmailVerified,
+      onboardingCompleted: user.onboardingCompleted
+    });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ message: 'Error updating user', error: error.message });
   }
 };

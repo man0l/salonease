@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { api } from '../utils/api';
 import { useAuth } from './useAuth';
 
@@ -10,23 +10,7 @@ export const useSalon = () => {
   const [totalPages, setTotalPages] = useState(1);
   const { user } = useAuth();
 
-  useEffect(() => {
-    if (user) {
-      fetchSalons();
-    }
-  }, [user, currentPage]);
-
-  const handleError = (error) => {
-    if (error.response) {
-      setError(`Server error: ${error.response.data.message || error.response.statusText}`);
-    } else if (error.request) {
-      setError('Network error: Unable to reach the server. Please check your internet connection.');
-    } else {
-      setError(`Error: ${error.message}`);
-    }
-  };
-
-  const fetchSalons = async () => {
+  const fetchSalons = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api.get(`/salons?page=${currentPage}&limit=10`);
@@ -38,12 +22,28 @@ export const useSalon = () => {
     } finally {
       setLoading(false);
     }
+  }, [currentPage]);
+
+  useEffect(() => {
+    if (user) {
+      fetchSalons();
+    }
+  }, [user, fetchSalons]);
+
+  const handleError = (error) => {
+    if (error.response) {
+      setError(`Server error: ${error.response.data.message || error.response.statusText}`);
+    } else if (error.request) {
+      setError('Network error: Unable to reach the server. Please check your internet connection.');
+    } else {
+      setError(`Error: ${error.message}`);
+    }
   };
 
   const addSalon = async (salonData) => {
     try {
       const response = await api.post('/salons', salonData);
-      setSalons([...salons, response.data]);
+      await fetchSalons(); // Refetch salons after adding a new one
       return response.data;
     } catch (err) {
       handleError(err);
@@ -66,6 +66,7 @@ export const useSalon = () => {
     try {
       await api.delete(`/salons/${salonId}`);
       setSalons(salons.filter(salon => salon.id !== salonId));
+      await fetchSalons(); // Refetch salons after deletion
     } catch (err) {
       handleError(err);
       throw err;

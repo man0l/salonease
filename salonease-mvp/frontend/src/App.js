@@ -17,6 +17,8 @@ import ForgotPassword from './components/Auth/ForgotPassword';
 import ResetPassword from './components/Auth/ResetPassword';
 import SuperAdminDashboard from './components/Dashboard/SuperAdminDashboard';
 import SalonManagement from './components/Salon/SalonManagement';
+import RegistrationSuccess from './components/Auth/RegistrationSuccess';
+import SalonOwnerOnboarding from './components/Onboarding/SalonOwnerOnboarding';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -46,12 +48,13 @@ function AppContent() {
         {user && (
           <Sidebar className="w-64 flex-shrink-0 bg-gray-100 border-r border-gray-200" />
         )}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 relative z-20">
           <div className="container mx-auto px-6 py-8">
             <ToastContainer />
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/registration-success" element={<RegistrationSuccess />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
@@ -59,7 +62,7 @@ function AppContent() {
                 path="/dashboard" 
                 element={
                   <PrivateRoute>
-                    <Dashboard />
+                    {user && !user.onboardingCompleted ? <SalonOwnerOnboarding /> : <Dashboard />}
                   </PrivateRoute>
                 } 
               />

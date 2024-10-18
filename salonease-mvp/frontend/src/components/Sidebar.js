@@ -4,35 +4,35 @@ import { HomeIcon, CalendarDaysIcon, ClipboardDocumentListIcon, UserGroupIcon, C
 import { useAuth } from '../hooks/useAuth';
 
 const navigation = [
-  { name: 'Dashboard', icon: HomeIcon, route: '/dashboard' },
-  { name: 'Calendar', icon: CalendarDaysIcon, route: '/salons/:salonId/calendar' },
-  { name: 'Bookings', icon: ClipboardDocumentListIcon, route: '/salons/:salonId/bookings' },
-  { name: 'Clients', icon: UserGroupIcon, route: '/salons/:salonId/clients' },
-  { name: 'Staff', icon: UserGroupIcon, route: '/salons/:salonId/staff' },
-  { name: 'Services', icon: () => <span className="text-xl">✂️</span>, route: '/salons/:salonId/services' },
-  { name: 'Billing', icon: CreditCardIcon, route: '/billing' },
-  { name: 'Reports', icon: ChartBarIcon, route: '/reports' },
-  { name: 'Settings', icon: Cog6ToothIcon, route: '/settings' },
+  { name: 'Dashboard', icon: HomeIcon, route: '/dashboard', roles: ['SalonOwner', 'SuperAdmin', 'Staff'], alwaysEnabled: true },
+  { name: 'Salon Management', icon: BuildingStorefrontIcon, route: '/salons', roles: ['SalonOwner', 'SuperAdmin'], alwaysEnabled: true },
+  { name: 'Calendar', icon: CalendarDaysIcon, route: '/salons/:salonId/calendar', roles: ['SalonOwner', 'Staff'] },
+  { name: 'Bookings', icon: ClipboardDocumentListIcon, route: '/salons/:salonId/bookings', roles: ['SalonOwner', 'Staff'] },
+  { name: 'Clients', icon: UserGroupIcon, route: '/salons/:salonId/clients', roles: ['SalonOwner', 'Staff'] },
+  { name: 'Staff', icon: UserGroupIcon, route: '/salons/:salonId/staff', roles: ['SalonOwner'] },
+  { name: 'Services', icon: () => <span className="text-xl">✂️</span>, route: '/salons/:salonId/services', roles: ['SalonOwner'] },
+  { name: 'Billing', icon: CreditCardIcon, route: '/billing', roles: ['SalonOwner'] },
+  { name: 'Reports', icon: ChartBarIcon, route: '/reports', roles: ['SalonOwner', 'SuperAdmin'] },
+  { name: 'Settings', icon: Cog6ToothIcon, route: '/settings', roles: ['SalonOwner', 'SuperAdmin', 'Staff'] },
+  { name: 'Admin Dashboard', icon: HomeIcon, route: '/admin-dashboard', roles: ['SuperAdmin'] },
 ];
 
 function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
 
-  const isSalonOwnerOrSuperAdmin = user && (user.role === 'SalonOwner' || user.role === 'SuperAdmin');
-
-  const fullNavigation = isSalonOwnerOrSuperAdmin
-    ? [{ name: 'Salon Management', icon: BuildingStorefrontIcon, route: '/salons' }, ...navigation]
-    : navigation;
+  const filteredNavigation = navigation.filter(item => 
+    item.roles.includes(user.role) || (user.role === 'SuperAdmin' && item.roles.includes('SalonOwner'))
+  );
 
   return (
-    <div className="bg-white shadow-md lg:h-full">
+    <div className="bg-white shadow-md lg:h-full relative z-10">
       <button className="lg:hidden p-4 text-text hover:text-primary transition-colors" onClick={() => setIsOpen(!isOpen)}>
         <Bars3Icon className="h-6 w-6" />
       </button>
       <div 
         className={`
-          transform top-0 left-0 w-64 bg-white fixed h-full overflow-auto ease-in-out transition-all duration-300 z-30
+          transform top-0 left-0 w-64 bg-white fixed h-full overflow-auto ease-in-out transition-all duration-300 z-20
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:relative lg:translate-x-0 lg:flex lg:flex-col
         `}
@@ -41,7 +41,7 @@ function Sidebar() {
           <h2 className="text-primary font-bold text-xl">Menu</h2>
         </div>
         <nav className="space-y-1">
-          {fullNavigation.map((item) => (
+          {filteredNavigation.map((item) => (
             <NavLink
               key={item.name}
               to={item.route}
@@ -50,6 +50,10 @@ function Sidebar() {
                   isActive
                     ? 'bg-primary text-white'
                     : 'text-text hover:bg-gray-100 hover:text-primary'
+                } ${
+                  (!user.onboardingCompleted && !item.alwaysEnabled)
+                    ? 'opacity-50 pointer-events-none'
+                    : ''
                 }`
               }
               onClick={() => setIsOpen(false)}
@@ -62,7 +66,7 @@ function Sidebar() {
       </div>
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-10 lg:hidden"
           onClick={() => setIsOpen(false)}
         ></div>
       )}
