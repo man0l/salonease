@@ -40,7 +40,7 @@ const SalonManagement = ({ isOnboarding = false }) => {
         const updatedSalon = await updateSalon(editingSalon.id, data);
         if (updatedSalon) {
           toast.success('Salon updated successfully');
-          reset();
+          reset(updatedSalon);
           setEditingSalon(null);
           await fetchSalons();
           setShowForm(false);
@@ -71,6 +71,18 @@ const SalonManagement = ({ isOnboarding = false }) => {
   const handleEdit = (salon) => {
     setEditingSalon(salon);
     reset(salon);
+    setShowForm(true);
+  };
+
+  const handleAddNewSalon = () => {
+    setEditingSalon(null);
+    reset({
+      name: '',
+      address: '',
+      contactNumber: '',
+      description: '',
+    });
+    setShowForm(true);
   };
 
   const handleDelete = (salonId) => {
@@ -134,7 +146,7 @@ const SalonManagement = ({ isOnboarding = false }) => {
       
       {!isOnboarding && (
         <button
-          onClick={() => setShowForm(!showForm)}
+          onClick={showForm ? () => setShowForm(false) : handleAddNewSalon}
           className="mb-6 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-full transition duration-300 flex items-center"
         >
           {showForm ? <FaMinus className="mr-2" /> : <FaPlus className="mr-2" />}
