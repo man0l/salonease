@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { HomeIcon, CalendarDaysIcon, ClipboardDocumentListIcon, UserGroupIcon, CreditCardIcon, ChartBarIcon, Cog6ToothIcon, Bars3Icon, BuildingStorefrontIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../hooks/useAuth';
+import { useSalonContext } from '../contexts/SalonContext';
 
 const navigation = [
   { name: 'Dashboard', icon: HomeIcon, route: '/dashboard', roles: ['SalonOwner', 'SuperAdmin', 'Staff'], alwaysEnabled: true },
@@ -9,7 +10,7 @@ const navigation = [
   { name: 'Calendar', icon: CalendarDaysIcon, route: '/salons/:salonId/calendar', roles: ['SalonOwner', 'Staff'] },
   { name: 'Bookings', icon: ClipboardDocumentListIcon, route: '/salons/:salonId/bookings', roles: ['SalonOwner', 'Staff'] },
   { name: 'Clients', icon: UserGroupIcon, route: '/salons/:salonId/clients', roles: ['SalonOwner', 'Staff'] },
-  { name: 'Staff', icon: UserGroupIcon, route: '/salons/:salonId/staff', roles: ['SalonOwner'] },
+  { name: 'Staff', icon: UserGroupIcon, route: '/salons/:salonId/staff', roles: ['SalonOwner', 'SuperAdmin'] },
   { name: 'Services', icon: () => <span className="text-xl">✂️</span>, route: '/salons/:salonId/services', roles: ['SalonOwner'] },
   { name: 'Billing', icon: CreditCardIcon, route: '/billing', roles: ['SalonOwner'] },
   { name: 'Reports', icon: ChartBarIcon, route: '/reports', roles: ['SalonOwner', 'SuperAdmin'] },
@@ -20,10 +21,18 @@ const navigation = [
 function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
+  const { selectedSalon } = useSalonContext();
 
   const filteredNavigation = navigation.filter(item => 
     item.roles.includes(user.role) || (user.role === 'SuperAdmin' && item.roles.includes('SalonOwner'))
   );
+
+  const getRoute = (route) => {
+    if (selectedSalon && route.includes(':salonId')) {
+      return route.replace(':salonId', selectedSalon.id);
+    }
+    return route;
+  };
 
   return (
     <div className="bg-white shadow-md lg:h-full relative z-10">
@@ -44,7 +53,7 @@ function Sidebar() {
           {filteredNavigation.map((item) => (
             <NavLink
               key={item.name}
-              to={item.route}
+              to={getRoute(item.route)}
               className={({ isActive }) =>
                 `flex items-center px-4 py-3 text-sm font-medium transition-colors ${
                   isActive

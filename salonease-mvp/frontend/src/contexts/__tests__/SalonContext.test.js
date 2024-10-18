@@ -7,8 +7,8 @@ jest.mock('../../hooks/useSalon');
 
 describe('SalonContext', () => {
   const mockSalons = [
-    { id: 1, name: 'Salon A' },
-    { id: 2, name: 'Salon B' },
+    { id: '123e4567-e89b-12d3-a456-426614174000', name: 'Salon A' },
+    { id: '223e4567-e89b-12d3-a456-426614174001', name: 'Salon B' },
   ];
 
   const mockUseSalon = {
@@ -85,7 +85,7 @@ describe('SalonContext', () => {
   });
 
   test('addSalon calls hookAddSalon and updates selectedSalon', async () => {
-    const newSalon = { id: 3, name: 'New Salon' };
+    const newSalon = { id: '323e4567-e89b-12d3-a456-426614174002', name: 'New Salon' };
     mockUseSalon.addSalon.mockResolvedValue(newSalon);
     
     // Update the mock to include the new salon
@@ -142,10 +142,10 @@ describe('SalonContext', () => {
     });
 
     await act(async () => {
-      await contextValue.deleteSalon(1);
+      await contextValue.deleteSalon('123e4567-e89b-12d3-a456-426614174000');
     });
 
-    expect(mockUseSalon.deleteSalon).toHaveBeenCalledWith(1);
+    expect(mockUseSalon.deleteSalon).toHaveBeenCalledWith('123e4567-e89b-12d3-a456-426614174000');
     // The selected salon should now be the first salon in the updated list
     expect(contextValue.selectedSalon).toEqual(mockSalons[0]);
   });

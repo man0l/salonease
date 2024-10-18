@@ -2,17 +2,22 @@ const { Model, DataTypes } = require('sequelize');
 
 class Salon extends Model {
   static associate(models) {
-    // define associations here
     this.belongsTo(models.User, { 
       foreignKey: 'ownerId', 
       as: 'owner',
       onDelete: 'CASCADE'
     });
+    this.hasMany(models.Staff, { foreignKey: 'salonId', as: 'staff' });
   }
 }
 
 module.exports = (sequelize) => {
   Salon.init({
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -39,7 +44,7 @@ module.exports = (sequelize) => {
       allowNull: true
     },
     ownerId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: {
         model: 'Users',

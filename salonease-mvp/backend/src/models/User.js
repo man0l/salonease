@@ -2,13 +2,17 @@ const { Model, DataTypes } = require('sequelize');
 
 class User extends Model {
   static associate(models) {
-    // define associations here
     this.hasMany(models.Salon, { foreignKey: 'ownerId', as: 'salons' });
   }
 }
 
 module.exports = (sequelize) => {
   User.init({
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
     fullName: {
       type: DataTypes.STRING,
       allowNull: false,

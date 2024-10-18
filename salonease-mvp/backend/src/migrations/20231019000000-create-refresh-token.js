@@ -5,9 +5,9 @@ module.exports = {
     await queryInterface.createTable('RefreshTokens', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4
       },
       token: {
         type: Sequelize.STRING,
@@ -15,7 +15,7 @@ module.exports = {
         unique: true
       },
       userId: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         allowNull: false,
         references: {
           model: 'Users',

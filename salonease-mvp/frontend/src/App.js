@@ -20,6 +20,7 @@ import SuperAdminDashboard from './components/Dashboard/SuperAdminDashboard';
 import SalonManagement from './components/Salon/SalonManagement';
 import RegistrationSuccess from './components/Auth/RegistrationSuccess';
 import SalonOwnerOnboarding from './components/Onboarding/SalonOwnerOnboarding';
+import StaffManagement from './components/Salon/StaffManagement';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -91,6 +92,15 @@ function AppContent() {
                 element={
                   <PrivateRoute allowedRoles={['SalonOwner']}>
                     <SalonManagement />
+                  </PrivateRoute>
+                } 
+              />
+              {/* Add the new route for staff management */}
+              <Route 
+                path="/salons/:salonId/staff" 
+                element={
+                  <PrivateRoute allowedRoles={['SalonOwner', 'SuperAdmin']}>
+                    <StaffManagement />
                   </PrivateRoute>
                 } 
               />

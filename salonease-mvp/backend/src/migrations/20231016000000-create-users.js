@@ -5,9 +5,9 @@ module.exports = {
     await queryInterface.createTable('Users', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4
       },
       fullName: {
         type: Sequelize.STRING,
@@ -27,6 +27,18 @@ module.exports = {
         defaultValue: 'SalonOwner'
       },
       isEmailVerified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
+      resetToken: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      resetTokenExpiry: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
+      onboardingCompleted: {
         type: Sequelize.BOOLEAN,
         defaultValue: false
       },

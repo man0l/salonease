@@ -7,7 +7,6 @@ import { useAuth } from '../../hooks/useAuth';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
-import { useSalon } from '../../hooks/useSalon';
 
 const schema = yup.object().shape({
   name: yup.string().required('Salon name is required'),

@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BellIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../hooks/useAuth';
-import { useDebounce } from '../hooks/useDebounce';
 import SalonSelector from './SalonSelector';
 
 function Header() {
@@ -10,24 +9,22 @@ function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const [debouncedCloseDropdown, cancelDebouncedClose] = useDebounce(() => {
-    setIsDropdownOpen(false);
-  }, 300);
-
-  const handleMouseEnter = () => {
-    cancelDebouncedClose();
-    setIsDropdownOpen(true);
-  };
-
-  const handleMouseLeave = () => {
-    debouncedCloseDropdown();
+  const handleToggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
   };
 
   useEffect(() => {
-    return () => {
-      cancelDebouncedClose();
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
     };
-  }, [cancelDebouncedClose]);
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const renderUserMenu = () => (
     <>
@@ -37,12 +34,11 @@ function Header() {
       </button>
       <div 
         className="relative"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
         ref={dropdownRef}
       >
         <button
           className="flex items-center space-x-2 text-text hover:text-primary transition-colors"
+          onClick={handleToggleDropdown}
         >
           <img
             className="h-8 w-8 rounded-full object-cover"
@@ -54,16 +50,20 @@ function Header() {
         </button>
         {isDropdownOpen && (
           <div
-            className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10"
+            className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"
           >
             <Link
               to="/profile"
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              onClick={() => setIsDropdownOpen(false)}
             >
               Profile
             </Link>
             <button
-              onClick={logout}
+              onClick={() => {
+                logout();
+                setIsDropdownOpen(false);
+              }}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               Logout
@@ -92,7 +92,7 @@ function Header() {
             ) : (
               <div className="space-x-4">
                 <Link to="/login" className="text-text hover:text-primary transition-colors">Login</Link>
-                <Link to="/register" className="bg-primary text-white px-4 py-2 rounded-md hover:bg-secondary transition-colors">Sign Up</Link>
+                <Link to="/register" className="bg-primary text-text px-4 py-2 rounded-md hover:bg-secondary transition-colors">Sign Up</Link>
               </div>
             )}
           </div>

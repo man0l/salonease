@@ -1,9 +1,11 @@
 const { Salon } = require('../config/db');
+const { v4: uuidv4 } = require('uuid');
 
 exports.createSalon = async (req, res) => {
   try {
     const { name, address, contactNumber, description } = req.body;
     const salon = await Salon.create({
+      id: uuidv4(), // Generate a new UUID for the salon
       name,
       address,
       contactNumber,

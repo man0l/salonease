@@ -14,12 +14,12 @@ const SalonSelector = () => {
   if (error) return <div>Error loading salons: {error}</div>;
 
   const handleSalonChange = (e) => {
-    const selectedId = parseInt(e.target.value, 10);
+    const selectedId = e.target.value;
     const selected = salons.find(salon => salon.id === selectedId);
     if (selected) {
       setSelectedSalon(selected);
     } else {
-      console.warn('Selected salon not found:', e.target.value);
+      console.warn('Selected salon not found:', selectedId);
     }
   };
 

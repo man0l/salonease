@@ -38,9 +38,7 @@ export const SalonProvider = ({ children }) => {
   const handleAddSalon = useCallback(async (salonData) => {
     const newSalon = await hookAddSalon(salonData);
     if (newSalon) {
-      // Fetch salons again to update the list
       await fetchSalons();
-      // Set the new salon as selected after fetching
       setSelectedSalon(newSalon);
     }
     return newSalon;

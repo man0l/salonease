@@ -5,9 +5,9 @@ module.exports = {
     await queryInterface.createTable('Salons', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4
       },
       name: {
         type: Sequelize.STRING,
@@ -26,7 +26,7 @@ module.exports = {
         allowNull: true
       },
       ownerId: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         allowNull: false,
         references: {
           model: 'Users',
@@ -45,16 +45,9 @@ module.exports = {
       }
     });
 
-    // Check if the index exists before creating it
-    const indices = await queryInterface.showIndex('Salons');
-    const indexExists = indices.some(index => index.name === 'salons_owner_id');
-    
-    if (!indexExists) {
-      // Add an index on the ownerId for better query performance
-      await queryInterface.addIndex('Salons', ['ownerId'], {
-        name: 'salons_owner_id'
-      });
-    }
+    await queryInterface.addIndex('Salons', ['ownerId'], {
+      name: 'salons_owner_id'
+    });
   },
 
   down: async (queryInterface, Sequelize) => {

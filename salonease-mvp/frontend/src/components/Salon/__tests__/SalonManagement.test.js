@@ -61,7 +61,7 @@ describe('SalonManagement', () => {
   });
 
   it('submits the form with valid data', async () => {
-    const mockAddSalon = jest.fn().mockResolvedValue({ id: '1', name: 'Test Salon' });
+    const mockAddSalon = jest.fn().mockResolvedValue({ id: '123e4567-e89b-12d3-a456-426614174000', name: 'Test Salon' });
     useSalon.mockReturnValue({
       ...useSalon(),
       addSalon: mockAddSalon,

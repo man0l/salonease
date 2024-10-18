@@ -90,4 +90,11 @@ const authApi = {
   logout: (refreshToken) => api.post('/auth/logout', { refreshToken }),
 };
 
-export { api, authApi };
+const staffApi = {
+  getStaff: (salonId) => api.get(`/salons/${salonId}/staff`),
+  inviteStaff: (salonId, staffData) => api.post(`/salons/${salonId}/staff/invite`, staffData),
+  updateStaff: (salonId, staffId, staffData) => api.put(`/salons/${salonId}/staff/${staffId}`, staffData),
+  deleteStaff: (salonId, staffId) => api.delete(`/salons/${salonId}/staff/${staffId}`),
+};
+
+export { api, authApi, staffApi };
