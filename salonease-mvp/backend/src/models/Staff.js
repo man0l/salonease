@@ -21,12 +21,14 @@ module.exports = (sequelize) => {
     },
     isActive: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false,
+      defaultValue: true,
     },
     invitationToken: {
       type: DataTypes.STRING,
       allowNull: true,
     },
+  }, {
+    tableName: 'Staffs'
   });
 
   Staff.associate = (models) => {
