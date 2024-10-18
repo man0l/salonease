@@ -10,7 +10,7 @@ router.use(authMiddleware);
 const allowedRoles = ['SuperAdmin', 'SalonOwner'];
 
 // Apply roleMiddleware to all staff routes
-router.use(roleMiddleware(...allowedRoles));
+router.use(roleMiddleware(allowedRoles));
 
 router.get('/:salonId/staff', staffController.getStaff);
 router.post('/:salonId/staff/invite', staffController.inviteStaff);

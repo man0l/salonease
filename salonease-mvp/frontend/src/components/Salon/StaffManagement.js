@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { staffApi } from '../../utils/api';
 import { useSalonContext } from '../../contexts/SalonContext';
 
@@ -9,13 +9,8 @@ const StaffManagement = () => {
   const [newStaff, setNewStaff] = useState({ email: '', fullName: '', role: '' });
   const { selectedSalon } = useSalonContext();
 
-  useEffect(() => {
-    if (selectedSalon) {
-      fetchStaff();
-    }
-  }, [selectedSalon]);
-
-  const fetchStaff = async () => {
+  const fetchStaff = useCallback(async () => {
+    if (!selectedSalon) return;
     try {
       setLoading(true);
       const response = await staffApi.getStaff(selectedSalon.id);
@@ -25,7 +20,11 @@ const StaffManagement = () => {
       setError('Failed to fetch staff');
       setLoading(false);
     }
-  };
+  }, [selectedSalon]);
+
+  useEffect(() => {
+    fetchStaff();
+  }, [fetchStaff]);
 
   const handleInviteStaff = async (e) => {
     e.preventDefault();

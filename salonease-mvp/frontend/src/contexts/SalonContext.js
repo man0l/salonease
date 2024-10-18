@@ -11,7 +11,7 @@ export const useSalonContext = () => {
   return context;
 };
 
-export const SalonProvider = ({ children }) => {
+export const SalonProvider = ({ children, navigate, location }) => {
   const { salons, loading, error, fetchSalons, addSalon: hookAddSalon, updateSalon, deleteSalon: hookDeleteSalon, currentPage, totalPages, setCurrentPage } = useSalon();
   const [selectedSalon, setSelectedSalon] = useState(null);
 
@@ -30,10 +30,19 @@ export const SalonProvider = ({ children }) => {
   const handleSetSelectedSalon = useCallback((salon) => {
     if (salon && salon.id) {
       setSelectedSalon(salon);
+      
+      // Update URL for all routes containing 'salons'
+      if (location && navigate) {
+        const currentPath = location.pathname;
+        if (currentPath.includes('salons')) {
+          const newPath = currentPath.replace(/\/salons\/[^/]*/, `/salons/${salon.id}`);
+          navigate(newPath, { replace: true });
+        }
+      }
     } else {
       console.warn('Attempted to set invalid salon:', salon);
     }
-  }, []);
+  }, [navigate, location]);
 
   const handleAddSalon = useCallback(async (salonData) => {
     const newSalon = await hookAddSalon(salonData);

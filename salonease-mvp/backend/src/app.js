@@ -17,7 +17,7 @@ const staffRoutes = require('./routes/staffRoutes');
 // Use routes
 app.use('/api/auth', authRoutes);
 app.use('/api/salons', salonRoutes);
-app.use('/api/staff', staffRoutes); // Add staff routes under salons
+app.use('/api/salons', staffRoutes);
 
 // Basic route
 app.get('/', (req, res) => {
