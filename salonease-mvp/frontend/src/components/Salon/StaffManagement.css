@@ -1,0 +1,112 @@
+.staff-management {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.staff-form-container, .staff-list-container {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.staff-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+input, select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.btn-invite, .btn-promote, .btn-remove {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.btn-invite {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.btn-invite:hover {
+  background-color: #45a049;
+}
+
+.staff-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.staff-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.staff-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.staff-name {
+  font-weight: bold;
+}
+
+.staff-role {
+  color: #666;
+}
+
+.staff-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-promote {
+  background-color: #2196F3;
+  color: white;
+}
+
+.btn-promote:hover {
+  background-color: #1e87db;
+}
+
+.btn-remove {
+  background-color: #f44336;
+  color: white;
+}
+
+.btn-remove:hover {
+  background-color: #da190b;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 20px;
+  font-size: 18px;
+}
+
+.error {
+  color: #f44336;
+}

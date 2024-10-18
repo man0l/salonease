@@ -17,10 +17,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      role: {
-        type: Sequelize.ENUM('stylist', 'manager'),
-        allowNull: false,
-      },
       isActive: {
         type: Sequelize.BOOLEAN,
         defaultValue: true,

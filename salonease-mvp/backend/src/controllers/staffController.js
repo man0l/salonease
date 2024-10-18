@@ -5,7 +5,10 @@ const { sendInvitationEmail } = require("../utils/helpers/emailHelper");
 exports.getStaff = async (req, res) => {
   try {
     const { salonId } = req.params;
-    const staff = await Staff.findAll({ where: { salonId } });
+    const staff = await Staff.findAll({
+      where: { salonId },
+      attributes: ['id', 'email', 'fullName', 'isActive'] // Explicitly specify the columns
+    });
     res.json(staff);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching staff', error: error.message });
@@ -15,14 +18,14 @@ exports.getStaff = async (req, res) => {
 exports.inviteStaff = async (req, res) => {
   try {
     const { salonId } = req.params;
-    const { email, fullName, role } = req.body;
+    const { email, fullName } = req.body;
 
     const salon = await Salon.findByPk(salonId);
     if (!salon) {
       return res.status(404).json({ message: 'Salon not found' });
     }
 
-    const newStaff = await Staff.create({ salonId, email, fullName, role });
+    const newStaff = await Staff.create({ salonId, email, fullName });
 
     // Send invitation email
     await sendInvitationEmail(email, fullName, salon.name);
@@ -36,10 +39,14 @@ exports.inviteStaff = async (req, res) => {
 exports.updateStaff = async (req, res) => {
   try {
     const { salonId, staffId } = req.params;
-    const [updatedRowsCount, [updatedStaff]] = await Staff.update(req.body, {
-      where: { id: staffId, salonId },
-      returning: true,
-    });
+    const { fullName, isActive } = req.body; // Only allow updating these fields
+    const [updatedRowsCount, [updatedStaff]] = await Staff.update(
+      { fullName, isActive },
+      {
+        where: { id: staffId, salonId },
+        returning: true,
+      }
+    );
 
     if (updatedRowsCount === 0) {
       return res.status(404).json({ message: 'Staff not found' });

@@ -1,13 +1,21 @@
 const { createSalon, getSalons, updateSalon, deleteSalon } = require('../../src/controllers/salonController');
 const { Salon, User } = require('../setupTests');
 const httpMocks = require('node-mocks-http');
+const { v4: uuidv4 } = require('uuid');
 
 describe('Salon Controller', () => {
-  let req, res;
+  let req, res, testUser;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     req = httpMocks.createRequest();
     res = httpMocks.createResponse();
+
+    testUser = await User.create({
+      fullName: 'Test User',
+      email: 'test@example.com',
+      password: 'password123',
+      role: 'SalonOwner',
+    });
   });
 
   describe('createSalon', () => {
@@ -92,23 +100,16 @@ describe('Salon Controller', () => {
 
   describe('updateSalon', () => {
     it('should update an existing salon', async () => {
-      const user = await User.create({
-        fullName: 'Salon Owner',
-        email: 'owner3@example.com',
-        password: 'Password123!',
-        role: 'SalonOwner',
-      });
-
       const salon = await Salon.create({
         name: 'Original Salon',
         address: '789 Test Blvd',
         contactNumber: '1122334455',
-        ownerId: user.id,
+        ownerId: testUser.id,
       });
 
       req.params = { id: salon.id };
       req.body = { name: 'Updated Salon', address: 'New Address' };
-      req.user = { id: user.id };
+      req.user = { id: testUser.id };
 
       await updateSalon(req, res);
 
@@ -121,9 +122,10 @@ describe('Salon Controller', () => {
     });
 
     it('should return 404 if salon does not exist', async () => {
-      req.params = { id: 9999 };
+      const nonExistentId = uuidv4();
+      req.params = { id: nonExistentId };
       req.body = { name: 'Updated Salon' };
-      req.user = { id: 1 };
+      req.user = { id: testUser.id };
 
       await updateSalon(req, res);
 
@@ -134,22 +136,15 @@ describe('Salon Controller', () => {
 
   describe('deleteSalon', () => {
     it('should delete an existing salon', async () => {
-      const user = await User.create({
-        fullName: 'Salon Owner',
-        email: 'owner4@example.com',
-        password: 'Password123!',
-        role: 'SalonOwner',
-      });
-
       const salon = await Salon.create({
         name: 'Salon to Delete',
         address: '999 Delete St',
         contactNumber: '9876543210',
-        ownerId: user.id,
+        ownerId: testUser.id,
       });
 
       req.params = { id: salon.id };
-      req.user = { id: user.id };
+      req.user = { id: testUser.id };
 
       await deleteSalon(req, res);
 
@@ -160,8 +155,9 @@ describe('Salon Controller', () => {
     });
 
     it('should return 404 if salon to delete does not exist', async () => {
-      req.params = { id: 9999 };
-      req.user = { id: 1 };
+      const nonExistentId = uuidv4();
+      req.params = { id: nonExistentId };
+      req.user = { id: testUser.id };
 
       await deleteSalon(req, res);
 

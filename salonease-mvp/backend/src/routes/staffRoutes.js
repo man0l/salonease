@@ -3,6 +3,7 @@ const router = express.Router();
 const staffController = require('../controllers/staffController');
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
+
 // Apply authMiddleware to all routes
 router.use(authMiddleware);
 
