@@ -70,12 +70,19 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUser = async (userData) => {
+    const response = await api.put('/auth/update', userData);
+    setUser(response.data);
+    return response.data;
+  };
+
   const value = {
     user,
     loading,
     login,
     logout,
     register,
+    updateUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

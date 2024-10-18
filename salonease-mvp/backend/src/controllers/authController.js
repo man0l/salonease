@@ -48,6 +48,7 @@ exports.register = async (req, res) => {
       email,
       password: hashedPassword,
       role: 'SalonOwner',
+      onboardingCompleted: false,
     });
     console.log('User created successfully:', newUser);
 
