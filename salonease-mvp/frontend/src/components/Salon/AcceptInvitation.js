@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
 import { toast } from 'react-toastify';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { staffApi } from '../../utils/api';
-
-const schema = yup.object().shape({
-  password: yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
-  confirmPassword: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match'),
-});
+import { acceptInvitationSchema } from '../../utils/validationSchemas';
 
 const AcceptInvitation = () => {
   const [loading, setLoading] = useState(false);
@@ -17,7 +12,7 @@ const AcceptInvitation = () => {
   const navigate = useNavigate();
 
   const { register, handleSubmit, formState: { errors } } = useForm({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(acceptInvitationSchema),
   });
 
   const onSubmit = async (data) => {
@@ -29,7 +24,14 @@ const AcceptInvitation = () => {
       toast.success('Invitation accepted successfully');
       navigate('/login');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to accept invitation');
+      console.error('Error accepting invitation:', error);
+      if (error.response && error.response.data && error.response.data.message) {
+        toast.error(`Error: ${error.response.data.message}`);
+      } else if (error.message) {
+        toast.error(`Error: ${error.message}`);
+      } else {
+        toast.error('An unexpected error occurred while accepting the invitation');
+      }
     } finally {
       setLoading(false);
     }

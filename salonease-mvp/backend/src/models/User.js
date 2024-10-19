@@ -1,4 +1,5 @@
 const { Model, DataTypes } = require('sequelize');
+const ROLES = require('../config/roles');
 
 class User extends Model {
   static associate(models) {
@@ -28,7 +29,7 @@ module.exports = (sequelize) => {
     },
     role: {
       type: DataTypes.STRING,
-      defaultValue: 'SalonOwner',
+      defaultValue: ROLES.SALON_OWNER,
     },
     isEmailVerified: {
       type: DataTypes.BOOLEAN,

@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { authApi } from '../../utils/api';
 import { toast } from 'react-toastify';
+import { forgotPasswordSchema } from '../../utils/validationSchemas';
 
 const ForgotPassword = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: yupResolver(forgotPasswordSchema)
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (data) => {

@@ -1,31 +1,15 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { authApi } from '../../utils/api';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { registerSchema } from '../../utils/validationSchemas';
 
 const Register = () => {
   const navigate = useNavigate();
-  const validationSchema = Yup.object().shape({
-    fullName: Yup.string().required('Full Name is required'),
-    email: Yup.string().email('Email is invalid').required('Email is required'),
-    password: Yup.string()
-      .min(8, 'Password must be at least 8 characters')
-      .matches(/[a-z]/, 'Password must contain a lowercase letter')
-      .matches(/[A-Z]/, 'Password must contain an uppercase letter')
-      .matches(/[0-9]/, 'Password must contain a number')
-      .matches(/[@$!%*?&#]/, 'Password must contain a special character')
-      .required('Password is required'),
-    confirmPassword: Yup.string()
-      .oneOf([Yup.ref('password'), null], 'Passwords must match')
-      .required('Confirm Password is required'),
-    acceptTerms: Yup.bool().oneOf([true], 'Accept Terms is required'),
-  });
-
   const { register, handleSubmit, formState: { errors } } = useForm({
-    resolver: yupResolver(validationSchema)
+    resolver: yupResolver(registerSchema)
   });
 
   const onSubmit = async (data) => {

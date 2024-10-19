@@ -2,7 +2,7 @@ const { Staff, Salon, User } = require('../config/db');
 const { sendInvitationEmail, sendWelcomeEmail } = require("../utils/helpers/emailHelper");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+const ROLES = require('../config/roles');
 exports.getStaff = async (req, res) => {
   try {
     const { salonId } = req.params;
@@ -108,14 +108,30 @@ exports.updateStaff = async (req, res) => {
 exports.deleteStaff = async (req, res) => {
   try {
     const { salonId, staffId } = req.params;
-    const deletedRowsCount = await Staff.destroy({ where: { id: staffId, salonId } });
+    
+    // Check if the salon belongs to the current user
+    const salon = await Salon.findOne({ where: { id: salonId, ownerId: req.user.id } });
+    if (!salon) {
+      return res.status(403).json({ message: 'You can only delete staff from your own salon' });
+    }
 
-    if (deletedRowsCount === 0) {
+    // Find the staff member
+    const staff = await Staff.findOne({ where: { id: staffId, salonId } });
+    if (!staff) {
       return res.status(404).json({ message: 'Staff not found' });
     }
 
-    res.json({ message: 'Staff deleted successfully' });
+    // Delete the associated user if it exists
+    if (staff.userId) {
+      await User.destroy({ where: { id: staff.userId } });
+    }
+
+    // Delete the staff member
+    await staff.destroy();
+
+    res.json({ message: 'Staff and associated user deleted successfully' });
   } catch (error) {
+    console.error('Error deleting staff:', error);
     res.status(500).json({ message: 'Error deleting staff', error: error.message });
   }
 };
@@ -131,9 +147,13 @@ exports.acceptInvitation = async (req, res) => {
     }
 
     // Check if the invitation has expired
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (Date.now() >= decoded.exp * 1000) {
-      return res.status(400).json({ message: 'Invitation has expired' });
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+        return res.status(400).json({ message: 'Invitation has expired' });
+      }
+      throw error;
     }
 
     // Create a new user account
@@ -142,7 +162,8 @@ exports.acceptInvitation = async (req, res) => {
       email: staff.email,
       password: hashedPassword,
       fullName: staff.fullName,
-      role: 'staff'
+      role: ROLES.STAFF,
+      isEmailVerified: true
     });
 
     // Update the staff record with the new user ID
@@ -159,10 +180,33 @@ exports.acceptInvitation = async (req, res) => {
 
     res.status(200).json({ message: 'Invitation accepted successfully' });
   } catch (error) {
-    if (error.name === 'JsonWebTokenError') {
-      return res.status(400).json({ message: 'Invalid or expired invitation token' });
-    }
     console.error('Error accepting invitation:', error);
     res.status(500).json({ message: 'Error accepting invitation', error: error.message });
+  }
+};
+
+exports.getAssociatedSalon = async (req, res) => {
+  try {
+    const staff = await Staff.findOne({
+      where: { userId: req.user.id },
+      include: [{
+        model: Salon,
+        as: 'salon',
+        attributes: ['id', 'name', 'address', 'contactNumber']
+      }]
+    });
+
+    if (!staff) {
+      return res.status(404).json({ message: 'Staff record not found' });
+    }
+
+    if (!staff.salon) {
+      return res.status(404).json({ message: 'Associated salon not found' });
+    }
+
+    res.json(staff.salon);
+  } catch (error) {
+    console.error('Error fetching associated salon:', error);
+    res.status(500).json({ message: 'Error fetching associated salon', error: error.message });
   }
 };

@@ -11,13 +11,13 @@ app.use(express.urlencoded({ extended: true }));
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
-const salonRoutes = require('./routes/salonRoutes');
 const staffRoutes = require('./routes/staffRoutes');
+const salonRoutes = require('./routes/salonRoutes');
 
 // Use routes
 app.use('/api/auth', authRoutes);
 app.use('/api/salons', salonRoutes);
-app.use('/api/salons', staffRoutes);
+app.use('/api/staff', staffRoutes);
 
 // Basic route
 app.get('/', (req, res) => {

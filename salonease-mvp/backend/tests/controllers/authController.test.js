@@ -1,10 +1,17 @@
-const { register, verifyEmail, login, refreshToken: refreshTokenAction, logout } = require('../../src/controllers/authController');
+const { register, verifyEmail, login, refreshToken: refreshTokenAction, logout, forgotPassword } = require('../../src/controllers/authController');
 const { User, RefreshToken: RefreshTokenModel, sequelize } = require('../setupTests');
 const httpMocks = require('node-mocks-http');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 
+// mock the emailHelper
+jest.mock('../../src/utils/helpers/emailHelper', () => ({
+  sendVerificationEmail: jest.fn().mockResolvedValue(),
+  sendPasswordResetEmail: jest.fn().mockResolvedValue(),
+}));
+
+const emailHelper = require('../../src/utils/helpers/emailHelper');
 describe('Auth Controller', () => {
   let req, res;
 
@@ -12,6 +19,8 @@ describe('Auth Controller', () => {
     req = httpMocks.createRequest();
     res = httpMocks.createResponse();
     process.env.JWT_SECRET = 'testsecret';
+    // Clear all mocks before each test
+    jest.clearAllMocks();
   });
 
   describe('register', () => {
@@ -31,6 +40,12 @@ describe('Auth Controller', () => {
 
       const newUser = await User.findOne({ where: { email: req.body.email } });
       expect(newUser).not.toBeNull();
+
+      // Check if the sendVerificationEmail function was called
+      expect(emailHelper.sendVerificationEmail).toHaveBeenCalledWith(
+        req.body.email,
+        expect.any(String)
+      );
     });
 
     // Add more register tests...
@@ -164,5 +179,32 @@ describe('Auth Controller', () => {
       const storedRefreshToken = await RefreshTokenModel.findOne({ where: { token: refreshTokenValue } });
       expect(storedRefreshToken).toBeNull();
     });
+  });
+
+  describe('forgotPassword', () => {
+    it('should send a password reset email', async () => {
+      const user = await User.create({
+        fullName: 'Forgot Password User',
+        email: 'forgotpassword@example.com',
+        password: await bcrypt.hash('OldPassword123!', 10),
+        isEmailVerified: true,
+      });
+
+      req.body = {
+        email: 'forgotpassword@example.com',
+      };
+
+      await forgotPassword(req, res);
+
+      expect(res.statusCode).toBe(200);
+      expect(res._getJSONData().message).toBe('Password reset email sent');
+      // Add this assertion to check if the sendPasswordResetEmail function was called
+      expect(emailHelper.sendPasswordResetEmail).toHaveBeenCalledWith(
+        req.body.email,
+        expect.any(String)
+      );
+    });
+
+    // ... (other forgotPassword tests)
   });
 });

@@ -89,12 +89,16 @@ const StaffManagement = () => {
     
     try {
       await staffApi.deleteStaff(selectedSalon.id, staffToDelete);
-      toast.success('Staff deleted successfully');
+      toast.success('Staff and associated user deleted successfully');
       setIsDeleteDialogOpen(false);
       setStaffToDelete(null);
       await fetchStaff();
     } catch (err) {
-      toast.error('Failed to delete staff');
+      if (err.response && err.response.data && err.response.data.message) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error('Failed to delete staff');
+      }
     }
   }, [staffToDelete, selectedSalon, fetchStaff]);
 
@@ -188,7 +192,7 @@ const StaffManagement = () => {
               <li key={member.id} className="flex justify-between items-center p-4 border border-gray-200 rounded-lg hover:shadow-md transition duration-300">
                 <div>
                   <span className="font-semibold text-primary-600">{member.fullName}</span>
-                  <span className="ml-2 text-sm text-gray-600">{member.email}</span>
+                  <span className="ml-2 text-sm text-gray-600">({member.email})</span>
                 </div>
                 <div className="space-x-2">
                   <button

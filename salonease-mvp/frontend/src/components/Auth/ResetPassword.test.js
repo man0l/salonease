@@ -42,12 +42,12 @@ describe('ResetPassword Component', () => {
     const confirmPasswordInput = screen.getByLabelText(/^confirm new password$/i);
     const submitButton = screen.getByRole('button', { name: /reset password/i });
 
-    fireEvent.change(newPasswordInput, { target: { value: 'password123' } });
-    fireEvent.change(confirmPasswordInput, { target: { value: 'password456' } });
+    fireEvent.change(newPasswordInput, { target: { value: 'Password123!' } });
+    fireEvent.change(confirmPasswordInput, { target: { value: 'DifferentPassword123!' } });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/passwords do not match/i)).toBeInTheDocument();
+      expect(screen.getByText('Passwords must match')).toBeInTheDocument();
     });
   });
 

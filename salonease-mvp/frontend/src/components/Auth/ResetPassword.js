@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { authApi } from '../../utils/api';
 import { toast } from 'react-toastify';
+import { resetPasswordSchema } from '../../utils/validationSchemas';
 
 const ResetPassword = () => {
-  const { register, handleSubmit, formState: { errors }, watch } = useForm();
+  const { register, handleSubmit, formState: { errors }, watch } = useForm({
+    resolver: yupResolver(resetPasswordSchema)
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -45,13 +49,7 @@ const ResetPassword = () => {
                 <input
                   id="password"
                   type="password"
-                  {...register('password', {
-                    required: 'Password is required',
-                    minLength: {
-                      value: 8,
-                      message: 'Password must be at least 8 characters',
-                    },
-                  })}
+                  {...register('password')}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
               </div>
@@ -66,9 +64,7 @@ const ResetPassword = () => {
                 <input
                   id="confirmPassword"
                   type="password"
-                  {...register('confirmPassword', {
-                    validate: (value) => value === watch('password') || 'Passwords do not match',
-                  })}
+                  {...register('confirmPassword')}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
               </div>

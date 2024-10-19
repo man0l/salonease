@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const emailHelper = require('../../src/utils/helpers/emailHelper');
 const { v4: uuidv4 } = require('uuid');
+const ROLES = require('../../src/config/roles');
 
 jest.mock('../../src/utils/helpers/emailHelper', () => ({
   sendInvitationEmail: jest.fn(),
@@ -22,7 +23,7 @@ describe('Staff Routes', () => {
       fullName: 'Test Owner',
       email: 'owner@example.com',
       password: hashedPassword,
-      role: 'SalonOwner',
+      role: ROLES.SALON_OWNER,
       isEmailVerified: true
     });
     salon = await Salon.create({
@@ -35,7 +36,7 @@ describe('Staff Routes', () => {
     token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET);
   });
 
-  describe('GET /api/salons/:salonId/staff', () => {
+  describe('GET /api/staff/:salonId', () => {
     it('should get all staff for a salon', async () => {
       await Staff.bulkCreate([
         { id: uuidv4(), salonId: salon.id, email: 'staff1@example.com', fullName: 'Staff One' },
@@ -43,7 +44,7 @@ describe('Staff Routes', () => {
       ]);
 
       const response = await request(app)
-        .get(`/api/salons/${salon.id}/staff`)
+        .get(`/api/staff/${salon.id}`)
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.statusCode).toBe(200);
@@ -53,7 +54,7 @@ describe('Staff Routes', () => {
     });
   });
 
-  describe('POST /api/salons/:salonId/staff/invite', () => {
+  describe('POST /api/staff/:salonId/invite', () => {
     it('should invite a new staff member', async () => {
       const staffData = {
         email: 'newstaff@example.com',
@@ -61,7 +62,7 @@ describe('Staff Routes', () => {
       };
 
       const response = await request(app)
-        .post(`/api/salons/${salon.id}/staff/invite`)
+        .post(`/api/staff/${salon.id}/invite`)
         .set('Authorization', `Bearer ${token}`)
         .send(staffData);
 
@@ -72,13 +73,14 @@ describe('Staff Routes', () => {
       expect(emailHelper.sendInvitationEmail).toHaveBeenCalledWith(
         staffData.email,
         staffData.fullName,
-        salon.name
+        salon.name,
+        expect.any(String) // Expect the fourth argument to be a string (invitation token)
       );
     });
 
     it('should return 400 if staff data is invalid', async () => {
       const response = await request(app)
-        .post(`/api/salons/${salon.id}/staff/invite`)
+        .post(`/api/staff/${salon.id}/invite`)
         .set('Authorization', `Bearer ${token}`)
         .send({ email: 'invalid-email' });
 
@@ -90,7 +92,7 @@ describe('Staff Routes', () => {
 
     it('should return 400 if full name is missing', async () => {
       const response = await request(app)
-        .post(`/api/salons/${salon.id}/staff/invite`)
+        .post(`/api/staff/${salon.id}/invite`)
         .set('Authorization', `Bearer ${token}`)
         .send({ email: 'valid@email.com' });
 
@@ -101,7 +103,7 @@ describe('Staff Routes', () => {
     });
   });
 
-  describe('PUT /api/salons/:salonId/staff/:staffId', () => {
+  describe('PUT /api/staff/:salonId/:staffId', () => {
     it('should update a staff member', async () => {
       const staff = await Staff.create({
         id: uuidv4(),
@@ -111,7 +113,7 @@ describe('Staff Routes', () => {
       });
 
       const response = await request(app)
-        .put(`/api/salons/${salon.id}/staff/${staff.id}`)
+        .put(`/api/staff/${salon.id}/${staff.id}`)
         .set('Authorization', `Bearer ${token}`)
         .send({ fullName: 'Updated Staff Name' });
 
@@ -125,7 +127,7 @@ describe('Staff Routes', () => {
     it('should return 404 if staff does not exist', async () => {
       const nonExistentId = uuidv4();
       const response = await request(app)
-        .put(`/api/salons/${salon.id}/staff/${nonExistentId}`)
+        .put(`/api/staff/${salon.id}/${nonExistentId}`)
         .set('Authorization', `Bearer ${token}`)
         .send({ fullName: 'Updated Name' });
 
@@ -134,34 +136,129 @@ describe('Staff Routes', () => {
     });
   });
 
-  describe('DELETE /api/salons/:salonId/staff/:staffId', () => {
-    it('should delete a staff member', async () => {
+  describe('DELETE /api/staff/:salonId/staff/:staffId', () => {
+    it('should delete a staff member and associated user', async () => {
+      const user = await User.create({
+        id: uuidv4(),
+        fullName: 'Staff Member',
+        email: 'staff@example.com',
+        password: await bcrypt.hash('Password123!', 10),
+        role: 'Staff',
+        isEmailVerified: true
+      });
+
       const staff = await Staff.create({
         id: uuidv4(),
         salonId: salon.id,
+        userId: user.id,
         email: 'staff@example.com',
         fullName: 'Staff Member'
       });
 
       const response = await request(app)
-        .delete(`/api/salons/${salon.id}/staff/${staff.id}`)
+        .delete(`/api/staff/${salon.id}/staff/${staff.id}`)
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.statusCode).toBe(200);
-      expect(response.body).toHaveProperty('message', 'Staff deleted successfully');
+      expect(response.body).toHaveProperty('message', 'Staff and associated user deleted successfully');
 
       const deletedStaff = await Staff.findByPk(staff.id);
       expect(deletedStaff).toBeNull();
+
+      const deletedUser = await User.findByPk(user.id);
+      expect(deletedUser).toBeNull();
     });
 
     it('should return 404 if staff to delete does not exist', async () => {
       const nonExistentId = uuidv4();
       const response = await request(app)
-        .delete(`/api/salons/${salon.id}/staff/${nonExistentId}`)
+        .delete(`/api/staff/${salon.id}/staff/${nonExistentId}`)
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.statusCode).toBe(404);
       expect(response.body).toHaveProperty('message', 'Staff not found');
+    });
+  });
+
+  describe('GET /api/staff/my-salon', () => {
+    it('should get the associated salon for a staff member', async () => {
+      const staffUser = await User.create({
+        id: uuidv4(),
+        fullName: 'Staff Member',
+        email: 'staff@example.com',
+        password: await bcrypt.hash('Password123!', 10),
+        role: ROLES.STAFF,
+        isEmailVerified: true
+      });
+
+      await Staff.create({
+        id: uuidv4(),
+        salonId: salon.id,
+        userId: staffUser.id,
+        email: 'staff@example.com',
+        fullName: 'Staff Member'
+      });
+
+      const staffToken = jwt.sign({ userId: staffUser.id, role: staffUser.role }, process.env.JWT_SECRET);
+
+      const response = await request(app)
+        .get('/api/staff/my-salon')
+        .set('Authorization', `Bearer ${staffToken}`);
+
+      console.log(response.body);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toHaveProperty('id', salon.id);
+      expect(response.body).toHaveProperty('name', salon.name);
+      expect(response.body).toHaveProperty('address', salon.address);
+      expect(response.body).toHaveProperty('contactNumber', salon.contactNumber);
+    });
+
+    it('should return 404 if staff record is not found', async () => {
+      const nonExistentStaffUser = await User.create({
+        id: uuidv4(),
+        fullName: 'Non-existent Staff',
+        email: 'nonexistent@example.com',
+        password: await bcrypt.hash('Password123!', 10),
+        role: ROLES.STAFF,
+        isEmailVerified: true
+      });
+
+      const nonExistentStaffToken = jwt.sign({ userId: nonExistentStaffUser.id, role: nonExistentStaffUser.role }, process.env.JWT_SECRET);
+
+      const response = await request(app)
+        .get('/api/staff/my-salon')
+        .set('Authorization', `Bearer ${nonExistentStaffToken}`);
+
+      expect(response.statusCode).toBe(404);
+      expect(response.body).toHaveProperty('message', 'Staff record not found');
+    });
+
+    it('should return 404 if staff has no associated salon', async () => {
+      const staffUser = await User.create({
+        id: uuidv4(),
+        fullName: 'Unassigned Staff',
+        email: 'unassigned@example.com',
+        password: await bcrypt.hash('Password123!', 10),
+        role: ROLES.STAFF,
+        isEmailVerified: true
+      });
+
+      await Staff.create({
+        id: uuidv4(),
+        userId: staffUser.id,
+        email: 'unassigned@example.com',
+        fullName: 'Unassigned Staff'
+      });
+
+      const staffToken = jwt.sign({ userId: staffUser.id, role: staffUser.role }, process.env.JWT_SECRET);
+
+      const response = await request(app)
+        .get('/api/staff/my-salon')
+        .set('Authorization', `Bearer ${staffToken}`);
+
+      expect(response.statusCode).toBe(404);
+      expect(response.body).toHaveProperty('message', 'Associated salon not found');
     });
   });
 });

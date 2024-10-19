@@ -49,7 +49,7 @@ beforeEach(async () => {
   try {
     // Use a single query to truncate all tables at once
     await sequelize.query(`
-      TRUNCATE TABLE "Salons", "Users", "RefreshTokens", "Staff"
+      TRUNCATE TABLE "Salons", "Users", "RefreshTokens", "Staffs"
       RESTART IDENTITY
       CASCADE;
     `);

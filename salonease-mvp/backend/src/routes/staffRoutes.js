@@ -3,21 +3,19 @@ const router = express.Router();
 const staffController = require('../controllers/staffController');
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
+const ROLES = require('../config/roles');
 
-// Define allowed roles for staff management
-const allowedRoles = ['SuperAdmin', 'SalonOwner'];
-
-// Public route for accepting invitations
-router.post('/accept-invitation', staffController.acceptInvitation);
-
-// Apply authMiddleware and roleMiddleware to protected routes
+// Apply authMiddleware to all routes
 router.use(authMiddleware);
-router.use(roleMiddleware(allowedRoles));
 
-// Protected routes
-router.get('/:salonId/staff', staffController.getStaff);
-router.post('/:salonId/staff/invite', staffController.inviteStaff);
-router.put('/:salonId/staff/:staffId', staffController.updateStaff);
-router.delete('/:salonId/staff/:staffId', staffController.deleteStaff);
+router.get('/my-salon', roleMiddleware([ROLES.STAFF]), staffController.getAssociatedSalon);
+
+// Protected routes for staff management
+router.get('/:salonId', roleMiddleware([ROLES.SUPER_ADMIN, ROLES.SALON_OWNER]), staffController.getStaff);
+router.post('/:salonId/invite', roleMiddleware([ROLES.SUPER_ADMIN, ROLES.SALON_OWNER]), staffController.inviteStaff);
+router.put('/:salonId/:staffId', roleMiddleware([ROLES.SUPER_ADMIN, ROLES.SALON_OWNER]), staffController.updateStaff);
+
+// Only salon owners can delete staff
+router.delete('/:salonId/staff/:staffId', roleMiddleware([ROLES.SALON_OWNER]), staffController.deleteStaff);
 
 module.exports = router;

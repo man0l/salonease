@@ -91,11 +91,11 @@ const authApi = {
 };
 
 const staffApi = {
-  getStaff: (salonId) => api.get(`/salons/${salonId}/staff`),
-  inviteStaff: (salonId, staffData) => api.post(`/salons/${salonId}/staff/invite`, staffData),
-  updateStaff: (salonId, staffId, staffData) => api.put(`/salons/${salonId}/staff/${staffId}`, staffData),
-  deleteStaff: (salonId, staffId) => api.delete(`/salons/${salonId}/staff/${staffId}`),
-  acceptInvitation: (data) => axios.post(`${api.defaults.baseURL}/staff/accept-invitation`, data),
+  getStaff: (salonId) => api.get(`/staff/${salonId}`),
+  inviteStaff: (salonId, staffData) => api.post(`/staff/${salonId}/invite`, staffData),
+  updateStaff: (salonId, staffId, staffData) => api.put(`/staff/${salonId}/${staffId}`, staffData),
+  deleteStaff: (salonId, staffId) => api.delete(`/staff/${salonId}/${staffId}`),
+  acceptInvitation: (data) => axios.post(`${api.defaults.baseURL}/auth/accept-invitation`, data),
 };
 
 export { api, authApi, staffApi };

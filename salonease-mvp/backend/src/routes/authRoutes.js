@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
+const staffController = require('../controllers/staffController');
 const authMiddleware = require('../middleware/authMiddleware');
 
 // Registration route
@@ -22,6 +23,8 @@ router.post('/reset-password', authController.resetPassword);
 // Add these new routes
 router.post('/refresh-token', authController.refreshToken);
 router.post('/logout', authController.logout);
+// Public route for accepting invitations
+router.post('/accept-invitation', staffController.acceptInvitation);
 
 // Add this new route
 router.put('/update', authMiddleware, authController.updateUser);

@@ -21,6 +21,7 @@ import SalonManagement from './components/Salon/SalonManagement';
 import RegistrationSuccess from './components/Auth/RegistrationSuccess';
 import SalonOwnerOnboarding from './components/Onboarding/SalonOwnerOnboarding';
 import StaffManagement from './components/Salon/StaffManagement';
+import AcceptInvitation from './components/Salon/AcceptInvitation';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -61,6 +62,7 @@ function AppContent() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/registration-success" element={<RegistrationSuccess />} />
                 <Route path="/verify-email" element={<VerifyEmail />} />
+                <Route path="/accept-invitation" element={<AcceptInvitation />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route 
