@@ -16,13 +16,19 @@ function Login() {
       const success = await login(data.email, data.password);
       if (success) {
         toast.success('Login successful');
-        navigate('/dashboard');
+        // Redirect based on user role
+        if (success) {
+          navigate('/dashboard');
+        } else {
+          navigate('/'); // Fallback route
+        }
       } else {
         toast.error('Invalid email or password');
       }
     } catch (error) {
       console.error('Login error:', error);
       toast.error(error.response?.data?.message || 'An error occurred. Please try again.');
+      setIsSubmitting(false);
     } finally {
       setIsSubmitting(false);
     }

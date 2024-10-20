@@ -75,11 +75,11 @@ function Header() {
   );
 
   return (
-    <header className="bg-white shadow-md">
+    <header className="bg-white shadow-custom">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           <div className="flex-shrink-0">
-            <Link to="/" className="text-2xl font-bold text-primary">SalonEase</Link>
+            <Link to="/" className="text-2xl font-bold text-primary-600">SalonEase</Link>
           </div>
           {user && user.role === 'SalonOwner' && (
             <div className="flex-grow flex justify-center">
@@ -91,8 +91,8 @@ function Header() {
               renderUserMenu()
             ) : (
               <div className="space-x-4">
-                <Link to="/login" className="text-text hover:text-primary transition-colors">Login</Link>
-                <Link to="/register" className="bg-primary text-text px-4 py-2 rounded-md hover:bg-secondary transition-colors">Sign Up</Link>
+                <Link to="/login" className="text-text hover:text-primary-600 transition-colors">Login</Link>
+                <Link to="/register" className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition-colors">Sign Up</Link>
               </div>
             )}
           </div>

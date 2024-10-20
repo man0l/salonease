@@ -1,17 +1,28 @@
 import React, { useEffect } from 'react';
 import { useSalonContext } from '../contexts/SalonContext';
+import ROLES from '../utils/roles'; // Add this import
 
 const SalonSelector = () => {
-  const { salons, loading, error, selectedSalon, setSelectedSalon } = useSalonContext();
+  const { salons, loading, error, selectedSalon, setSelectedSalon, userRole } = useSalonContext();
 
   useEffect(() => {
-    if (salons.length > 0 && !selectedSalon) {
+    if (userRole === ROLES.SALON_OWNER && salons.length > 0 && !selectedSalon) {
       setSelectedSalon(salons[0]);
     }
-  }, [salons, selectedSalon, setSelectedSalon]);
+  }, [salons, selectedSalon, setSelectedSalon, userRole]);
 
-  if (loading) return <div>Loading salons...</div>;
-  if (error) return <div>Error loading salons: {error}</div>;
+  if (loading) return <div>Loading salon...</div>;
+  if (error) return <div>Error loading salon: {error}</div>;
+
+  if (userRole === ROLES.STAFF) {
+    return selectedSalon ? (
+      <div className="bg-white text-primary-600 border border-primary-600 rounded px-2 py-1">
+        {selectedSalon.name}
+      </div>
+    ) : (
+      <div>No associated salon found</div>
+    );
+  }
 
   const handleSalonChange = (e) => {
     const selectedId = e.target.value;
@@ -24,7 +35,7 @@ const SalonSelector = () => {
   };
 
   return (
-    salons.length > 0 ? (
+    userRole === ROLES.SALON_OWNER && salons.length > 0 ? (
       <select 
         className="bg-white text-primary border border-primary rounded px-2 py-1"
         value={selectedSalon?.id || ''}

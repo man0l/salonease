@@ -1,5 +1,8 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { useSalon } from '../hooks/useSalon';
+import { staffApi } from '../utils/api';
+import { useAuth } from '../hooks/useAuth';
+import ROLES from '../utils/roles';
 
 const SalonContext = createContext();
 
@@ -14,10 +17,24 @@ export const useSalonContext = () => {
 export const SalonProvider = ({ children, navigate, location }) => {
   const { salons, loading, error, fetchSalons, addSalon: hookAddSalon, updateSalon, deleteSalon: hookDeleteSalon, currentPage, totalPages, setCurrentPage } = useSalon();
   const [selectedSalon, setSelectedSalon] = useState(null);
+  const { user } = useAuth();
 
   useEffect(() => {
-    fetchSalons();
-  }, [fetchSalons]);
+    const fetchSalonData = async () => {
+      if (user.role === ROLES.SALON_OWNER) {
+        await fetchSalons();
+      } else if (user.role === ROLES.STAFF) {
+        try {
+          const response = await staffApi.getAssociatedSalon();
+          setSelectedSalon(response.data);
+        } catch (error) {
+          console.error('Error fetching associated salon:', error);
+        }
+      }
+    };
+
+    fetchSalonData();
+  }, [fetchSalons, user.role]);
 
   useEffect(() => {
     if (salons.length > 0 && (!selectedSalon || !salons.find(salon => salon.id === selectedSalon.id))) {
@@ -74,6 +91,7 @@ export const SalonProvider = ({ children, navigate, location }) => {
     currentPage,
     totalPages,
     setCurrentPage,
+    userRole: user.role,
   };
 
   return <SalonContext.Provider value={value}>{children}</SalonContext.Provider>;

@@ -5,6 +5,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ForgotPassword from './ForgotPassword';
 import { authApi } from '../../utils/api';
+import { act } from 'react-dom/test-utils';
 
 // Mock the authApi and toast
 jest.mock('../../utils/api', () => ({
@@ -88,8 +89,10 @@ describe('ForgotPassword Component', () => {
 
     authApi.forgotPassword.mockImplementationOnce(() => new Promise(resolve => setTimeout(resolve, 100)));
 
-    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-    fireEvent.click(submitButton);
+    await act(async () => {
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+      fireEvent.click(submitButton);
+    });
 
     expect(submitButton).toBeDisabled();
 

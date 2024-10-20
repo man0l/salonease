@@ -36,6 +36,14 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    // Handle network errors (API unreachable)
+    if (error.code === 'ERR_NETWORK') {
+      console.error('Network error: Unable to reach the API');
+      // You can dispatch an action to update the global state here if needed
+      // For example: store.dispatch(setApiOffline(true));
+      return Promise.reject(new Error('Unable to reach the server. Please check your internet connection and try again.'));
+    }
+
     const originalRequest = error.config;
 
     if (error.response.status === 401 && !originalRequest._retry) {
@@ -96,6 +104,7 @@ const staffApi = {
   updateStaff: (salonId, staffId, staffData) => api.put(`/staff/${salonId}/${staffId}`, staffData),
   deleteStaff: (salonId, staffId) => api.delete(`/staff/${salonId}/${staffId}`),
   acceptInvitation: (data) => axios.post(`${api.defaults.baseURL}/auth/accept-invitation`, data),
+  getAssociatedSalon: () => api.get('/staff/associated-salon'),
 };
 
 export { api, authApi, staffApi };

@@ -24,7 +24,7 @@ function Sidebar() {
   const { selectedSalon } = useSalonContext();
 
   const filteredNavigation = navigation.filter(item => 
-    item.roles.includes(user.role) || (user.role === 'SuperAdmin' && item.roles.includes('SalonOwner'))
+    user && (item.roles.includes(user.role) || (user.role === 'SuperAdmin' && item.roles.includes('SalonOwner')))
   );
 
   const getRoute = (route) => {
@@ -35,19 +35,19 @@ function Sidebar() {
   };
 
   return (
-    <div className="bg-white shadow-md lg:h-full relative z-10">
-      <button className="lg:hidden p-4 text-text hover:text-primary transition-colors" onClick={() => setIsOpen(!isOpen)}>
+    <div className="bg-background shadow-custom lg:h-full relative z-10">
+      <button className="lg:hidden p-4 text-text hover:text-primary-600 transition-colors" onClick={() => setIsOpen(!isOpen)}>
         <Bars3Icon className="h-6 w-6" />
       </button>
       <div 
         className={`
-          transform top-0 left-0 w-64 bg-white fixed h-full overflow-auto ease-in-out transition-all duration-300 z-20
+          transform top-0 left-0 w-64 bg-background fixed h-full overflow-auto ease-in-out transition-all duration-300 z-20
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:relative lg:translate-x-0 lg:flex lg:flex-col
         `}
       >
         <div className="p-6">
-          <h2 className="text-primary font-bold text-xl">Menu</h2>
+          <h2 className="text-primary-600 font-bold text-xl">Menu</h2>
         </div>
         <nav className="space-y-1">
           {filteredNavigation.map((item) => (
@@ -58,7 +58,7 @@ function Sidebar() {
                 `flex items-center px-4 py-3 text-sm font-medium transition-colors ${
                   isActive
                     ? 'bg-primary-100 text-primary-700 border-l-4 border-primary-500'
-                    : 'text-text hover:bg-gray-100 hover:text-primary'
+                    : 'text-text hover:bg-gray-100 hover:text-primary-600'
                 } ${
                   (!user.onboardingCompleted && !item.alwaysEnabled)
                     ? 'opacity-50 pointer-events-none'
