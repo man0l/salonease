@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { api } from '../utils/api';
+import { api, staffApi } from '../utils/api';
 import { useAuth } from './useAuth';
+import ROLES from '../utils/roles';
 
 export const useSalon = () => {
   const [salons, setSalons] = useState([]);
@@ -11,18 +12,26 @@ export const useSalon = () => {
   const { user } = useAuth();
 
   const fetchSalons = useCallback(async () => {
+    if (!user) return;
+    
     try {
       setLoading(true);
-      const response = await api.get(`/salons?page=${currentPage}&limit=10`);
-      setSalons(response.data.salons);
-      setTotalPages(response.data.totalPages);
+      let response;
+      if (user.role === ROLES.STAFF) {
+        response = await staffApi.getAssociatedSalon();
+        setSalons(response.data ? [response.data] : []);
+      } else {
+        response = await api.get(`/salons?page=${currentPage}&limit=10`);
+        setSalons(response.data.salons);
+        setTotalPages(response.data.totalPages);
+      }
       setError(null);
     } catch (err) {
       handleError(err);
     } finally {
       setLoading(false);
     }
-  }, [currentPage]);
+  }, [currentPage, user]);
 
   useEffect(() => {
     if (user) {
