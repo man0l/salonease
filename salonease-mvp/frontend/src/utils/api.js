@@ -96,6 +96,7 @@ const authApi = {
   resetPassword: (token, newPassword) => api.post('/auth/reset-password', { token, newPassword }),
   refreshToken: (refreshToken) => api.post('/auth/refresh-token', { refreshToken }),
   logout: (refreshToken) => api.post('/auth/logout', { refreshToken }),
+  me: () => api.get('/auth/me'),
 };
 
 const staffApi = {
