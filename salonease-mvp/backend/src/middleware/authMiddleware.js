@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { User } = require('../config/db');
+const { User, Staff } = require('../config/db');
 
 const authMiddleware = async (req, res, next) => {
   try {
@@ -11,7 +11,7 @@ const authMiddleware = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findByPk(decoded.userId, {
-      include: [{ model: Staff, as: 'staff' }]
+      include: [{ model: Staff, as: 'staff', required: false }]
     });
 
     if (!user) {

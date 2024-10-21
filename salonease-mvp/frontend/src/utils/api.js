@@ -18,13 +18,40 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Flag to prevent multiple simultaneous refresh attempts
+let isRefreshing = false;
+// Store of waiting requests
+let refreshSubscribers = [];
+
+// Function to add callbacks to the subscriber list
+const subscribeTokenRefresh = (callback) => {
+  refreshSubscribers.push(callback);
+}
+
+// Function to resolve all subscribers with a new token
+const onRefreshed = (token) => {
+  refreshSubscribers.map(callback => callback(token));
+  refreshSubscribers = [];
+}
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
     if (error.response.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // If a refresh is already in progress, wait for it to complete
+        return new Promise((resolve) => {
+          subscribeTokenRefresh((token) => {
+            originalRequest.headers['Authorization'] = `Bearer ${token}`;
+            resolve(api(originalRequest));
+          });
+        });
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
 
       try {
         const refreshToken = localStorage.getItem('refreshToken');
@@ -35,14 +62,18 @@ api.interceptors.response.use(
         localStorage.setItem('refreshToken', newRefreshToken);
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
+        // Resolve all waiting requests
+        onRefreshed(token);
+
         originalRequest.headers['Authorization'] = `Bearer ${token}`;
         return api(originalRequest);
       } catch (refreshError) {
         console.error('Error refreshing token:', refreshError);
         localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
-        window.location.href = '/login';
+        localStorage.removeItem('refreshToken');        
         return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 

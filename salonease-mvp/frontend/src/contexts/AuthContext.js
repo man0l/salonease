@@ -6,11 +6,11 @@ export const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token, setToken] = useState(null);
 
   const fetchUser = useCallback(async () => {
-    if (loading || !token) return;
-    
+    if (loading) return;
+    console.log('fetching user');
     try {
       setLoading(true);
       const response = await authApi.me();
@@ -30,10 +30,11 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('refreshToken', response.data.refreshToken);
       api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+      console.log('fetching user after login');
       await fetchUser();
       return true;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Login error:', error.message);
       return false;
     }
   };
@@ -43,7 +44,7 @@ export const AuthProvider = ({ children }) => {
       const refreshToken = localStorage.getItem('refreshToken');
       await authApi.logout(refreshToken);
     } catch (error) {
-      console.error('Logout error', error);
+      console.error('Logout error', error.message);
     } finally {
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
@@ -63,7 +64,7 @@ export const AuthProvider = ({ children }) => {
       await fetchUser();
       return true;
     } catch (error) {
-      console.error('Registration error', error);
+      console.error('Registration error', error.message);
       return false;
     }
   };
