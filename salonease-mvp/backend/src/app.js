@@ -13,11 +13,13 @@ app.use(express.urlencoded({ extended: true }));
 const authRoutes = require('./routes/authRoutes');
 const staffRoutes = require('./routes/staffRoutes');
 const salonRoutes = require('./routes/salonRoutes');
+const staffAvailabilityRoutes = require('./routes/staffAvailabilityRoutes');
 
 // Use routes
 app.use('/api/auth', authRoutes);
 app.use('/api/salons', salonRoutes);
 app.use('/api/staff', staffRoutes);
+app.use('/api/salons/:salonId/staff-availability', staffAvailabilityRoutes);
 
 // Basic route
 app.get('/', (req, res) => {

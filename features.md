@@ -382,37 +382,152 @@
 - **Associations:**
   - Staff belongs to a user and a salon.
 
+
 ### 7.3. Staff Availability Management
 
-#### Frontend
+#### Backend Implementation
 
-**Staff Availability Page (/staff/availability):**
+##### Database Schema
 
-- **Form Fields:**
-  - Working Days (checkboxes for days of the week)
-  - Daily Working Hours (time pickers for start and end times)
-  - Time Off Requests (date picker and reason)
+###### StaffAvailability Model
 
-- **Client-Side Validation:**
-  - Ensure end time is after start time.
+File: StaffAvailability.js
 
-- **API Integration:**
-  - GET and PUT requests to `/api/staff/availability`.
+Fields:
+- id: Unique identifier for the availability record
+- staffId: References the staff member (including salon owner)
+- salonId: References the salon
+- dayOfWeek: Indicates the day of the week (0 for Sunday to 6 for Saturday)
+- startTime: Start time of the availability slot
+- endTime: End time of the availability slot
+- type: Enum ('AVAILABILITY', 'TIME_OFF')
 
-#### Backend
+Explanation:
+- The model focuses on managing time slots for all types of staff activities.
+- Breaks are represented as gaps between availability records.
+- Time off is a separate type of record.
 
-**API Endpoint: GET /api/staff/availability**
+##### API Endpoints
 
-- **Actions:**
-  - Retrieve the staff member's current availability settings.
+1. Get Salon Staff Availability
 
-**API Endpoint: PUT /api/staff/availability**
+Endpoint: GET /api/salons/:salonId/staff-availability
+Description: Retrieves all availability slots for all staff members in a salon.
+Actions: Fetch availability from the StaffAvailability table where salonId matches the parameter.
 
-- **Request Body:**
-  - Availability settings as provided by the frontend.
+2. Create/Update Staff Availability
 
-- **Actions:**
-  - Update the staff member's availability in the database.
+Endpoint: POST /api/salons/:salonId/staff-availability
+Description: Creates or updates availability slots for a staff member.
+Request Body Example:
+```json
+{
+  "staffId": "staff_uuid",
+  "dayOfWeek": 1,
+  "startTime": "09:00",
+  "endTime": "12:00",
+  "type": "AVAILABILITY"
+}
+```
+Actions:
+- Validate entries to ensure no overlapping times with other availability slots.
+- If updating (availabilityId is provided), exclude the current availability from overlap check.
+- Create a new availability slot or update the existing one in the database.
+
+3. Delete Staff Availability
+
+Endpoint: DELETE /api/salons/:salonId/staff-availability/:availabilityId
+Description: Deletes an availability slot.
+Actions: Remove the record from the database.
+
+##### Validation Logic
+
+- No Overlaps: Ensure that availability slots for a staff member do not overlap with other slots.
+- Time Order: endTime must be after startTime.
+- Breaks: Represented by gaps between availability slots.
+
+#### Frontend Implementation
+
+##### Staff Availability Management Page (/salons/:salonId/staff-availability)
+
+###### User Interface Components
+
+1. Weekly Calendar View:
+   - Uses react-big-calendar library for implementation.
+   - Displays a week view by default, with an option to switch to a month view.
+   - Each column represents a staff member, including the salon owner.
+   - Each row represents a day of the week.
+   - Shows existing availability slots, breaks, and time off.
+
+2. Add/Edit Availability Modal:
+   - Appears when clicking on an empty slot or existing availability.
+   - Fields:
+     - Staff Member: Auto-filled based on the column clicked (read-only).
+     - Day of Week: Auto-filled based on the row clicked (read-only).
+     - Start Time / End Time: Time pickers.
+     - Type: Dropdown (Availability, Break, Time Off).
+   - Validation:
+     - Ensures endTime is after startTime.
+     - Checks for overlapping slots.
+
+###### Interaction Flow
+
+1. Viewing Availability:
+   - The salon owner sees the calendar view with all staff members' schedules.
+   - Different types of slots (availability, breaks, time off) are color-coded.
+
+2. Adding/Editing Availability:
+   - The salon owner clicks on an empty slot or existing availability.
+   - The Add/Edit Availability Modal appears with pre-filled information.
+   - The salon owner adjusts the times and type as needed.
+   - Upon saving, the calendar updates to reflect the changes.
+
+3. Deleting Availability:
+   - The salon owner can delete an availability slot by clicking on it and selecting a delete option in the modal.
+
+###### API Integration
+
+- Fetch Salon Staff Availability:
+  - On page load, fetch all staff availability data for the salon.
+  - Update the calendar view with the fetched data.
+
+- Create/Update Availability:
+  - When the salon owner saves a new or edited availability slot, send a POST request to the backend.
+  - Update the calendar view upon successful response.
+
+- Delete Availability:
+  - When the salon owner deletes an availability slot, send a DELETE request to the backend.
+  - Remove the slot from the calendar view upon successful response.
+
+#### Example Scenario
+
+Salon Owner Action:
+1. Opens the Staff Availability Management page.
+2. Sees a weekly calendar view with columns for each staff member.
+3. Clicks on an empty slot in John's column for Monday from 9 AM to 12 PM.
+4. In the modal, selects "Availability" as the type and confirms the times.
+5. Clicks save, and sees the slot appear in John's column.
+6. Clicks on the newly created slot, changes the end time to 11 AM, and saves.
+7. Clicks on the slot from 11 AM to 12 PM and sets it as a "Break".
+8. Repeats the process for other staff members and time slots as needed.
+
+#### Advantages of This Approach
+
+- Centralized Management: Allows salon owners to manage all staff schedules from a single interface.
+- Visual Representation: Provides a clear, calendar-based view of all staff availability.
+- Flexibility: Easily accommodates regular schedules, breaks, and time off.
+- Real-time Updates: Changes are immediately reflected in the calendar view.
+
+#### Considerations
+
+- Performance: Optimize data fetching for salons with many staff members.
+- User Permissions: Ensure that only salon owners can modify staff availability.
+- Mobile Responsiveness: Adapt the calendar view for smaller screens.
+
+#### Summary
+
+This staff availability management system provides salon owners with a powerful, visual tool to manage their staff's schedules. By using a calendar interface with react-big-calendar, it offers an intuitive way to view and modify availability, breaks, and time off for all staff members. The backend supports this flexibility with a simple data model and efficient API endpoints, ensuring a smooth and responsive user experience.
+
 
 ## 8. Service Management
 
@@ -1076,3 +1191,4 @@
 ---
 
 This detailed point provides specific instructions on how to design and implement the application's layout, including the sidebar, links, icons, color scheme, and Tailwind CSS theme. It includes code snippets and configuration examples to assist in development, making it suitable for use with AI coding assistants.
+
