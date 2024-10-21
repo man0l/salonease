@@ -11,6 +11,7 @@ const navigation = [
   { name: 'Bookings', icon: ClipboardDocumentListIcon, route: '/salons/:salonId/bookings', roles: ['SalonOwner', 'Staff'] },
   { name: 'Clients', icon: UserGroupIcon, route: '/salons/:salonId/clients', roles: ['SalonOwner', 'Staff'] },
   { name: 'Staff', icon: UserGroupIcon, route: '/salons/:salonId/staff', roles: ['SalonOwner', 'SuperAdmin'] },
+  { name: 'Staff Availability', icon: CalendarDaysIcon, route: '/salons/:salonId/staff-availability', roles: ['SalonOwner', 'SuperAdmin'] },
   { name: 'Services', icon: () => <span className="text-xl">✂️</span>, route: '/salons/:salonId/services', roles: ['SalonOwner'] },
   { name: 'Billing', icon: CreditCardIcon, route: '/billing', roles: ['SalonOwner'] },
   { name: 'Reports', icon: ChartBarIcon, route: '/reports', roles: ['SalonOwner', 'SuperAdmin'] },
@@ -35,30 +36,30 @@ function Sidebar() {
   };
 
   return (
-    <div className="bg-background shadow-custom lg:h-full relative z-10">
-      <button className="lg:hidden p-4 text-text hover:text-primary-600 transition-colors" onClick={() => setIsOpen(!isOpen)}>
+    <div className="bg-white shadow-md lg:h-full relative z-30">
+      <button className="lg:hidden p-4 text-primary-600 hover:text-primary-700 transition-colors" onClick={() => setIsOpen(!isOpen)}>
         <Bars3Icon className="h-6 w-6" />
       </button>
       <div 
         className={`
-          transform top-0 left-0 w-64 bg-background fixed h-full overflow-auto ease-in-out transition-all duration-300 z-20
+          transform top-0 left-0 w-64 bg-white fixed h-full overflow-auto ease-in-out transition-all duration-300 z-40
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:relative lg:translate-x-0 lg:flex lg:flex-col
         `}
       >
-        <div className="p-6">
+        <div className="p-6 border-b border-gray-200">
           <h2 className="text-primary-600 font-bold text-xl">Menu</h2>
         </div>
-        <nav className="space-y-1">
+        <nav className="space-y-1 py-4">
           {filteredNavigation.map((item) => (
             <NavLink
               key={item.name}
               to={getRoute(item.route)}
               className={({ isActive }) =>
-                `flex items-center px-4 py-3 text-sm font-medium transition-colors ${
+                `flex items-center px-6 py-3 text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-primary-100 text-primary-700 border-l-4 border-primary-500'
-                    : 'text-text hover:bg-gray-100 hover:text-primary-600'
+                    ? 'bg-primary-50 text-primary-700 border-l-4 border-primary-500'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-primary-600'
                 } ${
                   (!user.onboardingCompleted && !item.alwaysEnabled)
                     ? 'opacity-50 pointer-events-none'
@@ -75,7 +76,7 @@ function Sidebar() {
       </div>
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-10 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-35 lg:hidden"
           onClick={() => setIsOpen(false)}
         ></div>
       )}

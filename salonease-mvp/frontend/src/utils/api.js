@@ -99,6 +99,10 @@ const staffApi = {
   deleteStaff: (salonId, staffId) => api.delete(`/staff/${salonId}/${staffId}`),
   acceptInvitation: (data) => axios.post(`${api.defaults.baseURL}/auth/accept-invitation`, data),
   getAssociatedSalon: () => api.get('/staff/my-salon'),
+  getStaffAvailability: (salonId) => api.get(`/salons/${salonId}/staff-availability`),
+  createStaffAvailability: (salonId, availabilityData) => api.post(`/salons/${salonId}/staff-availability`, availabilityData),
+  updateStaffAvailability: (salonId, availabilityId, availabilityData) => api.put(`/salons/${salonId}/staff-availability/${availabilityId}`, availabilityData),
+  deleteStaffAvailability: (salonId, availabilityId) => api.delete(`/salons/${salonId}/staff-availability/${availabilityId}`),
 };
 
 export { api, authApi, staffApi };

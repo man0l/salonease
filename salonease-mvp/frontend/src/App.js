@@ -22,6 +22,7 @@ import RegistrationSuccess from './components/Auth/RegistrationSuccess';
 import StaffManagement from './components/Salon/StaffManagement';
 import AcceptInvitation from './components/Salon/AcceptInvitation';
 import ROLES from './utils/roles'; // Import ROLES
+import StaffAvailability from './components/Salon/StaffAvailability';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -107,6 +108,14 @@ function AppContent() {
                 element={
                   <PrivateRoute allowedRoles={[ROLES.SALON_OWNER, ROLES.SUPER_ADMIN]}>
                     <StaffManagement />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/salons/:salonId/staff-availability" 
+                element={
+                  <PrivateRoute allowedRoles={[ROLES.SALON_OWNER, ROLES.SUPER_ADMIN]}>
+                    <StaffAvailability />
                   </PrivateRoute>
                 } 
               />

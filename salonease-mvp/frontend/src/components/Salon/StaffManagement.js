@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { staffApi } from '../../utils/api';
-import { useSalonContext } from '../../contexts/SalonContext';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { toast } from 'react-toastify';
 import { FaEdit, FaTrash, FaPlus, FaMinus, FaUserPlus } from 'react-icons/fa';
+import useStaff from '../../hooks/useStaff';
 
 const schema = yup.object().shape({
   email: yup.string().email('Invalid email').required('Email is required'),
@@ -13,63 +11,36 @@ const schema = yup.object().shape({
 });
 
 const StaffManagement = () => {
-  const [staff, setStaff] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [editingStaff, setEditingStaff] = useState(null);
-  const { selectedSalon } = useSalonContext();
-
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [staffToDelete, setStaffToDelete] = useState(null);
+
+  const {
+    staff,
+    loading,
+    error,
+    inviteStaff,
+    updateStaff,
+    deleteStaff,
+  } = useStaff();
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
   });
 
-  const fetchStaff = useCallback(async () => {
-    if (!selectedSalon) return;
-    try {
-      setLoading(true);
-      const response = await staffApi.getStaff(selectedSalon.id);
-      setStaff(response.data);
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to fetch staff');
-      toast.error('Failed to fetch staff');
-      setLoading(false);
-    }
-  }, [selectedSalon]);
-
-  useEffect(() => {
-    fetchStaff();
-  }, [fetchStaff]);
-
   const onSubmit = async (data) => {
     try {
       if (editingStaff) {
-        const { id, ...updateData } = data;
-        await staffApi.updateStaff(selectedSalon.id, editingStaff.id, updateData);
-        toast.success('Staff updated successfully');
+        await updateStaff(editingStaff.id, data);
       } else {
-        await staffApi.inviteStaff(selectedSalon.id, data);
-        toast.success('Staff invited successfully');
+        await inviteStaff(data);
       }
       reset();
       setEditingStaff(null);
       setShowForm(false);
-      fetchStaff();
     } catch (err) {
-      if (err.response && err.response.data) {
-        const { message, errors } = err.response.data;
-        if (errors && errors.length > 0) {
-          errors.forEach(errorMsg => toast.error(errorMsg));
-        } else if (message) {
-          toast.error(message);
-        }
-      } else {
-        toast.error('Failed to save staff. Please try again.');
-      }
+      // Error handling is now managed by useStaff
     }
   };
 
@@ -84,23 +55,17 @@ const StaffManagement = () => {
     setIsDeleteDialogOpen(true);
   };
 
-  const confirmDelete = useCallback(async () => {
+  const confirmDelete = async () => {
     if (!staffToDelete) return;
     
     try {
-      await staffApi.deleteStaff(selectedSalon.id, staffToDelete);
-      toast.success('Staff and associated user deleted successfully');
+      await deleteStaff(staffToDelete);
       setIsDeleteDialogOpen(false);
       setStaffToDelete(null);
-      await fetchStaff();
     } catch (err) {
-      if (err.response && err.response.data && err.response.data.message) {
-        toast.error(err.response.data.message);
-      } else {
-        toast.error('Failed to delete staff');
-      }
+      // Error handling is now managed by useStaff
     }
-  }, [staffToDelete, selectedSalon, fetchStaff]);
+  };
 
   const DeleteConfirmationDialog = ({ isOpen, onClose, onConfirm }) => {
     if (!isOpen) return null;
@@ -184,7 +149,11 @@ const StaffManagement = () => {
 
       <div className="bg-background rounded-lg shadow-card p-6">
         <h3 className="text-xl font-semibold mb-4 text-primary-600">Current Staff</h3>
-        {staff.length === 0 ? (
+        {loading ? (
+          <p className="text-gray-600">Loading staff...</p>
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
+        ) : staff.length === 0 ? (
           <p className="text-gray-600">No staff members yet.</p>
         ) : (
           <ul className="space-y-4">
