@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback, useRef } from 'react';
 import { useSalon } from '../hooks/useSalon';
 import { staffApi } from '../utils/api';
 import { useAuth } from '../hooks/useAuth';
@@ -18,23 +18,27 @@ export const SalonProvider = ({ children, navigate, location }) => {
   const { salons, loading, error, fetchSalons, addSalon: hookAddSalon, updateSalon, deleteSalon: hookDeleteSalon, currentPage, totalPages, setCurrentPage } = useSalon();
   const [selectedSalon, setSelectedSalon] = useState(null);
   const { user } = useAuth();
+  const hasFetchedSalon = useRef(false);
 
   useEffect(() => {
     const fetchSalonData = async () => {
-      if (user.role === ROLES.SALON_OWNER) {
-        await fetchSalons();
-      } else if (user.role === ROLES.STAFF) {
-        try {
-          const response = await staffApi.getAssociatedSalon();
-          setSelectedSalon(response.data);
-        } catch (error) {
-          console.error('Error fetching associated salon:', error);
+      if (user && !hasFetchedSalon.current) {
+        if (user.role === ROLES.SALON_OWNER) {
+          await fetchSalons();
+        } else if (user.role === ROLES.STAFF) {
+          try {
+            const response = await staffApi.getAssociatedSalon();
+            setSelectedSalon(response.data);
+          } catch (error) {
+            console.error('Error fetching associated salon:', error);
+          }
         }
+        hasFetchedSalon.current = true;
       }
     };
 
     fetchSalonData();
-  }, [fetchSalons, user.role]);
+  }, [user, fetchSalons]);
 
   useEffect(() => {
     if (salons.length > 0 && (!selectedSalon || !salons.find(salon => salon.id === selectedSalon.id))) {
@@ -91,7 +95,7 @@ export const SalonProvider = ({ children, navigate, location }) => {
     currentPage,
     totalPages,
     setCurrentPage,
-    userRole: user.role,
+    userRole: user ? user.role : null,
   };
 
   return <SalonContext.Provider value={value}>{children}</SalonContext.Provider>;

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { api, staffApi } from '../utils/api';
 import { useAuth } from './useAuth';
 import ROLES from '../utils/roles';
@@ -7,21 +7,23 @@ export const useSalon = () => {
   const [salons, setSalons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const { user } = useAuth();
+  const currentPageRef = useRef(1);
+  const isFetchingRef = useRef(false);
 
   const fetchSalons = useCallback(async () => {
-    if (!user) return;
+    if (!user || isFetchingRef.current) return;
     
     try {
+      isFetchingRef.current = true;
       setLoading(true);
       let response;
       if (user.role === ROLES.STAFF) {
         response = await staffApi.getAssociatedSalon();
         setSalons(response.data ? [response.data] : []);
       } else {
-        response = await api.get(`/salons?page=${currentPage}&limit=10`);
+        response = await api.get(`/salons?page=${currentPageRef.current}&limit=10`);
         setSalons(response.data.salons);
         setTotalPages(response.data.totalPages);
       }
@@ -30,8 +32,9 @@ export const useSalon = () => {
       handleError(err);
     } finally {
       setLoading(false);
+      isFetchingRef.current = false;
     }
-  }, [currentPage, user]);
+  }, [user]);
 
   useEffect(() => {
     if (user) {
@@ -75,8 +78,9 @@ export const useSalon = () => {
     try {
       await api.delete(`/salons/${salonId}`);
       setSalons(prevSalons => prevSalons.filter(salon => salon.id !== salonId));
-      if (salons.length === 1 && currentPage > 1) {
-        setCurrentPage(prev => prev - 1);
+      if (salons.length === 1 && currentPageRef.current > 1) {
+        currentPageRef.current -= 1;
+        fetchSalons();
       } else {
         await fetchSalons();
       }
@@ -87,6 +91,11 @@ export const useSalon = () => {
     }
   };
 
+  const setCurrentPage = (page) => {
+    currentPageRef.current = page;
+    fetchSalons();
+  };
+
   return { 
     salons, 
     loading, 
@@ -95,7 +104,7 @@ export const useSalon = () => {
     updateSalon, 
     deleteSalon, 
     fetchSalons,
-    currentPage,
+    currentPage: currentPageRef.current,
     totalPages,
     setCurrentPage
   };

@@ -82,8 +82,8 @@ function Header() {
             <Link to="/" className="text-2xl font-bold text-primary-600">SalonEase</Link>
           </div>
           {user && user.role === 'SalonOwner' && (
-            <div className="flex-grow flex justify-center">
-              <SalonSelector />
+            <div className="flex-grow flex justify-center">              
+                <SalonSelector />              
             </div>
           )}
           <div className="flex items-center space-x-4">

@@ -6,10 +6,10 @@ export const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('token'));
 
   const fetchUser = useCallback(async () => {
-    if (loading) return;
+    if (loading || !token) return;
     
     try {
       setLoading(true);
@@ -21,16 +21,22 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [token]);
 
-  useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
+  // useEffect(() => {
+  //   if (token) {
+  //     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  //     fetchUser();
+  //   }
+  // }, [fetchUser, token]);
 
   const login = async (email, password) => {
     try {
       const response = await authApi.login({ email, password });
       setToken(response.data.token);
+      localStorage.setItem('token', token);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;  
       await fetchUser();
       return true;
     } catch (error) {

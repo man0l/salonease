@@ -77,7 +77,6 @@ api.interceptors.response.use(
         processQueue(err, null);
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
-        window.location.href = '/login';
         return Promise.reject(err);
       } finally {
         isRefreshing = false;
@@ -105,7 +104,7 @@ const staffApi = {
   updateStaff: (salonId, staffId, staffData) => api.put(`/staff/${salonId}/${staffId}`, staffData),
   deleteStaff: (salonId, staffId) => api.delete(`/staff/${salonId}/${staffId}`),
   acceptInvitation: (data) => axios.post(`${api.defaults.baseURL}/auth/accept-invitation`, data),
-  getAssociatedSalon: () => api.get('/staff/associated-salon'),
+  getAssociatedSalon: () => api.get('/staff/my-salon'),
 };
 
 export { api, authApi, staffApi };

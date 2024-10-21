@@ -19,7 +19,6 @@ import ResetPassword from './components/Auth/ResetPassword';
 import SuperAdminDashboard from './components/Dashboard/SuperAdminDashboard';
 import SalonManagement from './components/Salon/SalonManagement';
 import RegistrationSuccess from './components/Auth/RegistrationSuccess';
-import SalonOwnerOnboarding from './components/Onboarding/SalonOwnerOnboarding';
 import StaffManagement from './components/Salon/StaffManagement';
 import AcceptInvitation from './components/Salon/AcceptInvitation';
 import ROLES from './utils/roles'; // Import ROLES
@@ -43,21 +42,19 @@ const PrivateRoute = ({ children, allowedRoles }) => {
 };
 
 function AppContent() {
-  const { user, loading } = useAuth();
+  
   const navigate = useNavigate();
   const location = useLocation();
-
-  if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
-  }
 
   const content = (
     <div className="flex flex-col min-h-screen">
       <Header />
       <div className="flex-grow flex">
-        {user && (
-          <Sidebar className="w-64 flex-shrink-0 bg-gray-100 border-r border-gray-200" />
-        )}
+        
+        <PrivateRoute allowedRoles={[ROLES.SALON_OWNER, ROLES.STAFF, ROLES.SUPER_ADMIN]}>
+          <Sidebar className="w-64 flex-shrink-0 bg-background border-r border-gray-200" />
+        </PrivateRoute>
+        
         <main className="flex-grow overflow-x-hidden overflow-y-auto bg-gray-50">
           <div className="container mx-auto px-6 py-8">
             <ToastContainer />
@@ -80,63 +77,63 @@ function AppContent() {
                   </div>
                 } 
               />
-              {user && (
-                <>
-                  <Route 
-                    path="/dashboard" 
-                    element={
-                      <PrivateRoute allowedRoles={[ROLES.SALON_OWNER, ROLES.STAFF]}>
-                        {user.role === ROLES.SALON_OWNER && !user.onboardingCompleted ? <SalonOwnerOnboarding /> : <Dashboard />}
-                      </PrivateRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/admin-dashboard" 
-                    element={
-                      <PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN]}>
-                        <SuperAdminDashboard />
-                      </PrivateRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/salons" 
-                    element={
-                      <PrivateRoute allowedRoles={[ROLES.SALON_OWNER]}>
-                        <SalonManagement />
-                      </PrivateRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/salons/:salonId/staff" 
-                    element={
-                      <PrivateRoute allowedRoles={[ROLES.SALON_OWNER, ROLES.SUPER_ADMIN]}>
-                        <StaffManagement />
-                      </PrivateRoute>
-                    } 
-                  />
-                </>
-              )}
+              
+              <Route 
+                path="/dashboard" 
+                element={
+                  <PrivateRoute allowedRoles={[ROLES.SALON_OWNER, ROLES.STAFF]}>
+                    <Dashboard />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/admin-dashboard" 
+                element={
+                  <PrivateRoute allowedRoles={[ROLES.SUPER_ADMIN]}>
+                    <SuperAdminDashboard />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/salons" 
+                element={
+                  <PrivateRoute allowedRoles={[ROLES.SALON_OWNER]}>
+                    <SalonManagement />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/salons/:salonId/staff" 
+                element={
+                  <PrivateRoute allowedRoles={[ROLES.SALON_OWNER, ROLES.SUPER_ADMIN]}>
+                    <StaffManagement />
+                  </PrivateRoute>
+                } 
+              />
+              
             </Routes>
           </div>
-        </main>
+        </main
       </div>
       <Footer />
     </div>
   );
 
-  return user ? (
-    <SalonProvider navigate={navigate} location={location}>
+  return (
+    <>
       {content}
-    </SalonProvider>
-  ) : content;
+    </>
+  );
 }
 
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
+      <SalonProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </SalonProvider>
     </AuthProvider>
   );
 }

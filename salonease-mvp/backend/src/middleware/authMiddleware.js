@@ -10,7 +10,9 @@ const authMiddleware = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findByPk(decoded.userId);
+    const user = await User.findByPk(decoded.userId, {
+      include: [{ model: Staff, as: 'staff' }]
+    });
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
