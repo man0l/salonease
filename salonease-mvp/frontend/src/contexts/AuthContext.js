@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useState, useCallback } from 'react';
 import { api, authApi } from '../utils/api';
 
 export const AuthContext = createContext(null);
@@ -23,20 +23,13 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
-  // useEffect(() => {
-  //   if (token) {
-  //     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  //     fetchUser();
-  //   }
-  // }, [fetchUser, token]);
-
   const login = async (email, password) => {
     try {
       const response = await authApi.login({ email, password });
       setToken(response.data.token);
-      localStorage.setItem('token', token);
+      localStorage.setItem('token', response.data.token);
       localStorage.setItem('refreshToken', response.data.refreshToken);
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;  
+      api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       await fetchUser();
       return true;
     } catch (error) {
@@ -56,12 +49,14 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('refreshToken');
       delete api.defaults.headers.common['Authorization'];
       setUser(null);
+      setToken(null);
     }
   };
 
   const register = async (userData) => {
     try {
       const response = await authApi.register(userData);
+      setToken(response.data.token);
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('refreshToken', response.data.refreshToken);
       api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;

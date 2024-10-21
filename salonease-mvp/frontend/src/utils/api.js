@@ -7,21 +7,6 @@ const api = axios.create({
   },
 });
 
-let isRefreshing = false;
-let failedQueue = [];
-
-const processQueue = (error, token = null) => {
-  failedQueue.forEach(prom => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
-  });
-
-  failedQueue = [];
-};
-
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -36,50 +21,28 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    // Handle network errors (API unreachable)
-    if (error.code === 'ERR_NETWORK') {
-      console.error('Network error: Unable to reach the API');
-      // You can dispatch an action to update the global state here if needed
-      // For example: store.dispatch(setApiOffline(true));
-      return Promise.reject(new Error('Unable to reach the server. Please check your internet connection and try again.'));
-    }
-
     const originalRequest = error.config;
 
     if (error.response.status === 401 && !originalRequest._retry) {
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        }).then(token => {
-          originalRequest.headers['Authorization'] = 'Bearer ' + token;
-          return api(originalRequest);
-        }).catch(err => {
-          return Promise.reject(err);
-        });
-      }
-
       originalRequest._retry = true;
-      isRefreshing = true;
-
-      const refreshToken = localStorage.getItem('refreshToken');
-      if (!refreshToken) {
-        return Promise.reject(error);
-      }
 
       try {
-        const response = await api.post('/auth/refresh-token', { refreshToken });
-        const { token } = response.data;
+        const refreshToken = localStorage.getItem('refreshToken');
+        const response = await authApi.refreshToken(refreshToken);
+        const { token, refreshToken: newRefreshToken } = response.data;
+
         localStorage.setItem('token', token);
-        api.defaults.headers.common['Authorization'] = 'Bearer ' + token;
-        processQueue(null, token);
+        localStorage.setItem('refreshToken', newRefreshToken);
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+        originalRequest.headers['Authorization'] = `Bearer ${token}`;
         return api(originalRequest);
-      } catch (err) {
-        processQueue(err, null);
+      } catch (refreshError) {
+        console.error('Error refreshing token:', refreshError);
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
-        return Promise.reject(err);
-      } finally {
-        isRefreshing = false;
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
       }
     }
 
