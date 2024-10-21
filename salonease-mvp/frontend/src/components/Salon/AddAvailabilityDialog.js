@@ -3,22 +3,26 @@ import { Dialog } from '@headlessui/react';
 import TimePicker from 'react-time-picker';
 import { AVAILABILITY_TYPES } from '../../utils/constants';
 
-const AddAvailabilityDialog = ({ isOpen, onClose, onSave, selectedSlot, staffName }) => {
+const AddAvailabilityDialog = ({ isOpen, onClose, onSave, selectedSlot, staffName, allStaff, isWeekView }) => {
   const [type, setType] = useState(AVAILABILITY_TYPES.AVAILABILITY);
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('17:00');
+  const [selectedStaffId, setSelectedStaffId] = useState('');
 
   useEffect(() => {
     if (selectedSlot) {
       setStartTime(selectedSlot.start.toTimeString().slice(0, 5));
       setEndTime(selectedSlot.end.toTimeString().slice(0, 5));
     }
-  }, [selectedSlot]);
+    if (isWeekView && allStaff.length > 0) {
+      setSelectedStaffId(allStaff[0].id);
+    }
+  }, [selectedSlot, isWeekView, allStaff]);
 
   const handleSave = () => {
     if (selectedSlot) {
       const newEvent = {
-        staffId: selectedSlot.resourceId,
+        staffId: isWeekView ? selectedStaffId : selectedSlot.resourceId,
         dayOfWeek: selectedSlot.start.getDay(),
         startTime,
         endTime,
@@ -33,6 +37,9 @@ const AddAvailabilityDialog = ({ isOpen, onClose, onSave, selectedSlot, staffNam
     setType(AVAILABILITY_TYPES.AVAILABILITY);
     setStartTime('09:00');
     setEndTime('17:00');
+    if (isWeekView && allStaff.length > 0) {
+      setSelectedStaffId(allStaff[0].id);
+    }
   };
 
   return (
@@ -49,13 +56,27 @@ const AddAvailabilityDialog = ({ isOpen, onClose, onSave, selectedSlot, staffNam
               Add Availability
             </Dialog.Title>
             <div className="mt-2 space-y-4">
-              <input
-                type="text"
-                placeholder={`Availability for ${staffName}`}
-                className="w-full p-2 border rounded bg-gray-100"
-                value={staffName}
-                readOnly
-              />
+              {isWeekView ? (
+                <select
+                  className="w-full p-2 border rounded"
+                  value={selectedStaffId}
+                  onChange={(e) => setSelectedStaffId(e.target.value)}
+                >
+                  {allStaff.map((staff) => (
+                    <option key={staff.id} value={staff.id}>
+                      {staff.fullName}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  placeholder={`Availability for ${staffName}`}
+                  className="w-full p-2 border rounded bg-gray-100"
+                  value={staffName}
+                  readOnly
+                />
+              )}
               <select
                 className="w-full p-2 border rounded"
                 value={type}
