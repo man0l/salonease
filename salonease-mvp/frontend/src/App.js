@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { SalonProvider } from './contexts/SalonContext';
 import Header from './components/Header';
@@ -21,8 +21,9 @@ import SalonManagement from './components/Salon/SalonManagement';
 import RegistrationSuccess from './components/Auth/RegistrationSuccess';
 import StaffManagement from './components/Salon/StaffManagement';
 import AcceptInvitation from './components/Salon/AcceptInvitation';
-import ROLES from './utils/roles'; // Import ROLES
+import ROLES from './utils/roles';
 import StaffAvailability from './components/Salon/StaffAvailability';
+import ServiceManagement from './components/Salon/ServiceManagement';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -43,19 +44,13 @@ const PrivateRoute = ({ children, allowedRoles }) => {
 };
 
 function AppContent() {
-  
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const content = (
+  return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <div className="flex-grow flex">
-        
         <PrivateRoute allowedRoles={[ROLES.SALON_OWNER, ROLES.STAFF, ROLES.SUPER_ADMIN]}>
           <Sidebar className="w-64 flex-shrink-0 bg-background border-r border-gray-200" />
         </PrivateRoute>
-        
         <main className="flex-grow overflow-x-hidden overflow-y-auto bg-gray-50">
           <div className="container mx-auto px-6 py-8">
             <ToastContainer />
@@ -78,7 +73,6 @@ function AppContent() {
                   </div>
                 } 
               />
-              
               <Route 
                 path="/dashboard" 
                 element={
@@ -119,19 +113,20 @@ function AppContent() {
                   </PrivateRoute>
                 } 
               />
-              
+              <Route 
+                path="/salons/:salonId/services" 
+                element={
+                  <PrivateRoute allowedRoles={[ROLES.SALON_OWNER, ROLES.SUPER_ADMIN]}>
+                    <ServiceManagement />
+                  </PrivateRoute>
+                } 
+              />
             </Routes>
           </div>
         </main>
       </div>
       <Footer />
     </div>
-  );
-
-  return (
-    <>
-      {content}
-    </>
   );
 }
 

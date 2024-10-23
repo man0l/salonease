@@ -5,6 +5,7 @@ const { Op } = require('sequelize');
 const emailHelper = require('../utils/helpers/emailHelper');
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
+const { validateRegister, validateLogin } = require('../validators/authValidator');
 
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET is not set in the environment variables');
@@ -12,24 +13,11 @@ if (!process.env.JWT_SECRET) {
 }
 
 exports.register = async (req, res) => {
-  const { fullName, email, password } = req.body;
-
   try {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: 'Email is invalid' });
-    }
+    const { error, value } = validateRegister(req.body);
+    if (error) return res.status(400).json({ message: error.details[0].message });
 
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!passwordRegex.test(password)) {
-      return res.status(400).json({ message: 'Password must be at least 8 characters long and include lowercase and uppercase letters, numbers, and special characters.' });
-    }
-
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Email already exists' });
-    }
-
+    const { fullName, email, password } = value;
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await User.create({
@@ -77,6 +65,9 @@ exports.login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    const { error, value } = validateLogin({ email, password });
+    if (error) return res.status(400).json({ message: error.details[0].message });
+
     const user = await User.findOne({ where: { email } });
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password' });

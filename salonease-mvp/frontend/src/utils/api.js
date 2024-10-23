@@ -105,4 +105,11 @@ const staffApi = {
   deleteStaffAvailability: (salonId, availabilityId) => api.delete(`/salons/${salonId}/staff-availability/${availabilityId}`),
 };
 
-export { api, authApi, staffApi };
+const serviceApi = {
+  getServices: (salonId) => api.get(`/services/${salonId}`),
+  createService: (salonId, serviceData) => api.post(`/services/${salonId}`, serviceData),
+  updateService: (serviceId, serviceData) => api.put(`/services/${serviceId}`, serviceData),
+  deleteService: (serviceId) => api.delete(`/services/${serviceId}`),
+};
+
+export { api, authApi, staffApi, serviceApi };
