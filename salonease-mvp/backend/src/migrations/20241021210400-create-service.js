@@ -23,9 +23,15 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      category: {
-        type: Sequelize.STRING,
+      categoryId: {
+        type: Sequelize.INTEGER,
         allowNull: false,
+        references: {
+          model: 'Categories',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'RESTRICT',
       },
       price: {
         type: Sequelize.DECIMAL(10, 2),

@@ -48,7 +48,10 @@ describe('Salon Routes', () => {
         .send({ name: '' });
 
       expect(response.statusCode).toBe(400);
-      expect(response.body).toHaveProperty('message', 'Validation error');
+      expect(response.body).toHaveProperty('message');
+      expect(response.body.message).toContain('Name is required');
+      expect(response.body.message).toContain('Address is required');
+      expect(response.body.message).toContain('Contact number is required');
     });
   });
 

@@ -8,7 +8,7 @@ import { formatCurrency } from '../../utils/currencyFormatter';
 
 const schema = yup.object().shape({
   name: yup.string().required('Service name is required'),
-  category: yup.string().required('Category is required'),
+  categoryId: yup.number().required('Category is required'),
   price: yup.number().positive('Price must be positive').required('Price is required'),
   duration: yup.number().positive('Duration must be positive').required('Duration is required'),
   description: yup.string(),
@@ -23,6 +23,7 @@ const ServiceManagement = ({ salonId }) => {
 
   const {
     services,
+    categories,
     loading,
     error,
     addService,
@@ -51,7 +52,10 @@ const ServiceManagement = ({ salonId }) => {
 
   const handleEdit = (service) => {
     setEditingService(service);
-    reset(service);
+    reset({
+      ...service,
+      categoryId: service.categoryId.toString(),
+    });
     setShowForm(true);
   };
 
@@ -135,14 +139,20 @@ const ServiceManagement = ({ salonId }) => {
               {errors.name && <span className="text-red-500 text-sm">{errors.name.message}</span>}
             </div>
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">Category:</label>
-              <input
-                id="category"
-                type="text"
-                {...register('category')}
+              <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700 mb-1">Category:</label>
+              <select
+                id="categoryId"
+                {...register('categoryId')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-              {errors.category && <span className="text-red-500 text-sm">{errors.category.message}</span>}
+              >
+                <option value="">Select a category</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+              {errors.categoryId && <span className="text-red-500 text-sm">{errors.categoryId.message}</span>}
             </div>
             <div>
               <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">Price:</label>
@@ -205,7 +215,7 @@ const ServiceManagement = ({ salonId }) => {
               <li key={service.id} className="flex justify-between items-center p-4 border border-gray-200 rounded-lg hover:shadow-md transition duration-300">
                 <div>
                   <span className="font-semibold text-primary-600">{service.name}</span>
-                  <span className="ml-2 text-sm text-gray-600">({service.category})</span>
+                  <span className="ml-2 text-sm text-gray-600">{categories.find(cat => cat.id === service.categoryId)?.name || 'Unknown Category'}</span>
                   <p className="text-sm text-gray-600">Price: {formatCurrency(service.price)} | Duration: {service.duration} minutes</p>
                   {service.promotionalOffer && <p className="text-sm text-green-600">Offer: {service.promotionalOffer}</p>}
                 </div>

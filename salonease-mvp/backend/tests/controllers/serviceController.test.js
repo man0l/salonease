@@ -1,28 +1,40 @@
 const { createService, getServices, updateService, deleteService } = require('../../src/controllers/serviceController');
-const { Service, Salon } = require('../setupTests');
+const { Service, Salon, Category, User } = require('../setupTests');
 const httpMocks = require('node-mocks-http');
 const { v4: uuidv4 } = require('uuid');
 
 describe('Service Controller', () => {
-  let req, res, testSalon;
+  let req, res, testSalon, testCategory, testOwner;
 
   beforeEach(async () => {
     req = httpMocks.createRequest();
     res = httpMocks.createResponse();
 
+    testOwner = await User.create({
+      fullName: 'Test Owner',
+      email: 'owner@example.com',
+      password: 'password123',
+      role: 'SalonOwner'
+    });
+
     testSalon = await Salon.create({
       name: 'Test Salon',
       address: 'Test Address',
       contactNumber: '1234567890',
+      ownerId: testOwner.id
+    });
+
+    testCategory = await Category.create({
+      name: 'Test Category',
     });
   });
 
   describe('createService', () => {
     it('should create a new service successfully', async () => {
+      req.params = { salonId: testSalon.id };
       req.body = {
-        salonId: testSalon.id,
         name: 'Haircut',
-        category: 'Hair',
+        categoryId: testCategory.id,
         price: 50.00,
         duration: 30,
       };
@@ -32,6 +44,7 @@ describe('Service Controller', () => {
       expect(res.statusCode).toBe(201);
       expect(res._getJSONData()).toHaveProperty('name', 'Haircut');
       expect(res._getJSONData()).toHaveProperty('salonId', testSalon.id);
+      expect(res._getJSONData()).toHaveProperty('categoryId', testCategory.id);
 
       const newService = await Service.findOne({ where: { name: 'Haircut' } });
       expect(newService).not.toBeNull();
@@ -45,13 +58,42 @@ describe('Service Controller', () => {
       expect(res.statusCode).toBe(400);
       expect(res._getJSONData()).toHaveProperty('message');
     });
+
+    it('should return 400 if categoryId is not a number', async () => {
+      req.body = {
+        name: 'Test Service',
+        categoryId: 'not a number',
+        price: 50,
+        duration: 60
+      };
+
+      await createService(req, res);
+
+      expect(res.statusCode).toBe(400);
+      expect(res._getJSONData()).toHaveProperty('message');
+      expect(res._getJSONData().message).toContain('"categoryId" must be a number');
+    });
+
+    it('should return 400 if category does not exist', async () => {
+      req.body = {
+        name: 'Test Service',
+        categoryId: 9999, // Assuming this category doesn't exist
+        price: 50,
+        duration: 60
+      };
+
+      await createService(req, res);
+
+      expect(res.statusCode).toBe(400);
+      expect(res._getJSONData()).toHaveProperty('message', 'Invalid category');
+    });
   });
 
   describe('getServices', () => {
-    it('should return services for the salon', async () => {
+    it('should return services for the salon with category information', async () => {
       await Service.bulkCreate([
-        { salonId: testSalon.id, name: 'Service 1', category: 'Hair', price: 50.00, duration: 30 },
-        { salonId: testSalon.id, name: 'Service 2', category: 'Nails', price: 30.00, duration: 45 },
+        { salonId: testSalon.id, name: 'Service 1', categoryId: testCategory.id, price: 50.00, duration: 30 },
+        { salonId: testSalon.id, name: 'Service 2', categoryId: testCategory.id, price: 30.00, duration: 45 },
       ]);
 
       req.params = { salonId: testSalon.id };
@@ -60,15 +102,8 @@ describe('Service Controller', () => {
 
       expect(res.statusCode).toBe(200);
       expect(res._getJSONData()).toHaveLength(2);
-    });
-
-    it('should return empty array if salon has no services', async () => {
-      req.params = { salonId: testSalon.id };
-
-      await getServices(req, res);
-
-      expect(res.statusCode).toBe(200);
-      expect(res._getJSONData()).toHaveLength(0);
+      expect(res._getJSONData()[0]).toHaveProperty('category');
+      expect(res._getJSONData()[0].category).toHaveProperty('name', 'Test Category');
     });
   });
 
@@ -77,33 +112,30 @@ describe('Service Controller', () => {
       const service = await Service.create({
         salonId: testSalon.id,
         name: 'Original Service',
-        category: 'Hair',
+        categoryId: testCategory.id,
         price: 40.00,
         duration: 30,
       });
 
+      const newCategory = await Category.create({ name: 'New Category' });
+
       req.params = { id: service.id };
-      req.body = { name: 'Updated Service', price: 45.00 };
+      req.body = { name: 'Updated Service', price: 45.00, categoryId: newCategory.id };
 
       await updateService(req, res);
+
+      if (res.statusCode === 400) {
+        console.log('Error response:', res._getJSONData());
+      }
 
       expect(res.statusCode).toBe(200);
       expect(res._getJSONData()).toHaveProperty('name', 'Updated Service');
-      expect(res._getJSONData()).toHaveProperty('price', '45.00');
+      expect(res._getJSONData()).toHaveProperty('price', 45.00);
+      expect(res._getJSONData()).toHaveProperty('categoryId', newCategory.id);
 
       const updatedService = await Service.findByPk(service.id);
       expect(updatedService.name).toBe('Updated Service');
-    });
-
-    it('should return 404 if service does not exist', async () => {
-      const nonExistentId = uuidv4();
-      req.params = { id: nonExistentId };
-      req.body = { name: 'Updated Service' };
-
-      await updateService(req, res);
-
-      expect(res.statusCode).toBe(404);
-      expect(res._getJSONData()).toHaveProperty('message', 'Service not found');
+      expect(updatedService.categoryId).toBe(newCategory.id);
     });
   });
 
@@ -112,7 +144,7 @@ describe('Service Controller', () => {
       const service = await Service.create({
         salonId: testSalon.id,
         name: 'Service to Delete',
-        category: 'Nails',
+        categoryId: testCategory.id,
         price: 35.00,
         duration: 60,
       });

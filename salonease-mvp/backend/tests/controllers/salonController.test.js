@@ -46,12 +46,15 @@ describe('Salon Controller', () => {
 
     it('should return 400 if salon data is invalid', async () => {
       req.body = { name: '' };
-      req.user = { id: 1 };
+      req.user = { id: testUser.id };
 
       await createSalon(req, res);
 
       expect(res.statusCode).toBe(400);
-      expect(res._getJSONData()).toHaveProperty('message', 'Validation error');
+      expect(res._getJSONData()).toHaveProperty('message');
+      expect(res._getJSONData().message).toContain('Name is required');
+      expect(res._getJSONData().message).toContain('Address is required');
+      expect(res._getJSONData().message).toContain('Contact number is required');
     });
   });
 

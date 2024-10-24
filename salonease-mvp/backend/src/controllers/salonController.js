@@ -4,7 +4,10 @@ const { validateSalon } = require('../validators/salonValidator');
 exports.createSalon = async (req, res) => {
   try {
     const { error, value } = validateSalon(req.body);
-    if (error) return res.status(400).json({ message: error.details[0].message });
+    if (error) {
+      const errorMessages = error.details.map(detail => detail.message);
+      return res.status(400).json({ message: errorMessages.join(', ') });
+    }
 
     const salon = await Salon.create({ ...value, ownerId: req.user.id });
     res.status(201).json(salon);

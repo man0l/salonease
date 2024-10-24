@@ -42,12 +42,14 @@ describe('POST /api/auth/register', () => {
   });
 
   it('should not register a user with an existing email', async () => {
+    // First, create a user
     await User.create({
       fullName: 'Existing User',
       email: 'existinguser@example.com',
-      password: 'Password123!',
+      password: await bcrypt.hash('Password123!', 10),
     });
 
+    // Attempt to register with the same email
     const response = await request(app)
       .post('/api/auth/register')
       .send({

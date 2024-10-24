@@ -15,8 +15,8 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    category: {
-      type: DataTypes.STRING,
+    categoryId: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     price: {
@@ -43,6 +43,10 @@ module.exports = (sequelize) => {
     Service.belongsTo(models.Salon, {
       foreignKey: 'salonId',
       as: 'salon',
+    });
+    Service.belongsTo(models.Category, {
+      foreignKey: 'categoryId',
+      as: 'category',
     });
   };
 

@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { useSalonContext } from '../contexts/SalonContext';
-import { serviceApi } from '../utils/api';
+import { serviceApi, api } from '../utils/api';
 
 const useService = () => {
   const [services, setServices] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { selectedSalon } = useSalonContext();
@@ -24,9 +25,20 @@ const useService = () => {
     }
   }, [selectedSalon]);
 
+  const fetchCategories = useCallback(async () => {
+    try {
+      const response = await api.get('/categories');
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      handleApiError(error);
+    }
+  }, []);
+
   useEffect(() => {
     fetchServices();
-  }, [fetchServices]);
+    fetchCategories();
+  }, [fetchServices, fetchCategories]);
 
   const handleApiError = (err) => {
     const errorMessage = err.response?.data?.message || 'An error occurred';
@@ -68,6 +80,7 @@ const useService = () => {
 
   return {
     services,
+    categories,
     loading,
     error,
     addService,

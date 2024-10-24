@@ -6,6 +6,7 @@ const emailHelper = require('../utils/helpers/emailHelper');
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
 const { validateRegister, validateLogin } = require('../validators/authValidator');
+const ROLES = require('../config/roles');
 
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET is not set in the environment variables');
@@ -14,23 +15,29 @@ if (!process.env.JWT_SECRET) {
 
 exports.register = async (req, res) => {
   try {
+    // Validate input
     const { error, value } = validateRegister(req.body);
-    if (error) return res.status(400).json({ message: error.details[0].message });
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
 
-    const { fullName, email, password } = value;
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Check if user already exists
+    const existingUser = await User.findOne({ where: { email: value.email } });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email already exists' });
+    }
 
+    const hashedPassword = await bcrypt.hash(value.password, 10);
     const newUser = await User.create({
-      fullName,
-      email,
+      ...value,
       password: hashedPassword,
-      role: 'SalonOwner',
+      role: ROLES.SALON_OWNER,
       onboardingCompleted: false,
     });
 
     const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    await emailHelper.sendVerificationEmail(email, token);
+    await emailHelper.sendVerificationEmail(value.email, token);
 
     res.status(201).json({ message: 'Registration successful. Please check your email to verify your account.' });
   } catch (error) {
