@@ -14,6 +14,7 @@ const Register = () => {
 
   const onSubmit = async (data) => {
     try {
+
       const response = await authApi.register(data);
       toast.success(response.data.message);
       // Redirect to a new page instead of the verify-email page

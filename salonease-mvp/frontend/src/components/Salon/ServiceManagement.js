@@ -109,18 +109,6 @@ const ServiceManagement = ({ salonId }) => {
     );
   };
 
-  const handleUpdateService = async (serviceId, updatedData) => {
-    try {
-      await updateService(serviceId, updatedData);
-      toast.success('Service updated successfully');
-      // Optionally, you might want to refresh the services list here
-      // await fetchServices();
-    } catch (error) {
-      console.error('Error updating service:', error);
-      toast.error('Failed to update service');
-    }
-  };
-
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-card">
       <h1 className="text-3xl font-bold mb-6 text-primary-700">Service Management</h1>

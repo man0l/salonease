@@ -29,5 +29,13 @@ const createSalonSchema = Joi.object({
 
 const updateSalonSchema = Joi.object(baseSalonSchema).min(1);
 
-exports.validateCreateSalon = (salon) => createSalonSchema.validate(salon, { abortEarly: false });
-exports.validateUpdateSalon = (salon) => updateSalonSchema.validate(salon, { abortEarly: false });
+exports.validateCreateSalon = (salon) => createSalonSchema.validate(salon, { 
+  abortEarly: false,
+  allowUnknown: true,
+  stripUnknown: true
+ });
+exports.validateUpdateSalon = (salon) => updateSalonSchema.validate(salon, { 
+  abortEarly: false,
+  allowUnknown: true,
+  stripUnknown: true
+});
