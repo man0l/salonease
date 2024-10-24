@@ -148,8 +148,7 @@ describe('ServiceManagement', () => {
     fireEvent.click(confirmDeleteButton);
 
     await waitFor(() => {
-      expect(deleteService).toHaveBeenCalledWith('1');
-      expect(toast.success).toHaveBeenCalledWith('Service deleted successfully');
+      expect(deleteService).toHaveBeenCalledWith('1');      
     });
   });
 

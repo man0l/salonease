@@ -70,8 +70,7 @@ const ServiceManagement = ({ salonId }) => {
     if (!serviceToDelete) return;
     
     try {
-      await deleteService(serviceToDelete);
-      toast.success('Service deleted successfully');
+      await deleteService(serviceToDelete);      
       setIsDeleteDialogOpen(false);
       setServiceToDelete(null);
     } catch (err) {
@@ -182,16 +181,7 @@ const ServiceManagement = ({ salonId }) => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                 rows="3"
               />
-            </div>
-            <div>
-              <label htmlFor="promotionalOffer" className="block text-sm font-medium text-gray-700 mb-1">Promotional Offer:</label>
-              <input
-                id="promotionalOffer"
-                type="text"
-                {...register('promotionalOffer')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-            </div>
+            </div>           
             <button type="submit" className="w-full bg-secondary-600 text-white py-2 px-4 rounded-md hover:bg-secondary-700 transition duration-300 flex items-center justify-center">
               <FaPlus className="mr-2" />
               {editingService ? 'Update Service' : 'Add Service'}
@@ -214,7 +204,7 @@ const ServiceManagement = ({ salonId }) => {
               <li key={service.id} className="flex justify-between items-center p-4 border border-gray-200 rounded-lg hover:shadow-md transition duration-300">
                 <div>
                   <span className="font-semibold text-primary-600">{service.name}</span>
-                  <span className="ml-2 text-sm text-gray-600">{categories.find(cat => cat.id === service.categoryId)?.name || 'Unknown Category'}</span>
+                  <span className="ml-2 text-sm text-gray-600">{service?.category?.name}</span>
                   <p className="text-sm text-gray-600">Price: {formatCurrency(service.price)} | Duration: {service.duration} minutes</p>
                   {service.promotionalOffer && <p className="text-sm text-green-600">Offer: {service.promotionalOffer}</p>}
                 </div>
