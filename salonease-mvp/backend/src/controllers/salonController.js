@@ -1,22 +1,19 @@
 const { Salon } = require('../config/db');
-const { validateSalon } = require('../validators/salonValidator');
+const { validateCreateSalon, validateUpdateSalon } = require('../validators/salonValidator');
 
 exports.createSalon = async (req, res) => {
   try {
-    const { error, value } = validateSalon(req.body);
+    const { error, value } = validateCreateSalon(req.body);
     if (error) {
       const errorMessages = error.details.map(detail => detail.message);
-      return res.status(400).json({ message: errorMessages.join(', ') });
+      return res.status(400).json({ message: 'Validation error', errors: errorMessages });
     }
 
     const salon = await Salon.create({ ...value, ownerId: req.user.id });
     res.status(201).json(salon);
   } catch (error) {
-    if (error.name === 'SequelizeValidationError') {
-      res.status(400).json({ message: 'Validation error', errors: error.errors.map(e => e.message) });
-    } else {
-      res.status(500).json({ message: 'Error creating salon', error: error.message });
-    }
+    console.error('Error creating salon:', error);
+    res.status(500).json({ message: 'Error creating salon', error: error.message });
   }
 };
 
@@ -46,22 +43,24 @@ exports.getSalons = async (req, res) => {
 
 exports.updateSalon = async (req, res) => {
   try {
+    const { error, value } = validateUpdateSalon(req.body);
+    if (error) {
+      const errorMessages = error.details.map(detail => detail.message);
+      return res.status(400).json({ message: 'Validation error', errors: errorMessages });
+    }
+
     const { id } = req.params;
-    const { name, address, contactNumber, description } = req.body;
     const salon = await Salon.findOne({ where: { id, ownerId: req.user.id } });
     
     if (!salon) {
       return res.status(404).json({ message: 'Salon not found' });
     }
 
-    await salon.update({ name, address, contactNumber, description });
+    await salon.update(value);
     res.status(200).json(salon);
   } catch (error) {
-    if (error.name === 'SequelizeValidationError') {
-      res.status(400).json({ message: 'Validation error', errors: error.errors.map(e => e.message) });
-    } else {
-      res.status(500).json({ message: 'Error updating salon', error: error.message });
-    }
+    console.error('Error updating salon:', error);
+    res.status(500).json({ message: 'Error updating salon', error: error.message });
   }
 };
 

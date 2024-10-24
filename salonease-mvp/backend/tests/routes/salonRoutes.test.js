@@ -48,10 +48,10 @@ describe('Salon Routes', () => {
         .send({ name: '' });
 
       expect(response.statusCode).toBe(400);
-      expect(response.body).toHaveProperty('message');
-      expect(response.body.message).toContain('Name is required');
-      expect(response.body.message).toContain('Address is required');
-      expect(response.body.message).toContain('Contact number is required');
+      expect(response.body).toHaveProperty('message', 'Validation error');
+      expect(response.body.errors).toContain('Name is required');
+      expect(response.body.errors).toContain('"address" is required');
+      expect(response.body.errors).toContain('"contactNumber" is required');
     });
   });
 
@@ -95,6 +95,28 @@ describe('Salon Routes', () => {
 
       const updatedSalon = await Salon.findByPk(salon.id);
       expect(updatedSalon.name).toBe('Updated Salon');
+    });
+
+    it('should return 400 if update data is invalid', async () => {
+      const salon = await Salon.create({
+        name: 'Old Salon',
+        address: '789 Test Blvd',
+        contactNumber: '1122334455',
+        ownerId: user.id
+      });
+
+      const response = await request(app)
+        .put(`/api/salons/${salon.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          name: '',
+          contactNumber: '123'
+        });
+
+      expect(response.statusCode).toBe(400);
+      expect(response.body).toHaveProperty('message', 'Validation error');
+      expect(response.body.errors).toContain('Name is required');
+      expect(response.body.errors).toContain('Contact number must be between 10 and 15 digits');
     });
 
     it('should return 404 if salon does not exist', async () => {

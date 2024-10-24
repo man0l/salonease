@@ -51,10 +51,40 @@ describe('Salon Controller', () => {
       await createSalon(req, res);
 
       expect(res.statusCode).toBe(400);
-      expect(res._getJSONData()).toHaveProperty('message');
-      expect(res._getJSONData().message).toContain('Name is required');
-      expect(res._getJSONData().message).toContain('Address is required');
-      expect(res._getJSONData().message).toContain('Contact number is required');
+      expect(res._getJSONData()).toHaveProperty('message', 'Validation error');
+      expect(res._getJSONData().errors).toContain('Name is required');
+      expect(res._getJSONData().errors).toContain('"address" is required');
+      expect(res._getJSONData().errors).toContain('"contactNumber" is required');
+    });
+
+    it('should return 400 if name is too long', async () => {
+      req.body = {
+        name: 'a'.repeat(256),
+        address: '123 Test St',
+        contactNumber: '1234567890',
+      };
+      req.user = { id: testUser.id };
+
+      await createSalon(req, res);
+
+      expect(res.statusCode).toBe(400);
+      expect(res._getJSONData()).toHaveProperty('message', 'Validation error');
+      expect(res._getJSONData().errors).toContain('Name cannot exceed 255 characters');
+    });
+
+    it('should return 400 if contact number is invalid', async () => {
+      req.body = {
+        name: 'Test Salon',
+        address: '123 Test St',
+        contactNumber: '123',
+      };
+      req.user = { id: testUser.id };
+
+      await createSalon(req, res);
+
+      expect(res.statusCode).toBe(400);
+      expect(res._getJSONData()).toHaveProperty('message', 'Validation error');
+      expect(res._getJSONData().errors).toContain('Contact number must be between 10 and 15 digits');
     });
   });
 
@@ -132,6 +162,26 @@ describe('Salon Controller', () => {
 
       expect(res.statusCode).toBe(404);
       expect(res._getJSONData()).toHaveProperty('message', 'Salon not found');
+    });
+
+    it('should return 400 if update data is invalid', async () => {
+      const salon = await Salon.create({
+        name: 'Original Salon',
+        address: '789 Test Blvd',
+        contactNumber: '1122334455',
+        ownerId: testUser.id,
+      });
+
+      req.params = { id: salon.id };
+      req.body = { name: '', contactNumber: '123' };
+      req.user = { id: testUser.id };
+
+      await updateSalon(req, res);
+
+      expect(res.statusCode).toBe(400);
+      expect(res._getJSONData()).toHaveProperty('message', 'Validation error');
+      expect(res._getJSONData().errors).toContain('Name is required');
+      expect(res._getJSONData().errors).toContain('Contact number must be between 10 and 15 digits');
     });
   });
 

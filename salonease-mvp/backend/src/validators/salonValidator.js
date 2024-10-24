@@ -1,19 +1,33 @@
 const Joi = require('joi');
 
-const salonSchema = Joi.object({
-  name: Joi.string().required().messages({
+const baseSalonSchema = {
+  name: Joi.string().trim().min(1).max(255).messages({
     'string.empty': 'Name is required',
-    'any.required': 'Name is required'
+    'string.min': 'Name must be at least 1 character long',
+    'string.max': 'Name cannot exceed 255 characters'
   }),
-  address: Joi.string().required().messages({
+  address: Joi.string().trim().min(1).max(255).messages({
     'string.empty': 'Address is required',
-    'any.required': 'Address is required'
+    'string.min': 'Address must be at least 1 character long',
+    'string.max': 'Address cannot exceed 255 characters'
   }),
-  contactNumber: Joi.string().required().messages({
+  contactNumber: Joi.string().trim().pattern(/^[0-9]{10,15}$/).messages({
     'string.empty': 'Contact number is required',
-    'any.required': 'Contact number is required'
+    'string.pattern.base': 'Contact number must be between 10 and 15 digits'
   }),
-  description: Joi.string().allow('', null)
+  description: Joi.string().allow('', null).max(1000).messages({
+    'string.max': 'Description cannot exceed 1000 characters'
+  })
+};
+
+const createSalonSchema = Joi.object({
+  ...baseSalonSchema,
+  name: baseSalonSchema.name.required(),
+  address: baseSalonSchema.address.required(),
+  contactNumber: baseSalonSchema.contactNumber.required()
 });
 
-exports.validateSalon = (salon) => salonSchema.validate(salon, { abortEarly: false });
+const updateSalonSchema = Joi.object(baseSalonSchema).min(1);
+
+exports.validateCreateSalon = (salon) => createSalonSchema.validate(salon, { abortEarly: false });
+exports.validateUpdateSalon = (salon) => updateSalonSchema.validate(salon, { abortEarly: false });
