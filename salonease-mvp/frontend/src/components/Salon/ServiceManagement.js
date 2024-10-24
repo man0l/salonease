@@ -6,6 +6,7 @@ import { FaEdit, FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
 import useService from '../../hooks/useService';
 import { formatCurrency } from '../../utils/currencyFormatter';
 import { toast } from 'react-toastify';
+import CategorySelector from '../CategorySelector';
 
 const schema = yup.object().shape({
   name: yup.string().required('Service name is required'),
@@ -32,7 +33,7 @@ const ServiceManagement = ({ salonId }) => {
     deleteService,
   } = useService(salonId);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+  const { register, handleSubmit, reset, formState: { errors }, watch, setValue } = useForm({
     resolver: yupResolver(schema),
   });
 
@@ -55,7 +56,7 @@ const ServiceManagement = ({ salonId }) => {
     setEditingService(service);
     reset({
       ...service,
-      categoryId: service.categoryId.toString(),
+      categoryId: service.categoryId, // Keep this as a number
     });
     setShowForm(true);
   };
@@ -143,18 +144,11 @@ const ServiceManagement = ({ salonId }) => {
             </div>
             <div>
               <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700 mb-1">Category:</label>
-              <select
-                id="categoryId"
-                {...register('categoryId')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="">Select a category</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
+              <CategorySelector
+                categories={categories}
+                value={parseInt(watch('categoryId'))}
+                onChange={(value) => setValue('categoryId', value)}
+              />
               {errors.categoryId && <span className="text-red-500 text-sm">{errors.categoryId.message}</span>}
             </div>
             <div>
