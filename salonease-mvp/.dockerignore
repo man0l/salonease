@@ -1,0 +1,58 @@
+# Node modules
+node_modules
+
+# Dockerfiles
+Dockerfile
+*.Dockerfile
+
+# Docker compose file
+docker-compose.yml
+
+# Git related
+.git
+.gitignore
+
+# Environment files
+.env
+.env.*
+
+# Log files
+*.log
+
+# Build directories
+build
+dist
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.idea
+.vscode
+*.swp
+*.swo
+
+# Test coverage
+coverage
+
+# Temporary files
+*.tmp
+*.temp
+
+# npm debug log
+npm-debug.log*
+
+# yarn error log
+yarn-error.log
+
+# Frontend specific
+frontend/build
+frontend/node_modules
+
+# Backend specific
+backend/node_modules
+
+# Database files
+*.sqlite
+

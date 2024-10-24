@@ -2,8 +2,10 @@ import React, { act } from 'react';
 import { render } from '@testing-library/react';
 import { SalonProvider, useSalonContext } from '../SalonContext';
 import { useSalon } from '../../hooks/useSalon';
+import { useAuth } from '../../hooks/useAuth';
 
 jest.mock('../../hooks/useSalon');
+jest.mock('../../hooks/useAuth');
 
 describe('SalonContext', () => {
   const mockSalons = [
@@ -27,6 +29,8 @@ describe('SalonContext', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     useSalon.mockReturnValue(mockUseSalon);
+    // Mock useAuth to return a user
+    useAuth.mockReturnValue({ user: { id: 'testUserId' } });
   });
 
   test('provides salon context values', async () => {
