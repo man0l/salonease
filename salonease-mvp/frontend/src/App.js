@@ -44,13 +44,17 @@ const PrivateRoute = ({ children, allowedRoles }) => {
 };
 
 function AppContent() {
+  const { user } = useAuth();
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <div className="flex-grow flex">
-        <PrivateRoute allowedRoles={[ROLES.SALON_OWNER, ROLES.STAFF, ROLES.SUPER_ADMIN]}>
-          <Sidebar className="w-64 flex-shrink-0 bg-background border-r border-gray-200" />
-        </PrivateRoute>
+        {user && (
+          <PrivateRoute allowedRoles={[ROLES.SALON_OWNER, ROLES.STAFF, ROLES.SUPER_ADMIN]}>
+            <Sidebar className="w-64 flex-shrink-0 bg-background border-r border-gray-200" />
+          </PrivateRoute>
+        )}
         <main className="flex-grow overflow-x-hidden overflow-y-auto bg-gray-50">
           <div className="container mx-auto px-6 py-8">
             <ToastContainer />
@@ -132,13 +136,13 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <SalonProvider>
-        <Router>
+    <Router>
+      <AuthProvider>
+        <SalonProvider>
           <AppContent />
-        </Router>
-      </SalonProvider>
-    </AuthProvider>
+        </SalonProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 
