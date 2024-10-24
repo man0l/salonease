@@ -5,6 +5,7 @@ import * as yup from 'yup';
 import { FaEdit, FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
 import useService from '../../hooks/useService';
 import { formatCurrency } from '../../utils/currencyFormatter';
+import { toast } from 'react-toastify';
 
 const schema = yup.object().shape({
   name: yup.string().required('Service name is required'),
@@ -69,10 +70,12 @@ const ServiceManagement = ({ salonId }) => {
     
     try {
       await deleteService(serviceToDelete);
+      toast.success('Service deleted successfully');
       setIsDeleteDialogOpen(false);
       setServiceToDelete(null);
     } catch (err) {
       // Error handling is managed by useService
+      toast.error('Failed to delete service');
     }
   };
 
@@ -104,6 +107,18 @@ const ServiceManagement = ({ salonId }) => {
         </div>
       </div>
     );
+  };
+
+  const handleUpdateService = async (serviceId, updatedData) => {
+    try {
+      await updateService(serviceId, updatedData);
+      toast.success('Service updated successfully');
+      // Optionally, you might want to refresh the services list here
+      // await fetchServices();
+    } catch (error) {
+      console.error('Error updating service:', error);
+      toast.error('Failed to update service');
+    }
   };
 
   return (
@@ -207,7 +222,7 @@ const ServiceManagement = ({ salonId }) => {
           <p className="text-gray-600">Loading services...</p>
         ) : error ? (
           <p className="text-red-500">{error}</p>
-        ) : services.length === 0 ? (
+        ) : !services ? (
           <p className="text-gray-600">No services available.</p>
         ) : (
           <ul className="space-y-4">
