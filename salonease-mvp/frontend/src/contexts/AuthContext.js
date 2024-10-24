@@ -30,8 +30,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('refreshToken', response.data.refreshToken);
       api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-      console.log('fetching user after login');
-      await fetchUser();
+      setUser(response.data.user); // Set the user state with the response data
       return true;
     } catch (error) {
       console.error('Login error:', error.message);

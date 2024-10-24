@@ -5,7 +5,7 @@ import StaffManagement from '../StaffManagement';
 import { staffApi } from '../../../utils/api';
 import { toast } from 'react-toastify';
 import { useSalonContext } from '../../../contexts/SalonContext';
-import '../../../hooks/useStaff';
+import useStaff from '../../../hooks/useStaff';
 
 // Mock the entire SalonContext module
 jest.mock('../../../contexts/SalonContext', () => ({
@@ -28,20 +28,7 @@ jest.mock('react-toastify', () => ({
   },
 }));
 
-jest.mock('../../../hooks/useStaff', () => ({
-  __esModule: true,
-  default: jest.fn(() => ({
-    staff: [
-      { id: '1', fullName: 'John Doe', email: 'john@example.com' },
-      { id: '2', fullName: 'Jane Smith', email: 'jane@example.com' },
-    ],
-    loading: false,
-    error: null,
-    inviteStaff: jest.fn(),
-    updateStaff: jest.fn(),
-    deleteStaff: jest.fn(),
-  })),
-}));
+jest.mock('../../../hooks/useStaff');
 
 describe('StaffManagement', () => {
   beforeEach(() => {
@@ -53,6 +40,21 @@ describe('StaffManagement', () => {
       { id: '1', fullName: 'John Doe', email: 'john@example.com' },
       { id: '2', fullName: 'Jane Smith', email: 'jane@example.com' },
     ]});
+
+    useStaff.mockReturnValue({
+      staff: [
+        { id: '1', fullName: 'John Doe', email: 'john@example.com' },
+        { id: '2', fullName: 'Jane Smith', email: 'jane@example.com' },
+      ],
+      loading: false,
+      error: null,
+      inviteStaff: jest.fn(),
+      updateStaff: jest.fn(),
+      deleteStaff: jest.fn(),
+    });
+
+    toast.success = jest.fn();
+    toast.error = jest.fn();
   });
 
   it('renders staff list', async () => {
@@ -67,7 +69,7 @@ describe('StaffManagement', () => {
   });
 
   it('invites new staff', async () => {
-    const { inviteStaff } = require('../../../hooks/useStaff').default();
+    const { inviteStaff } = useStaff();
     
     render(<StaffManagement />);
 
@@ -87,7 +89,7 @@ describe('StaffManagement', () => {
   });
 
   it('updates staff', async () => {
-    const { updateStaff } = require('../../../hooks/useStaff').default();
+    const { updateStaff } = useStaff();
     
     render(<StaffManagement />);
 
@@ -100,6 +102,7 @@ describe('StaffManagement', () => {
 
     await waitFor(() => {
       expect(updateStaff).toHaveBeenCalledWith('1', {
+        id: '1',
         email: 'john@example.com',
         fullName: 'Updated Name',
       });
@@ -107,7 +110,7 @@ describe('StaffManagement', () => {
   });
 
   it('removes staff and associated user', async () => {
-    const { deleteStaff } = require('../../../hooks/useStaff').default();
+    const { deleteStaff } = useStaff();
     
     render(<StaffManagement />);
 
@@ -127,8 +130,9 @@ describe('StaffManagement', () => {
   });
 
   it('handles deletion error', async () => {
-    const { deleteStaff } = require('../../../hooks/useStaff').default();
-    deleteStaff.mockRejectedValue(new Error('You can only delete staff from your own salon'));
+    const { deleteStaff } = useStaff();
+    const errorMessage = 'You can only delete staff from your own salon';
+    deleteStaff.mockRejectedValue(new Error(errorMessage));
     
     render(<StaffManagement />);
 
@@ -144,6 +148,7 @@ describe('StaffManagement', () => {
 
     await waitFor(() => {
       expect(deleteStaff).toHaveBeenCalledWith('1');
+      expect(toast.error).toHaveBeenCalledWith(errorMessage);
     });
   });
 });

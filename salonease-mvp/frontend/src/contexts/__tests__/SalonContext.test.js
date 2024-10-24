@@ -3,6 +3,7 @@ import { render } from '@testing-library/react';
 import { SalonProvider, useSalonContext } from '../SalonContext';
 import { useSalon } from '../../hooks/useSalon';
 import { useAuth } from '../../hooks/useAuth';
+import ROLES from '../../utils/roles';
 
 jest.mock('../../hooks/useSalon');
 jest.mock('../../hooks/useAuth');
@@ -154,7 +155,10 @@ describe('SalonContext', () => {
     expect(contextValue.selectedSalon).toEqual(mockSalons[0]);
   });
 
-  test('fetchSalons is called on mount', async () => {
+  test('fetchSalons is called on mount for salon owners', async () => {
+    // Mock the user as a salon owner
+    useAuth.mockReturnValue({ user: { id: 'testUserId', role: ROLES.SALON_OWNER } });
+
     await act(async () => {
       render(
         <SalonProvider>
@@ -164,5 +168,20 @@ describe('SalonContext', () => {
     });
 
     expect(mockUseSalon.fetchSalons).toHaveBeenCalled();
+  });
+
+  test('fetchSalons is not called on mount for staff', async () => {
+    // Mock the user as staff
+    useAuth.mockReturnValue({ user: { id: 'testUserId', role: ROLES.STAFF } });
+
+    await act(async () => {
+      render(
+        <SalonProvider>
+          <div />
+        </SalonProvider>
+      );
+    });
+
+    expect(mockUseSalon.fetchSalons).not.toHaveBeenCalled();
   });
 });

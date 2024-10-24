@@ -4,6 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { FaEdit, FaTrash, FaPlus, FaMinus, FaUserPlus } from 'react-icons/fa';
 import useStaff from '../../hooks/useStaff';
+import { toast } from 'react-toastify';
 
 const schema = yup.object().shape({
   email: yup.string().email('Invalid email').required('Email is required'),
@@ -32,15 +33,20 @@ const StaffManagement = () => {
   const onSubmit = async (data) => {
     try {
       if (editingStaff) {
-        await updateStaff(editingStaff.id, data);
+        await updateStaff(editingStaff.id, {
+          ...data,
+          id: editingStaff.id
+        });
+        toast.success('Staff updated successfully');
       } else {
         await inviteStaff(data);
+        toast.success('Staff invited successfully');
       }
       reset();
       setEditingStaff(null);
       setShowForm(false);
     } catch (err) {
-      // Error handling is now managed by useStaff
+      toast.error(err.message || 'An error occurred');
     }
   };
 
@@ -62,8 +68,9 @@ const StaffManagement = () => {
       await deleteStaff(staffToDelete);
       setIsDeleteDialogOpen(false);
       setStaffToDelete(null);
+      toast.success('Staff deleted successfully');
     } catch (err) {
-      // Error handling is now managed by useStaff
+      toast.error(err.message || 'An error occurred while deleting staff');
     }
   };
 
