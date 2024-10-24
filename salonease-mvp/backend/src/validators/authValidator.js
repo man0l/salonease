@@ -22,5 +22,13 @@ const loginSchema = Joi.object({
   password: Joi.string().required(),
 });
 
-exports.validateRegister = (user) => registerSchema.validate(user);
-exports.validateLogin = (credentials) => loginSchema.validate(credentials);
+exports.validateRegister = (user) => registerSchema.validate(user, {
+  abortEarly: false,
+  allowUnknown: true,
+  stripUnknown: true
+});
+exports.validateLogin = (credentials) => loginSchema.validate(credentials, {
+  abortEarly: false,
+  allowUnknown: true,
+  stripUnknown: true
+});

@@ -11,9 +11,9 @@ const baseSalonSchema = {
     'string.min': 'Address must be at least 1 character long',
     'string.max': 'Address cannot exceed 255 characters'
   }),
-  contactNumber: Joi.string().trim().pattern(/^[0-9]{10,15}$/).messages({
+  contactNumber: Joi.string().trim().pattern(/^[0-9]{5,20}$/).messages({
     'string.empty': 'Contact number is required',
-    'string.pattern.base': 'Contact number must be between 10 and 15 digits'
+    'string.pattern.base': 'Contact number must be between 5 and 20 digits'
   }),
   description: Joi.string().allow('', null).max(1000).messages({
     'string.max': 'Description cannot exceed 1000 characters'
