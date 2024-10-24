@@ -118,7 +118,7 @@ const ServiceManagement = ({ salonId }) => {
         onClick={() => {
           setShowForm(!showForm);
           setEditingService(null);
-          reset({ name: '', category: '', price: '', duration: '', description: '', promotionalOffer: '' });
+          reset({ name: '', price: '', duration: '', description: '', promotionalOffer: '' });
         }}
         className="mb-6 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-full transition duration-300 flex items-center"
       >
@@ -143,8 +143,9 @@ const ServiceManagement = ({ salonId }) => {
               {errors.name && <span className="text-red-500 text-sm">{errors.name.message}</span>}
             </div>
             <div>
-              <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700 mb-1">Category:</label>
+              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">Category:</label>
               <CategorySelector
+                id="category"
                 categories={categories}
                 value={parseInt(watch('categoryId'))}
                 onChange={(value) => setValue('categoryId', value)}

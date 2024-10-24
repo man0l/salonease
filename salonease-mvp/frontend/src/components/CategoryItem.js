@@ -7,7 +7,7 @@ const CategoryItem = ({ category, depth, search, isExpanded, toggleExpand, onSel
 
   return (
     <div className="py-1">
-      <div className="flex items-center">
+      <div className="flex items-center" data-testid={`category-item-${category.id}`}>
         {hasChildren && !search && (
           <button
             type="button"
