@@ -150,6 +150,7 @@ const ServiceManagement = ({ salonId }) => {
                 onChange={(value) => setValue('categoryId', value)}
               />
               {errors.categoryId && <span className="text-red-500 text-sm">{errors.categoryId.message}</span>}
+              {!watch('categoryId') && <span className="text-red-500 text-sm">Please select a category</span>}
             </div>
             <div>
               <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">Price:</label>

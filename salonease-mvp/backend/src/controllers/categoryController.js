@@ -24,18 +24,24 @@ function structureCategories(categories) {
   categories.forEach(category => {
     const categoryWithChildren = categoryMap.get(category.id);
     if (category.parentId === null || category.parentId === category.id) {
-      // If parentId is null or same as its own id, treat as root
       rootCategories.push(categoryWithChildren);
     } else {
       const parent = categoryMap.get(category.parentId);
       if (parent) {
         parent.children.push(categoryWithChildren);
       } else {
-        // If parent doesn't exist, treat as root
         rootCategories.push(categoryWithChildren);
       }
     }
   });
 
-  return rootCategories;
+  // Add sorting of categories
+  return sortCategories(rootCategories);
+}
+
+function sortCategories(categories) {
+  return categories.sort((a, b) => a.name.localeCompare(b.name)).map(category => ({
+    ...category,
+    children: category.children.length > 0 ? sortCategories(category.children) : []
+  }));
 }
