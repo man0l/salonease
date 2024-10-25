@@ -1,4 +1,5 @@
 const { Client } = require('../config/db');
+const { validateCreateClient, validateUpdateClient } = require('../validators/clientValidator');
 
 exports.getClients = async (req, res) => {
   try {
@@ -24,11 +25,13 @@ exports.getClient = async (req, res) => {
 exports.updateClient = async (req, res) => {
   try {
     const { salonId, clientId } = req.params;
-    const { name, email, phone, notes } = req.body;
+    const { error, value } = validateUpdateClient(req.body);
+    if (error) return res.status(400).json({ message: error.details[0].message });
+
     const client = await Client.findOne({ where: { id: clientId, salonId } });
     if (!client) return res.status(404).json({ message: 'Client not found' });
 
-    await client.update({ name, email, phone, notes });
+    await client.update(value);
     res.json(client);
   } catch (error) {
     res.status(500).json({ message: 'Error updating client', error: error.message });
@@ -52,8 +55,10 @@ exports.exportClients = async (req, res) => {
 exports.addClient = async (req, res) => {
   try {
     const { salonId } = req.params;
-    const { name, email, phone, notes } = req.body;
-    const newClient = await Client.create({ salonId, name, email, phone, notes });
+    const { error, value } = validateCreateClient(req.body);
+    if (error) return res.status(400).json({ message: error.details[0].message });
+
+    const newClient = await Client.create({ ...value, salonId });
     res.status(201).json(newClient);
   } catch (error) {
     res.status(500).json({ message: 'Error adding client', error: error.message });

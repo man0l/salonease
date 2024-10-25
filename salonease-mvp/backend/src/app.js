@@ -24,7 +24,7 @@ app.use('/api/staff', staffRoutes);
 app.use('/api/salons/:salonId/staff-availability', staffAvailabilityRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/categories', categoryRoutes);
-app.use('/api', clientRoutes);
+app.use('/api/clients', clientRoutes);
 
 // Basic route
 app.get('/', (req, res) => {

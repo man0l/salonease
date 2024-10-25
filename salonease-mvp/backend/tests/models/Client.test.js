@@ -1,14 +1,22 @@
 const { DataTypes } = require('sequelize');
-const { sequelize, Client, Salon } = require('../setupTests');
+const { sequelize, Client, Salon, User } = require('../setupTests');
 
 describe('Client Model', () => {
-  let salon;
+  let salon, salonOwner;
 
   beforeEach(async () => {
+    salonOwner = await User.create({
+      fullName: 'Test Owner',
+      email: 'owner@example.com',
+      password: 'password123',
+      role: 'SalonOwner'
+    });
+
     salon = await Salon.create({
       name: 'Test Salon',
       address: '123 Test St',
       contactNumber: '1234567890',
+      ownerId: salonOwner.id
     });
   });
 
