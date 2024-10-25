@@ -9,9 +9,9 @@ router.use(authMiddleware);
 router.use(roleMiddleware([ROLES.SALON_OWNER, ROLES.STAFF]));
 
 router.get('/:salonId', clientController.getClients);
+router.get('/:salonId/export', clientController.exportClients);
 router.get('/:salonId/:clientId', clientController.getClient);
 router.put('/:salonId/:clientId', clientController.updateClient);
-router.get('/:salonId/export', clientController.exportClients);
 router.post('/:salonId', clientController.addClient);
 
 module.exports = router;

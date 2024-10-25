@@ -113,14 +113,14 @@ const serviceApi = {
 };
 
 const clientApi = {
-  getClients: (salonId) => api.get(`/salons/${salonId}/clients`),
-  updateClient: (salonId, clientId, clientData) => api.put(`/salons/${salonId}/clients/${clientId}`, clientData),
-  addClient: (salonId, clientData) => api.post(`/salons/${salonId}/clients`, clientData),
-  exportClients: (salonId, selectedFields) => api.get(`/salons/${salonId}/clients/export`, { 
+  getClients: (salonId) => api.get(`/clients/${salonId}`),
+  getClient: (salonId, clientId) => api.get(`/clients/${salonId}/${clientId}`),
+  updateClient: (salonId, clientId, clientData) => api.put(`/clients/${salonId}/${clientId}`, clientData),
+  exportClients: (salonId, selectedFields) => api.get(`/clients/${salonId}/export`, { 
     params: { fields: selectedFields.join(',') },
     responseType: 'blob' 
   }),
-  getClient: (salonId, clientId) => api.get(`/salons/${salonId}/clients/${clientId}`),
+  addClient: (salonId, clientData) => api.post(`/clients/${salonId}`, clientData),
 };
 
 export { api, authApi, staffApi, serviceApi, clientApi };

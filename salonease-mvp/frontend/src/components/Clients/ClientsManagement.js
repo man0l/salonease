@@ -59,12 +59,14 @@ const ClientsManagement = () => {
   const exportClients = async () => {
     try {
       const response = await clientApi.exportClients(salonId, selectedFields);
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const blob = new Blob([response.data], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', 'clients.csv');
       document.body.appendChild(link);
       link.click();
+      link.remove();
     } catch (error) {
       toast.error('Error exporting clients');
     }
