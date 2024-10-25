@@ -212,4 +212,95 @@ describe('ClientsManagement', () => {
 
     expect(clientApi.exportClients).toHaveBeenCalledWith('mockSalonId', ['name', 'email']);
   });
+
+  test('toggles form visibility', async () => {
+    await act(async () => {
+      render(
+        <BrowserRouter>
+          <ClientsManagement />
+          <ToastContainer />
+        </BrowserRouter>
+      );
+    });
+
+    expect(screen.queryByText('Add New Client')).not.toBeInTheDocument();
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /add client/i }));
+    });
+
+    expect(screen.getByText('Add New Client')).toBeInTheDocument();
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /hide form/i }));
+    });
+
+    expect(screen.queryByText('Add New Client')).not.toBeInTheDocument();
+  });
+
+  test('displays last appointment date', async () => {
+    await act(async () => {
+      render(
+        <BrowserRouter>
+          <ClientsManagement />
+          <ToastContainer />
+        </BrowserRouter>
+      );
+    });
+
+    expect(screen.getByText('Last Appointment: 10/1/2023')).toBeInTheDocument();
+    expect(screen.getByText('Last Appointment: 9/15/2023')).toBeInTheDocument();
+  });
+
+  test('handles client add error', async () => {
+    clientApi.addClient.mockRejectedValueOnce(new Error('Add failed'));
+
+    await act(async () => {
+      render(
+        <BrowserRouter>
+          <ClientsManagement />
+          <ToastContainer />
+        </BrowserRouter>
+      );
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /add client/i }));
+    });
+
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText('Name:'), { target: { value: 'New Client' } });
+      fireEvent.change(screen.getByLabelText('Email:'), { target: { value: 'new@example.com' } });
+      fireEvent.change(screen.getByLabelText('Phone:'), { target: { value: '1112223333' } });
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /add client/i }));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Error adding client')).toBeInTheDocument();
+    });
+  });
+
+  test('handles export clients error', async () => {
+    clientApi.exportClients.mockRejectedValueOnce(new Error('Export failed'));
+
+    await act(async () => {
+      render(
+        <BrowserRouter>
+          <ClientsManagement />
+          <ToastContainer />
+        </BrowserRouter>
+      );
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /export clients/i }));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Error exporting clients')).toBeInTheDocument();
+    });
+  });
 });
