@@ -12,5 +12,6 @@ router.get('/salons/:salonId/clients', clientController.getClients);
 router.get('/salons/:salonId/clients/:clientId', clientController.getClient);
 router.put('/salons/:salonId/clients/:clientId', clientController.updateClient);
 router.get('/salons/:salonId/clients/export', clientController.exportClients);
+router.post('/salons/:salonId/clients', clientController.addClient);
 
 module.exports = router;

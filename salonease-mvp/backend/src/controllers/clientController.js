@@ -48,3 +48,14 @@ exports.exportClients = async (req, res) => {
     res.status(500).json({ message: 'Error exporting clients', error: error.message });
   }
 };
+
+exports.addClient = async (req, res) => {
+  try {
+    const { salonId } = req.params;
+    const { name, email, phone, notes } = req.body;
+    const newClient = await Client.create({ salonId, name, email, phone, notes });
+    res.status(201).json(newClient);
+  } catch (error) {
+    res.status(500).json({ message: 'Error adding client', error: error.message });
+  }
+};

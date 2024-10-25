@@ -127,4 +127,30 @@ describe('Client Routes', () => {
       expect(response.text).toContain('Client One,client1@example.com,1234567890');
     });
   });
+
+  describe('POST /api/clients/:salonId', () => {
+    it('should add a new client', async () => {
+      const clientData = {
+        name: 'New Client',
+        email: 'newclient@example.com',
+        phone: '1234567890',
+        notes: 'New client notes'
+      };
+
+      const response = await request(app)
+        .post(`/api/clients/${salon.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(clientData);
+
+      expect(response.statusCode).toBe(201);
+      expect(response.body).toHaveProperty('name', clientData.name);
+      expect(response.body).toHaveProperty('email', clientData.email);
+      expect(response.body).toHaveProperty('phone', clientData.phone);
+      expect(response.body).toHaveProperty('notes', clientData.notes);
+      expect(response.body).toHaveProperty('salonId', salon.id);
+
+      const addedClient = await Client.findOne({ where: { email: clientData.email } });
+      expect(addedClient).not.toBeNull();
+    });
+  });
 });

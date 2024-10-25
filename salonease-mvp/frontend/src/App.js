@@ -24,7 +24,7 @@ import AcceptInvitation from './components/Salon/AcceptInvitation';
 import ROLES from './utils/roles';
 import StaffAvailability from './components/Salon/StaffAvailability';
 import ServiceManagement from './components/Salon/ServiceManagement';
-import ClientsPage from './pages/ClientsPage'; // Import the ClientsPage component
+import ClientsManagement from './components/Clients/ClientsManagement';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -130,7 +130,7 @@ function AppContent() {
                 path="/salons/:salonId/clients" 
                 element={
                   <PrivateRoute allowedRoles={[ROLES.SALON_OWNER, ROLES.STAFF]}>
-                    <ClientsPage />
+                    <ClientsManagement />
                   </PrivateRoute>
                 } 
               />

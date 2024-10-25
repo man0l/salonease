@@ -66,4 +66,23 @@ describe('Client Controller', () => {
     expect(response.text).toContain('John Doe,john@example.com,1234567890');
     expect(Client.findAll).toHaveBeenCalledWith({ where: { salonId: 'salon1' } });
   });
+
+  test('POST /clients/:salonId - should add a new client', async () => {
+    const clientData = {
+      name: 'New Client',
+      email: 'newclient@example.com',
+      phone: '1234567890',
+      notes: 'New client notes'
+    };
+
+    Client.create.mockResolvedValue({ id: '3', ...clientData, salonId: 'salon1' });
+
+    const response = await request(app)
+      .post('/clients/salon1')
+      .send(clientData);
+
+    expect(response.status).toBe(201);
+    expect(response.body).toEqual({ id: '3', ...clientData, salonId: 'salon1' });
+    expect(Client.create).toHaveBeenCalledWith({ ...clientData, salonId: 'salon1' });
+  });
 });
