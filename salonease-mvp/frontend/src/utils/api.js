@@ -112,4 +112,10 @@ const serviceApi = {
   deleteService: (serviceId) => api.delete(`/services/${serviceId}`),
 };
 
-export { api, authApi, staffApi, serviceApi };
+const clientApi = {
+  getClients: (salonId) => api.get(`/salons/${salonId}/clients`),
+  updateClient: (salonId, clientId, clientData) => api.put(`/salons/${salonId}/clients/${clientId}`, clientData),
+  exportClients: (salonId) => api.get(`/salons/${salonId}/clients/export`, { responseType: 'blob' }),
+};
+
+export { api, authApi, staffApi, serviceApi, clientApi };

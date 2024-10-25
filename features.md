@@ -600,13 +600,15 @@ This staff availability management system provides salon owners with a powerful,
 
 - **List of Clients:**
   - Display client names, contact information, last appointment date.
-  - Search and filter options.
+  - Search and filter options using hooks and state management.
+  - Utilize `react-hook-form` for managing client data forms with validation using `yup`.
 
 **Client Details Page (/salons/:salonId/clients/:clientId):**
 
 - Display client profile with contact info and appointment history.
 - Add and edit notes about client preferences or requirements.
 - Option to export client data.
+- Implement `react-toastify` for user feedback on actions like adding, updating, or exporting client data.
 
 **Export Data:**
 
@@ -644,6 +646,14 @@ This staff availability management system provides salon owners with a powerful,
     - Generate a CSV file of client data.
   - **Response:**
     - Stream the CSV file for download.
+
+### Additional Considerations
+
+- **Testing:**
+  - Implement unit and integration tests for client management features using Jest and React Testing Library.
+
+- **Performance:**
+  - Optimize client data fetching and updates to ensure a responsive user experience, especially for salons with a large client base.
 
 ## 10. Booking and Appointment Management
 
@@ -1191,4 +1201,5 @@ This staff availability management system provides salon owners with a powerful,
 ---
 
 This detailed point provides specific instructions on how to design and implement the application's layout, including the sidebar, links, icons, color scheme, and Tailwind CSS theme. It includes code snippets and configuration examples to assist in development, making it suitable for use with AI coding assistants.
+
 
