@@ -17,6 +17,7 @@ const staffAvailabilityRoutes = require('./routes/staffAvailabilityRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const clientRoutes = require('./routes/clientRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
 // Use routes
 app.use('/api/auth', authRoutes);
 app.use('/api/salons', salonRoutes);
@@ -25,6 +26,7 @@ app.use('/api/salons/:salonId/staff-availability', staffAvailabilityRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/clients', clientRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 // Basic route
 app.get('/', (req, res) => {

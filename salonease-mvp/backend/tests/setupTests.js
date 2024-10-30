@@ -23,6 +23,7 @@ const Staff = require('../src/models/Staff')(sequelize);
 const StaffAvailability = require('../src/models/StaffAvailability')(sequelize);
 const Service = require('../src/models/Service')(sequelize);
 const Category = require('../src/models/Category')(sequelize);
+const Booking = require('../src/models/Booking')(sequelize);
 
 // Add models to sequelize.models
 sequelize.models.User = User;
@@ -33,6 +34,7 @@ sequelize.models.Staff = Staff;
 sequelize.models.StaffAvailability = StaffAvailability;
 sequelize.models.Service = Service;
 sequelize.models.Category = Category;
+sequelize.models.Booking = Booking;
 
 // Run associations
 User.associate(sequelize.models);
@@ -43,6 +45,7 @@ Staff.associate(sequelize.models);
 StaffAvailability.associate(sequelize.models);
 Service.associate(sequelize.models);
 Category.associate(sequelize.models);
+Booking.associate(sequelize.models);
 
 beforeAll(async () => {
   try {
@@ -61,7 +64,7 @@ beforeEach(async () => {
   try {
     // Use a single query to truncate all tables at once
     await sequelize.query(`
-      TRUNCATE TABLE "Salons", "Clients", "Users", "RefreshTokens", "Staffs", "StaffAvailabilities", "Services", "Categories"
+      TRUNCATE TABLE "Salons", "Clients", "Users", "RefreshTokens", "Staffs", "StaffAvailabilities", "Services", "Categories", "Bookings"
       RESTART IDENTITY
       CASCADE;
     `);
@@ -70,4 +73,4 @@ beforeEach(async () => {
   }
 });
 
-module.exports = { sequelize, User, Salon, Client, RefreshToken, Staff, StaffAvailability, Service, Category };
+module.exports = { sequelize, User, Salon, Client, RefreshToken, Staff, StaffAvailability, Service, Category, Booking };

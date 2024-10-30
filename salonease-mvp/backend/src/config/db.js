@@ -8,6 +8,7 @@ const StaffModel = require('../models/Staff');
 const StaffAvailabilityModel = require('../models/StaffAvailability');
 const ServiceModel = require('../models/Service');
 const CategoryModel = require('../models/Category');
+const BookingModel = require('../models/Booking');
 
 const sequelize = new Sequelize(config.database, config.username, config.password, {
   host: config.host,
@@ -24,16 +25,18 @@ const Staff = StaffModel(sequelize);
 const StaffAvailability = StaffAvailabilityModel(sequelize);
 const Service = ServiceModel(sequelize);
 const Category = CategoryModel(sequelize);
+const Booking = BookingModel(sequelize);
 
 // Add models to sequelize.models
 sequelize.models.User = User;
 sequelize.models.Salon = Salon;
-sequelize.models.Client = Client; // Add Client to sequelize.models
+sequelize.models.Client = Client;
 sequelize.models.RefreshToken = RefreshToken;
 sequelize.models.Staff = Staff;
 sequelize.models.StaffAvailability = StaffAvailability;
 sequelize.models.Service = Service;
 sequelize.models.Category = Category;
+sequelize.models.Booking = Booking;
 
 // Run associations if any
 Object.values(sequelize.models).forEach((model) => {
@@ -65,5 +68,6 @@ module.exports = {
   Staff, 
   StaffAvailability,
   Service,
-  Category
+  Category,
+  Booking
 };
