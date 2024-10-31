@@ -25,6 +25,7 @@ module.exports = (sequelize) => {
       },
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
+      unique: 'uniquePhonePerSalon'
     },
     name: {
       type: DataTypes.STRING,
@@ -38,8 +39,9 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: true,
       validate: {
-        is: /^[0-9]*$/, // Optional: Add a regex to ensure the phone number contains only digits
+        is: /^[0-9]*$/,
       },
+      unique: 'uniquePhonePerSalon'
     },
     notes: {
       type: DataTypes.TEXT,

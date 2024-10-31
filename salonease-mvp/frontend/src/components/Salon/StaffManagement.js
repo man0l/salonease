@@ -24,6 +24,7 @@ const StaffManagement = () => {
     inviteStaff,
     updateStaff,
     deleteStaff,
+    fetchStaff,
   } = useStaff();
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
@@ -68,7 +69,7 @@ const StaffManagement = () => {
       await deleteStaff(staffToDelete);
       setIsDeleteDialogOpen(false);
       setStaffToDelete(null);
-      toast.success('Staff deleted successfully');
+      await fetchStaff();
     } catch (err) {
       toast.error(err.message || 'An error occurred while deleting staff');
     }

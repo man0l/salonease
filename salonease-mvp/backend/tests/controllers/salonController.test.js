@@ -84,7 +84,7 @@ describe('Salon Controller', () => {
 
       expect(res.statusCode).toBe(400);
       expect(res._getJSONData()).toHaveProperty('message', 'Validation error');
-      expect(res._getJSONData().errors).toContain('Contact number must be between 10 and 15 digits');
+      expect(res._getJSONData().errors).toContain('Contact number must be between 5 and 20 digits');
     });
   });
 
@@ -181,7 +181,7 @@ describe('Salon Controller', () => {
       expect(res.statusCode).toBe(400);
       expect(res._getJSONData()).toHaveProperty('message', 'Validation error');
       expect(res._getJSONData().errors).toContain('Name is required');
-      expect(res._getJSONData().errors).toContain('Contact number must be between 10 and 15 digits');
+      expect(res._getJSONData().errors).toContain('Contact number must be between 5 and 20 digits');
     });
   });
 

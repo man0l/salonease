@@ -116,7 +116,7 @@ describe('Salon Routes', () => {
       expect(response.statusCode).toBe(400);
       expect(response.body).toHaveProperty('message', 'Validation error');
       expect(response.body.errors).toContain('Name is required');
-      expect(response.body.errors).toContain('Contact number must be between 10 and 15 digits');
+      expect(response.body.errors).toContain('Contact number must be between 5 and 20 digits');
     });
 
     it('should return 404 if salon does not exist', async () => {

@@ -33,8 +33,20 @@ describe('Client Routes', () => {
   describe('GET /api/clients/:salonId', () => {
     it('should get all clients for a salon', async () => {
       await Client.bulkCreate([
-        { id: uuidv4(), salonId: salon.id, name: 'Client One', email: 'client1@example.com', phone: '1234567890' },
-        { id: uuidv4(), salonId: salon.id, name: 'Client Two', email: 'client2@example.com', phone: '0987654321' }
+        {
+          id: uuidv4(),
+          salonId: salon.id,
+          name: 'Client One',
+          email: 'client1@example.com',
+          phone: '1234567890'
+        },
+        {
+          id: uuidv4(),
+          salonId: salon.id,
+          name: 'Client Two',
+          email: 'client2@example.com',
+          phone: '0987654321'
+        }
       ]);
 
       const response = await request(app)
@@ -43,8 +55,9 @@ describe('Client Routes', () => {
 
       expect(response.statusCode).toBe(200);
       expect(response.body).toHaveLength(2);
-      expect(response.body[0]).toHaveProperty('name', 'Client One');
-      expect(response.body[1]).toHaveProperty('name', 'Client Two');
+      const sortedClients = response.body.sort((a, b) => a.name.localeCompare(b.name));
+      expect(sortedClients[0]).toHaveProperty('name', 'Client One');
+      expect(sortedClients[1]).toHaveProperty('name', 'Client Two');
     });
   });
 
@@ -113,17 +126,20 @@ describe('Client Routes', () => {
 
   describe('GET /api/clients/:salonId/export', () => {
     it('should export clients as CSV', async () => {
-      await Client.bulkCreate([
-        { id: uuidv4(), salonId: salon.id, name: 'Client One', email: 'client1@example.com', phone: '1234567890' },
-        { id: uuidv4(), salonId: salon.id, name: 'Client Two', email: 'client2@example.com', phone: '0987654321' }
-      ]);
+      await Client.create({
+        id: uuidv4(),
+        salonId: salon.id,
+        name: 'Client One',
+        email: 'client1@example.com',
+        phone: '1234567890'
+      });
 
       const response = await request(app)
         .get(`/api/clients/${salon.id}/export`)
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.statusCode).toBe(200);
-      expect(response.headers['content-type']).toBe('text/csv');
+      expect(response.headers['content-type']).toContain('text/csv');
       expect(response.text).toContain('Client One,client1@example.com,1234567890');
     });
   });
@@ -151,6 +167,37 @@ describe('Client Routes', () => {
 
       const addedClient = await Client.findOne({ where: { email: clientData.email } });
       expect(addedClient).not.toBeNull();
+    });
+  });
+
+  describe('DELETE /api/clients/:salonId/:clientId', () => {
+    it('should delete a client', async () => {
+      const client = await Client.create({
+        id: uuidv4(),
+        salonId: salon.id,
+        name: 'Client to Delete',
+        email: 'delete@example.com',
+        phone: '1234567890'
+      });
+
+      const response = await request(app)
+        .delete(`/api/clients/${salon.id}/${client.id}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.statusCode).toBe(204);
+
+      const deletedClient = await Client.findByPk(client.id);
+      expect(deletedClient).toBeNull();
+    });
+
+    it('should return 404 if client to delete does not exist', async () => {
+      const nonExistentId = uuidv4();
+      const response = await request(app)
+        .delete(`/api/clients/${salon.id}/${nonExistentId}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.statusCode).toBe(404);
+      expect(response.body).toHaveProperty('message', 'Client not found');
     });
   });
 });

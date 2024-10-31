@@ -1,4 +1,4 @@
-const { getClients, getClient, updateClient, exportClients, addClient } = require('../../src/controllers/clientController');
+const { getClients, getClient, updateClient, exportClients, addClient, deleteClient } = require('../../src/controllers/clientController');
 const { Client, Salon, User } = require('../setupTests');
 const httpMocks = require('node-mocks-http');
 const { v4: uuidv4 } = require('uuid');
@@ -265,6 +265,60 @@ describe('Client Controller', () => {
 
       expect(res.statusCode).toBe(400);
       expect(res._getJSONData()).toHaveProperty('message', 'Phone number must contain only digits');
+    });
+  });
+
+  describe('deleteClient', () => {
+    it('should delete a client', async () => {
+      const client = await Client.create({
+        salonId: testSalon.id,
+        name: 'Client to Delete',
+        email: 'delete@test.com',
+        phone: '1234567890'
+      });
+
+      req.params = { salonId: testSalon.id, clientId: client.id };
+
+      await deleteClient(req, res);
+
+      expect(res.statusCode).toBe(204);
+
+      const deletedClient = await Client.findByPk(client.id);
+      expect(deletedClient).toBeNull();
+    });
+
+    it('should return 404 if client to delete does not exist', async () => {
+      const nonExistentId = uuidv4();
+      req.params = { salonId: testSalon.id, clientId: nonExistentId };
+
+      await deleteClient(req, res);
+
+      expect(res.statusCode).toBe(404);
+      expect(res._getJSONData()).toHaveProperty('message', 'Client not found');
+    });
+
+    it('should handle deletion errors gracefully', async () => {
+      const client = await Client.create({
+        salonId: testSalon.id,
+        name: 'Client to Delete',
+        email: 'delete@test.com',
+        phone: '1234567890'
+      });
+
+      req.params = { salonId: testSalon.id, clientId: client.id };
+
+      // Mock Client.findOne to throw an error
+      const mockError = new Error('Database error');
+      jest.spyOn(Client, 'findOne').mockRejectedValue(mockError);
+
+      await deleteClient(req, res);
+
+      expect(res.statusCode).toBe(500);
+      expect(res._getJSONData()).toHaveProperty('message', 'Error deleting client');
+      expect(res._getJSONData().error).toBe(mockError.message);
+
+      // Restore the original implementation
+      jest.spyOn(Client, 'findOne').mockRestore();
     });
   });
 });

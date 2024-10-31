@@ -30,7 +30,9 @@
     "web-vitals": "^2.1.4",
     "yup": "^1.4.0",
     "moment": "^2.29.1",
-    "react-time-picker": "^5.2.0"
+    "react-time-picker": "^5.2.0",
+    "react-datepicker": "^4.25.0",
+    "date-fns": "^2.30.0"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
@@ -64,6 +66,10 @@
   "jest": {
     "transformIgnorePatterns": [
       "/node_modules/(?!axios/)"
-    ]
+    ],
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sass)$": "<rootDir>/styleMock.js"
+    }
+  
   }
 }

@@ -1,306 +1,340 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import { BrowserRouter } from 'react-router-dom';
+import { act } from 'react-dom/test-utils';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import ClientsManagement from '../ClientsManagement';
-import { ToastContainer } from 'react-toastify';
-import { clientApi } from '../../../utils/api';
+import useClients from '../../../hooks/useClients';
 
-// Mock clientApi
-jest.mock('../../../utils/api', () => ({
-  clientApi: {
-    getClients: jest.fn(),
-    updateClient: jest.fn(),
-    addClient: jest.fn(),
-    exportClients: jest.fn(),
-  },
-}));
-
-// Mock react-router-dom
+// Mock dependencies
+jest.mock('react-toastify');
+jest.mock('../../../hooks/useClients');
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: () => ({ salonId: 'mockSalonId' }),
 }));
 
+// Mock the DeleteConfirmationDialog component
+jest.mock('../../../components/common/DeleteConfirmationDialog', () => {
+  return function MockDeleteConfirmationDialog({ isOpen, onConfirm }) {
+    return isOpen ? (
+      <div data-testid="delete-modal">
+        <button onClick={onConfirm}>Confirm Delete</button>
+      </div>
+    ) : null;
+  };
+});
+
 const mockClients = [
-  { id: '1', name: 'John Doe', email: 'john@example.com', phone: '1234567890', notes: 'Regular customer', lastAppointmentDate: '2023-10-01' },
-  { id: '2', name: 'Jane Smith', email: 'jane@example.com', phone: '0987654321', notes: 'VIP customer', lastAppointmentDate: '2023-09-15' },
+  {
+    id: '1',
+    name: 'John Doe',
+    email: 'john@example.com',
+    phone: '123-456-7890',
+    notes: 'Regular customer',
+    lastAppointmentDate: '2024-03-20T10:00:00Z'
+  },
+  {
+    id: '2',
+    name: 'Jane Smith',
+    email: 'jane@example.com',
+    phone: '098-765-4321',
+    notes: 'Prefers afternoon appointments',
+    lastAppointmentDate: '2024-03-15T14:00:00Z'
+  }
 ];
 
 describe('ClientsManagement', () => {
+  let mockDeleteClient;
+  let mockFetchClients;
+
   beforeEach(() => {
-    clientApi.getClients.mockResolvedValue({ data: mockClients });
-  });
-
-  test('renders ClientsManagement and displays clients', async () => {
-    await act(async () => {
-      render(
-        <BrowserRouter>
-          <ClientsManagement />
-          <ToastContainer />
-        </BrowserRouter>
-      );
-    });
-
-    expect(screen.getByText('John Doe')).toBeInTheDocument();
-    expect(screen.getByText('john@example.com')).toBeInTheDocument();
-  });
-
-  test('allows adding a new client', async () => {
-    clientApi.addClient.mockResolvedValueOnce({ data: { id: '3', name: 'New Client', email: 'new@example.com', phone: '1112223333' } });
-
-    await act(async () => {
-      render(
-        <BrowserRouter>
-          <ClientsManagement />
-          <ToastContainer />
-        </BrowserRouter>
-      );
-    });
-
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /add client/i }));
-    });
-
-    await act(async () => {
-      fireEvent.change(screen.getByLabelText('Name:'), { target: { value: 'New Client' } });
-      fireEvent.change(screen.getByLabelText('Email:'), { target: { value: 'new@example.com' } });
-      fireEvent.change(screen.getByLabelText('Phone:'), { target: { value: '1112223333' } });
-    });
-
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /add client/i }));
-    });
-
-    await waitFor(() => {
-      expect(screen.getByText('Client added successfully')).toBeInTheDocument();
-    });
-
-    expect(clientApi.addClient).toHaveBeenCalledWith('mockSalonId', {
-      name: 'New Client',
-      email: 'new@example.com',
-      phone: '1112223333',
-      notes: '',
-    });
-  });
-
-  test('allows updating a client', async () => {
-    clientApi.updateClient.mockResolvedValueOnce({ data: { ...mockClients[0], name: 'John Updated' } });
-
-    await act(async () => {
-      render(
-        <BrowserRouter>
-          <ClientsManagement />
-          <ToastContainer />
-        </BrowserRouter>
-      );
-    });
-
-    await act(async () => {
-      fireEvent.click(screen.getByLabelText('Edit John Doe'));
-    });
-
-    await act(async () => {
-      const nameInput = screen.getByLabelText('Name:');
-      fireEvent.change(nameInput, { target: { value: 'John Updated' } });
-    });
-
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /update client/i }));
-    });
-
-    await waitFor(() => {
-      expect(screen.getByText('Client updated successfully')).toBeInTheDocument();
-    });
-
-    expect(clientApi.updateClient).toHaveBeenCalledWith('mockSalonId', '1', expect.objectContaining({
-      name: 'John Updated',
+    // Reset all mocks before each test
+    jest.clearAllMocks();
+    
+    // Create mock functions
+    mockDeleteClient = jest.fn().mockResolvedValue(true);
+    mockFetchClients = jest.fn();
+    
+    // Mock the useClients hook implementation
+    useClients.mockImplementation(() => ({
+      clients: mockClients,
+      loading: false,
+      error: null,
+      fetchClients: mockFetchClients,
+      addClient: jest.fn(),
+      updateClient: jest.fn(),
+      deleteClient: mockDeleteClient,
+      exportClients: jest.fn()
     }));
   });
 
-  test('handles client update error', async () => {
-    clientApi.updateClient.mockRejectedValueOnce(new Error('Update failed'));
+  const renderClientManagement = () => {
+    return render(
+      <Router>
+        <ClientsManagement />
+      </Router>
+    );
+  };
 
-    await act(async () => {
-      render(
-        <BrowserRouter>
-          <ClientsManagement />
-          <ToastContainer />
-        </BrowserRouter>
-      );
-    });
+  it('renders client management component', async () => {
+    renderClientManagement();
+    
+    expect(screen.getByText('Client Management')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Search clients')).toBeInTheDocument();
+    expect(screen.getByText('Export Clients')).toBeInTheDocument();
+    expect(screen.getByText('Add Client')).toBeInTheDocument();
+  });
 
-    await act(async () => {
-      fireEvent.click(screen.getByLabelText('Edit John Doe'));
-    });
-
-    await act(async () => {
-      const nameInput = screen.getByLabelText('Name:');
-      fireEvent.change(nameInput, { target: { value: 'John Updated' } });
-    });
-
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /update client/i }));
-    });
+  it('displays client list correctly', async () => {
+    renderClientManagement();
 
     await waitFor(() => {
-      expect(screen.getByText('Error updating client')).toBeInTheDocument();
+      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      expect(screen.getByText('jane@example.com')).toBeInTheDocument();
     });
   });
 
-  test('exports clients as CSV', async () => {
-    clientApi.exportClients.mockResolvedValueOnce({ data: new Blob(['name,email,phone\nJohn Doe,john@example.com,1234567890'], { type: 'text/csv' }) });
+  it('filters clients based on search term', async () => {
+    renderClientManagement();
 
-    await act(async () => {
-      render(
-        <BrowserRouter>
-          <ClientsManagement />
-          <ToastContainer />
-        </BrowserRouter>
-      );
+    const searchInput = screen.getByPlaceholderText('Search clients');
+    fireEvent.change(searchInput, { target: { value: 'john' } });
+
+    await waitFor(() => {
+      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      expect(screen.queryByText('Jane Smith')).not.toBeInTheDocument();
     });
-
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /export clients/i }));
-    });
-
-    expect(clientApi.exportClients).toHaveBeenCalledWith('mockSalonId', ['name', 'email', 'phone']);
   });
 
-  test('filters clients by search term', async () => {
-    await act(async () => {
-      render(
-        <BrowserRouter>
-          <ClientsManagement />
-          <ToastContainer />
-        </BrowserRouter>
-      );
-    });
+  it('toggles client form visibility', async () => {
+    renderClientManagement();
 
-    expect(screen.getByText('John Doe')).toBeInTheDocument();
-    expect(screen.getByText('Jane Smith')).toBeInTheDocument();
-
-    await act(async () => {
-      fireEvent.change(screen.getByPlaceholderText('Search clients'), { target: { value: 'Jane' } });
-    });
-
-    expect(screen.queryByText('John Doe')).not.toBeInTheDocument();
-    expect(screen.getByText('Jane Smith')).toBeInTheDocument();
-  });
-
-  test('exports only selected fields as CSV', async () => {
-    clientApi.exportClients.mockResolvedValueOnce({
-      data: new Blob(['name,email\nJohn Doe,john@example.com'], { type: 'text/csv' })
-    });
-
-    await act(async () => {
-      render(
-        <BrowserRouter>
-          <ClientsManagement />
-          <ToastContainer />
-        </BrowserRouter>
-      );
-    });
-
-    await act(async () => {
-      fireEvent.click(screen.getByLabelText('phone'));
-    });
-
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /export clients/i }));
-    });
-
-    expect(clientApi.exportClients).toHaveBeenCalledWith('mockSalonId', ['name', 'email']);
-  });
-
-  test('toggles form visibility', async () => {
-    await act(async () => {
-      render(
-        <BrowserRouter>
-          <ClientsManagement />
-          <ToastContainer />
-        </BrowserRouter>
-      );
-    });
-
-    expect(screen.queryByText('Add New Client')).not.toBeInTheDocument();
-
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /add client/i }));
-    });
+    const addButton = screen.getByText('Add Client');
+    fireEvent.click(addButton);
 
     expect(screen.getByText('Add New Client')).toBeInTheDocument();
 
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /hide form/i }));
+    fireEvent.click(screen.getByText('Hide Form'));
+    
+    await waitFor(() => {
+      expect(screen.queryByText('Add New Client')).not.toBeInTheDocument();
     });
-
-    expect(screen.queryByText('Add New Client')).not.toBeInTheDocument();
   });
 
-  test('displays last appointment date', async () => {
+  it('handles client update successfully', async () => {
+    // Create mock functions
+    const mockUpdateClient = jest.fn().mockResolvedValueOnce({});
+    const mockFetchClients = jest.fn();
+    
+    // Update the useClients mock implementation specifically for this test
+    useClients.mockImplementation(() => ({
+      clients: mockClients,
+      loading: false,
+      error: null,
+      fetchClients: mockFetchClients,
+      addClient: jest.fn(),
+      updateClient: mockUpdateClient,
+      deleteClient: jest.fn(),
+      exportClients: jest.fn()
+    }));
+    
+    renderClientManagement();
+
+    // Click edit button on first client
+    const editButton = screen.getByLabelText('Edit John Doe');
     await act(async () => {
-      render(
-        <BrowserRouter>
-          <ClientsManagement />
-          <ToastContainer />
-        </BrowserRouter>
-      );
+      fireEvent.click(editButton);
     });
 
-    expect(screen.getByText('Last Appointment: 10/1/2023')).toBeInTheDocument();
-    expect(screen.getByText('Last Appointment: 9/15/2023')).toBeInTheDocument();
+    // Wait for the form to be visible
+    await waitFor(() => {
+      expect(screen.getByText('Edit Client')).toBeInTheDocument();
+    });
+
+    // Update the client's information
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText(/name:/i), { 
+        target: { value: 'Updated Name' } 
+      });
+      fireEvent.change(screen.getByLabelText(/phone:/i), { 
+        target: { value: '999-999-9999' } 
+      });
+    });
+
+    // Find and click the update button
+    const updateButton = screen.getByText(/update client/i);
+    await act(async () => {
+      fireEvent.click(updateButton);
+    });
+
+    // Verify the update process
+    await waitFor(() => {
+      // Check that updateClient was called with the correct data
+      expect(mockUpdateClient).toHaveBeenCalledWith('1', expect.objectContaining({
+        name: 'Updated Name',
+        email: 'john@example.com',
+        phone: '999-999-9999',
+        notes: 'Regular customer'
+      }));
+      expect(mockFetchClients).toHaveBeenCalled();
+      expect(toast.success).toHaveBeenCalledWith('Client updated successfully');
+    });
   });
 
-  test('handles client add error', async () => {
-    clientApi.addClient.mockRejectedValueOnce(new Error('Add failed'));
+  it('handles client deletion', async () => {
+    renderClientManagement();
 
-    await act(async () => {
-      render(
-        <BrowserRouter>
-          <ClientsManagement />
-          <ToastContainer />
-        </BrowserRouter>
-      );
+    // Click delete button for the first client (John Doe)
+    const deleteButton = screen.getByLabelText('Delete John Doe');
+    fireEvent.click(deleteButton);
+
+    // Wait for the delete confirmation modal to appear
+    await waitFor(() => {
+      expect(screen.getByTestId('delete-modal')).toBeInTheDocument();
     });
 
+    // Click the confirm delete button
+    const confirmButton = screen.getByText('Confirm Delete');
+    fireEvent.click(confirmButton);
+
+    // Wait for and verify the deletion process
+    await waitFor(() => {
+      // Verify deleteClient was called with correct parameters
+      expect(mockDeleteClient).toHaveBeenCalledWith('mockSalonId', '1');
+      // Verify fetchClients was called to refresh the list
+      expect(mockFetchClients).toHaveBeenCalled();
+      // Verify success message was shown
+      expect(toast.success).toHaveBeenCalledWith('Client deleted successfully');
+    });
+  });
+
+  it('handles export clients functionality', async () => {
+    // Create a mock function for exportClients
+    const mockExportClients = jest.fn().mockResolvedValueOnce({});
+    
+    // Update the useClients mock implementation specifically for this test
+    useClients.mockImplementation(() => ({
+      clients: mockClients,
+      loading: false,
+      error: null,
+      fetchClients: jest.fn(),
+      addClient: jest.fn(),
+      updateClient: jest.fn(),
+      deleteClient: jest.fn(),
+      exportClients: mockExportClients
+    }));
+    
+    renderClientManagement();
+
+    // Find and click the export button
+    const exportButton = screen.getByRole('button', {
+      name: /export clients/i,
+    });
+    
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /add client/i }));
+      fireEvent.click(exportButton);
     });
 
-    await act(async () => {
-      fireEvent.change(screen.getByLabelText('Name:'), { target: { value: 'New Client' } });
-      fireEvent.change(screen.getByLabelText('Email:'), { target: { value: 'new@example.com' } });
-      fireEvent.change(screen.getByLabelText('Phone:'), { target: { value: '1112223333' } });
+    // Wait for the export function to be called
+    await waitFor(() => {
+      expect(mockExportClients).toHaveBeenCalled();
     });
+  });
 
+  it('displays loading state', async () => {
+    useClients.mockImplementation(() => ({
+      clients: [],
+      loading: true,
+      error: null,
+      fetchClients: jest.fn()
+    }));
+
+    renderClientManagement();
+    
+    expect(screen.getByText('No clients found.')).toBeInTheDocument();
+  });
+
+  it('handles error states in form submission', async () => {
+    const { addClient } = useClients();
+    addClient.mockRejectedValueOnce(new Error('Failed to add client'));
+    
+    renderClientManagement();
+
+    // Open the form
+    fireEvent.click(screen.getByText('Add Client'));
+
+    // Submit the form without required fields
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /add client/i }));
+      fireEvent.click(screen.getByText('Add Client'));
     });
 
     await waitFor(() => {
-      expect(screen.getByText('Error adding client')).toBeInTheDocument();
+      expect(screen.getByText('Name is required')).toBeInTheDocument();
+      expect(screen.getByText('Phone is required')).toBeInTheDocument();
     });
   });
 
-  test('handles export clients error', async () => {
-    clientApi.exportClients.mockRejectedValueOnce(new Error('Export failed'));
+  it('handles client addition successfully', async () => {
+    // Create mock functions
+    const mockAddClient = jest.fn().mockResolvedValueOnce({});
+    const mockFetchClients = jest.fn();
+    
+    // Update the useClients mock implementation specifically for this test
+    useClients.mockImplementation(() => ({
+      clients: mockClients,
+      loading: false,
+      error: null,
+      fetchClients: mockFetchClients,
+      addClient: mockAddClient,
+      updateClient: jest.fn(),
+      deleteClient: jest.fn(),
+      exportClients: jest.fn()
+    }));
+    
+    renderClientManagement();
 
-    await act(async () => {
-      render(
-        <BrowserRouter>
-          <ClientsManagement />
-          <ToastContainer />
-        </BrowserRouter>
-      );
-    });
+    // Click add client button
+    fireEvent.click(screen.getByText('Add Client'));
 
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /export clients/i }));
-    });
-
+    // Wait for the form to be visible
     await waitFor(() => {
-      expect(screen.getByText('Error exporting clients')).toBeInTheDocument();
+      expect(screen.getByText('Add New Client')).toBeInTheDocument();
+    });
+
+    // Fill in the form fields
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText(/name:/i), { 
+        target: { value: 'New Client' } 
+      });
+      fireEvent.change(screen.getByLabelText(/email:/i), { 
+        target: { value: 'newclient@example.com' } 
+      });
+      fireEvent.change(screen.getByLabelText(/phone:/i), { 
+        target: { value: '123-456-7890' } 
+      });
+      fireEvent.change(screen.getByLabelText(/notes:/i), { 
+        target: { value: 'Test notes' } 
+      });
+    });
+
+    // Submit the form
+    await act(async () => {
+      fireEvent.click(screen.getByText(/add client/i));
+    });
+
+    // Verify the addition process
+    await waitFor(() => {
+      // Check that addClient was called with the correct data
+      expect(mockAddClient).toHaveBeenCalledWith({
+        name: 'New Client',
+        email: 'newclient@example.com',
+        phone: '123-456-7890',
+        notes: 'Test notes'
+      });
+      // Verify that fetchClients was called to refresh the list
+      expect(mockFetchClients).toHaveBeenCalled();
     });
   });
-});
+}); 

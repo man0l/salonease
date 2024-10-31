@@ -4,8 +4,9 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { toast } from 'react-toastify';
-import { clientApi } from '../../utils/api';
-import { FaSearch, FaFileExport, FaEdit, FaSave, FaPlus, FaMinus } from 'react-icons/fa';
+import { FaSearch, FaFileExport, FaEdit, FaSave, FaPlus, FaMinus, FaTrash } from 'react-icons/fa';
+import useClients from '../../hooks/useClients';
+import DeleteConfirmationDialog from '../common/DeleteConfirmationDialog';
 
 const schema = yup.object().shape({
   name: yup.string().required('Name is required'),
@@ -16,36 +17,40 @@ const schema = yup.object().shape({
 
 const ClientsManagement = () => {
   const { salonId } = useParams();
-  const [clients, setClients] = useState([]);
-  const [selectedClient, setSelectedClient] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFields, setSelectedFields] = useState(['name', 'email', 'phone']);
   const [showForm, setShowForm] = useState(false);
+  const [selectedClient, setSelectedClient] = useState(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [clientToDelete, setClientToDelete] = useState(null);
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
   });
 
-  useEffect(() => {
-    fetchClients();
-  }, [salonId]);
+  const { 
+    clients, 
+    loading, 
+    error, 
+    fetchClients, 
+    addClient, 
+    updateClient, 
+    exportClients,
+    deleteClient 
+  } = useClients();
 
-  const fetchClients = async () => {
-    try {
-      const response = await clientApi.getClients(salonId);
-      setClients(response.data);
-    } catch (error) {
-      toast.error('Error fetching clients');
+  useEffect(() => {
+    if (salonId) {
+      fetchClients();
     }
-  };
+  }, [salonId, fetchClients]);
 
   const onSubmit = async (data) => {
     try {
       if (selectedClient) {
-        await clientApi.updateClient(salonId, selectedClient.id, data);
+        await updateClient(selectedClient.id, data);
         toast.success('Client updated successfully');
       } else {
-        await clientApi.addClient(salonId, data);
-        toast.success('Client added successfully');
+        await addClient(data);
       }
       fetchClients();
       setSelectedClient(null);
@@ -53,22 +58,6 @@ const ClientsManagement = () => {
       reset();
     } catch (error) {
       toast.error(selectedClient ? 'Error updating client' : 'Error adding client');
-    }
-  };
-
-  const exportClients = async () => {
-    try {
-      const response = await clientApi.exportClients(salonId, selectedFields);
-      const blob = new Blob([response.data], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'clients.csv');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (error) {
-      toast.error('Error exporting clients');
     }
   };
 
@@ -87,6 +76,28 @@ const ClientsManagement = () => {
       notes: '',
     });
     setShowForm(true);
+  };
+
+  const handleDelete = (client) => {
+    setClientToDelete(client);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!clientToDelete || !salonId) return;
+    
+    try {
+      const success = await deleteClient(salonId, clientToDelete.id);
+      if (success) {
+        await fetchClients();
+        toast.success('Client deleted successfully');
+      }
+    } catch (error) {
+      toast.error('Error deleting client');
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setClientToDelete(null);
+    }
   };
 
   const filteredClients = clients.filter(client =>
@@ -211,18 +222,33 @@ const ClientsManagement = () => {
                     <p className="text-sm text-gray-600">Last Appointment: {new Date(client.lastAppointmentDate).toLocaleDateString()}</p>
                   )}
                 </div>
-                <button
-                  onClick={() => handleEdit(client)}
-                  className="bg-secondary-500 hover:bg-secondary-600 text-white py-1 px-3 rounded-md text-sm transition duration-300"
-                  aria-label={`Edit ${client.name}`}
-                >
-                  <FaEdit />
-                </button>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => handleEdit(client)}
+                    className="bg-secondary-500 hover:bg-secondary-600 text-white py-1 px-3 rounded-md text-sm transition duration-300"
+                    aria-label={`Edit ${client.name}`}
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(client)}
+                    className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md text-sm transition duration-300"
+                    aria-label={`Delete ${client.name}`}
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
         )}
       </div>
+
+      <DeleteConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 };

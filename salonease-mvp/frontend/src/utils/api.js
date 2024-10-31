@@ -96,7 +96,7 @@ const staffApi = {
   getStaff: (salonId) => api.get(`/staff/${salonId}`),
   inviteStaff: (salonId, staffData) => api.post(`/staff/${salonId}/invite`, staffData),
   updateStaff: (salonId, staffId, staffData) => api.put(`/staff/${salonId}/${staffId}`, staffData),
-  deleteStaff: (salonId, staffId) => api.delete(`/staff/${salonId}/${staffId}`),
+  deleteStaff: (salonId, staffId) => api.delete(`/staff/${salonId}/staff/${staffId}`),
   acceptInvitation: (data) => axios.post(`${api.defaults.baseURL}/auth/accept-invitation`, data),
   getAssociatedSalon: () => api.get('/staff/my-salon'),
   getStaffAvailability: (salonId) => api.get(`/salons/${salonId}/staff-availability`),
@@ -121,6 +121,20 @@ const clientApi = {
     responseType: 'blob' 
   }),
   addClient: (salonId, clientData) => api.post(`/clients/${salonId}`, clientData),
+  deleteClient: (salonId, clientId) => {
+    console.log('Deleting client:', { salonId, clientId });
+    return api.delete(`/clients/${salonId}/${clientId}`);
+  },
 };
 
-export { api, authApi, staffApi, serviceApi, clientApi };
+const bookingApi = {
+  getBookings: (salonId, filters) => api.get(`/bookings/${salonId}`, { params: filters }),
+  getBooking: (salonId, bookingId) => api.get(`/bookings/${salonId}/${bookingId}`),
+  updateBooking: (salonId, bookingId, bookingData) => api.put(`/bookings/${salonId}/${bookingId}`, bookingData),
+  deleteBooking: (salonId, bookingId, notificationMessage) => 
+    api.delete(`/bookings/${salonId}/${bookingId}`, { data: { notificationMessage } }),
+  checkAvailability: (salonId, staffId, date) => 
+    api.get(`/bookings/${salonId}/availability`, { params: { staffId, date } }),
+};
+
+export { api, authApi, staffApi, serviceApi, clientApi, bookingApi };

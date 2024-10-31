@@ -43,9 +43,21 @@ module.exports = {
         type: Sequelize.DATE,
       },
     });
+
+    // Add composite unique constraint for phone and salonId
+    await queryInterface.addIndex('Clients', ['phone', 'salonId'], {
+      unique: true,
+      name: 'unique_phone_per_salon',
+      where: {
+        phone: {
+          [Sequelize.Op.ne]: null
+        }
+      }
+    });
   },
 
   down: async (queryInterface, Sequelize) => {
+    await queryInterface.removeIndex('Clients', 'unique_phone_per_salon');
     await queryInterface.dropTable('Clients');
   }
 };

@@ -25,6 +25,7 @@ import ROLES from './utils/roles';
 import StaffAvailability from './components/Salon/StaffAvailability';
 import ServiceManagement from './components/Salon/ServiceManagement';
 import ClientsManagement from './components/Clients/ClientsManagement';
+import BookingsManagement from './components/Bookings/BookingsManagement';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -131,6 +132,14 @@ function AppContent() {
                 element={
                   <PrivateRoute allowedRoles={[ROLES.SALON_OWNER, ROLES.STAFF]}>
                     <ClientsManagement />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/salons/:salonId/bookings" 
+                element={
+                  <PrivateRoute allowedRoles={[ROLES.SALON_OWNER, ROLES.STAFF]}>
+                    <BookingsManagement />
                   </PrivateRoute>
                 } 
               />
