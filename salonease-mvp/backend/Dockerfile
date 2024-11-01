@@ -9,7 +9,7 @@ COPY package*.json ./
 
 # Install dependencies
 RUN npm install
-RUN npm install -g sequelize-cli
+RUN npm install -g sequelize-cli nodemon
 
 # Copy app files
 COPY . .
@@ -17,5 +17,5 @@ COPY . .
 # Expose port
 EXPOSE 5000
 
-# Run the application
-CMD ["npm", "start"]
+# Run the application with nodemon instead of npm start
+CMD ["nodemon", "src/server.js"]

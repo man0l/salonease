@@ -113,7 +113,11 @@ const serviceApi = {
 };
 
 const clientApi = {
-  getClients: (salonId) => api.get(`/clients/${salonId}`),
+  getClients: (salonId, searchTerm = '') => {
+    return api.get(`/clients/${salonId}`, {
+      params: { search: searchTerm }
+    });
+  },
   getClient: (salonId, clientId) => api.get(`/clients/${salonId}/${clientId}`),
   updateClient: (salonId, clientId, clientData) => api.put(`/clients/${salonId}/${clientId}`, clientData),
   exportClients: (salonId, selectedFields) => api.get(`/clients/${salonId}/export`, { 

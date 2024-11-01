@@ -8,6 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import useClients from '../../../hooks/useClients';
 import { FaTrash } from 'react-icons/fa';
 import { bookingApi } from '../../../utils/api';
+import { useDebounce } from '../../../hooks/useDebounce';
 const schema = yup.object().shape({
   clientMode: yup.string().oneOf(['existing', 'new']),
   clientId: yup.string().when('clientMode', {
@@ -56,7 +57,7 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
       serviceId: '',
       staffId: '',
       notes: '',
-      appointmentDateTime: new Date()
+      appointmentDateTime: null
     }
   });
 
@@ -65,6 +66,23 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
       fetchClients();
     }
   }, [show, fetchClients]);
+
+  const resetForm = () => {
+    reset({
+      clientMode: 'existing',
+      clientId: '',
+      clientName: '',
+      clientEmail: '',
+      clientPhone: '',
+      serviceId: '',
+      staffId: '',
+      notes: '',
+      appointmentDateTime: null
+    });
+    setClientMode('existing');
+    setClientSearch('');
+    setFilteredClients([]);
+  };
 
   const onSubmit = async (data) => {
     try {
@@ -84,12 +102,12 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
         await fetchClients(); // Refresh clients list
       }
       
-      const response = await bookingApi.createBooking(salonId, data);
+      const response = await bookingApi.createBooking(salonId, { ...data, clientId });
       if (response.data) {
         toast.success('Booking created successfully');
         onSuccess();
         onClose();
-        reset();
+        resetForm();
       }
     } catch (error) {
       if (error.response?.data?.errors) {
@@ -104,19 +122,31 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
     }
   };
 
-  useEffect(() => {
-    if (clientSearch.trim()) {
-      const searchTerm = clientSearch.toLowerCase();
-      const filtered = clients.filter(client => 
-        client.name.toLowerCase().includes(searchTerm) ||
-        client.email.toLowerCase().includes(searchTerm) ||
-        client.phone.includes(searchTerm)
-      );
-      setFilteredClients(filtered);
+  const [debouncedSearch] = useDebounce(async (searchTerm) => {
+    if (searchTerm.length >= 3) {
+      try {
+        const response = await fetchClients(searchTerm);
+        setFilteredClients(response?.data || []);
+      } catch (error) {
+        console.error('Error fetching clients:', error);
+        setFilteredClients([]);
+      }
     } else {
       setFilteredClients([]);
     }
-  }, [clientSearch, clients]);
+  }, 300);
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setClientSearch(value);
+    debouncedSearch(value);
+  };
+
+  useEffect(() => {
+    if (!show) {
+      resetForm();
+    }
+  }, [show]);
 
   const selectClient = (client) => {
     reset({
@@ -216,13 +246,18 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
                     type="text"
                     value={clientSearch}
                     placeholder="Search clients by name, email, or phone..."
-                    onChange={(e) => setClientSearch(e.target.value)}
+                    onChange={handleSearchChange}
                     className={inputClassName(errors.clientId)}
                   />
+                  {clientSearch && clientSearch.length < 3 && (
+                    <p className="mt-1 text-sm text-gray-600">
+                      Please enter at least 3 characters to search
+                    </p>
+                  )}
                   {errors.clientId && (
                     <p className="mt-1 text-sm text-red-600">{errors.clientId.message}</p>
                   )}
-                  {clientSearch && (
+                  {clientSearch.length >= 3 && filteredClients.length > 0 && (
                     <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
                       {filteredClients.map(client => (
                         <div
@@ -245,20 +280,7 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
                       <h3 className="font-medium text-gray-700 mb-2">Selected Client</h3>
                       <button
                         type="button"
-                        onClick={() => {
-                          reset({
-                            clientMode: 'existing',
-                            clientId: '',
-                            clientName: '',
-                            clientEmail: '',
-                            clientPhone: '',
-                            serviceId: watch('serviceId'),
-                            staffId: watch('staffId'),
-                            notes: watch('notes')
-                          });
-                          setClientMode('existing');
-                          setClientSearch('');
-                        }}
+                        onClick={resetForm}
                         className="text-red-500 hover:text-red-700"
                       >
                         <FaTrash className="text-sm" />
@@ -320,13 +342,13 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
               Appointment Date & Time
             </label>
             <DatePicker
-              selected={selectedDate}
+              selected={watch('appointmentDateTime')}
               onChange={(date) => {
-                setSelectedDate(date);
-                setValue('appointmentDateTime', date);
+                setValue('appointmentDateTime', date, { shouldValidate: true });
               }}
+              timeIntervals={15}
               showTimeSelect
-              dateFormat="Pp"
+              dateFormat="MM/dd/yyyy h:mm aa"
               className={inputClassName(errors.appointmentDateTime)}
               minDate={new Date()}
             />
@@ -349,7 +371,10 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
           <div className="flex justify-end gap-2 mt-6">
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => {
+                resetForm();
+                onClose();
+              }}
               className="px-4 py-2 text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300"
             >
               Cancel

@@ -5,10 +5,52 @@ const { Op } = require('sequelize');
 exports.getClients = async (req, res) => {
   try {
     const { salonId } = req.params;
-    const clients = await Client.findAll({ where: { salonId } });
+    const { search } = req.query;
+
+    let whereClause = { salonId };
+
+    // Add search conditions if search parameter exists and has 3 or more characters
+    if (search && search.length >= 3) {
+      whereClause = {
+        salonId,
+        [Op.or]: [
+          { 
+            name: { 
+              [Op.iLike]: `%${search.toLowerCase()}%` 
+            } 
+          },
+          { 
+            email: { 
+              [Op.iLike]: `%${search.toLowerCase()}%` 
+            } 
+          },
+          { 
+            phone: { 
+              [Op.like]: `%${search}%`  // phone numbers should be exact match
+            } 
+          }
+        ]
+      };
+    }
+
+    console.log('Search query:', search);
+    console.log('Where clause:', JSON.stringify(whereClause, null, 2));
+
+    const clients = await Client.findAll({
+      where: whereClause,
+      order: [['name', 'ASC']],
+      limit: 10
+    });
+
+    console.log('Found clients:', clients.length);
+
     res.json(clients);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching clients', error: error.message });
+    console.error('Error in getClients:', error);
+    res.status(500).json({ 
+      message: 'Error fetching clients', 
+      error: error.message 
+    });
   }
 };
 

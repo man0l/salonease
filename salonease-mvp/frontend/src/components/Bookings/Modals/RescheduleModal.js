@@ -1,37 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
-import { bookingApi } from '../../../utils/api';
+import * as yup from 'yup';
 import { toast } from 'react-toastify';
+
+const schema = yup.object().shape({
+  appointmentDateTime: yup
+    .date()
+    .required('Appointment date and time are required')
+    .min(new Date(), 'Appointment date and time must be in the future'),
+});
 
 const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
   const [newDateTime, setNewDateTime] = useState(new Date(booking?.appointmentDateTime || Date.now()));
-  const [availableSlots, setAvailableSlots] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (show && booking) {
-      checkAvailability(newDateTime);
-    }
-  }, [show, booking, newDateTime]);
+  if (!show) return null;
 
-  const checkAvailability = async (date) => {
+  const handleDateChange = (date) => {
+    setError(null);
     try {
-      setLoading(true);
-      const response = await bookingApi.checkAvailability(salonId, booking.staffId, date);
-      setAvailableSlots(response.data);
-    } catch (error) {
-      toast.error('Failed to check availability');
-    } finally {
-      setLoading(false);
+      schema.validateSync({ appointmentDateTime: date });
+      setNewDateTime(date);
+    } catch (err) {
+      setError(err.message);
     }
   };
 
   const handleReschedule = () => {
-    onReschedule(booking.id, newDateTime.toISOString());
-    onClose();
+    try {
+      schema.validateSync({ appointmentDateTime: newDateTime });
+      onReschedule(booking.id, newDateTime.toISOString());
+      onClose();
+    } catch (err) {
+      toast.error(err.message);
+    }
   };
-
-  if (!show) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -49,17 +52,18 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
             <DatePicker
               id="newAppointmentDate"
               selected={newDateTime}
-              onChange={setNewDateTime}
+              onChange={handleDateChange}
               showTimeSelect
+              timeIntervals={15}
               dateFormat="Pp"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className={`w-full px-3 py-2 border rounded-md ${
+                error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary-500'
+              }`}
               minDate={new Date()}
-              filterTime={(time) => {
-                return availableSlots.some(slot => 
-                  new Date(slot).getTime() === time.getTime()
-                );
-              }}
             />
+            {error && (
+              <p className="mt-1 text-sm text-red-600">{error}</p>
+            )}
           </div>
         </div>
 
@@ -72,8 +76,8 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
           </button>
           <button
             onClick={handleReschedule}
-            disabled={loading}
             className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded transition duration-300"
+            disabled={!!error}
           >
             Confirm Reschedule
           </button>

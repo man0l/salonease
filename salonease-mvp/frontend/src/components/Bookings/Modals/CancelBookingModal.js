@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const CancelBookingModal = ({ show, onClose, booking, onCancel }) => {
-  const [notificationMessage, setNotificationMessage] = useState('');
+  const [bookingNote, setBookingNote] = useState('');
 
   if (!show) return null;
 
@@ -17,25 +17,25 @@ const CancelBookingModal = ({ show, onClose, booking, onCancel }) => {
           
           <div>
             <label 
-              htmlFor="notification-message"
+              htmlFor="booking-note"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Notification Message (optional)
+              Booking Note (optional)
             </label>
             <textarea
-              id="notification-message"
-              value={notificationMessage}
-              onChange={(e) => setNotificationMessage(e.target.value)}
+              id="booking-note"
+              value={bookingNote}
+              onChange={(e) => setBookingNote(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               rows="3"
-              placeholder="Enter a message to send to the client..."
+              placeholder="Add a note about why this booking was cancelled..."
             />
           </div>
         </div>
 
         <div className="mt-6 flex justify-end space-x-2">
           <button
-            onClick={() => onCancel(booking.id, notificationMessage)}
+            onClick={() => onCancel(booking.id, bookingNote)}
             className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition duration-300"
           >
             Confirm Cancellation

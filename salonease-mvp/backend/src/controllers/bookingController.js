@@ -15,7 +15,16 @@ exports.getBookings = async (req, res) => {
       whereClause.appointmentDateTime = {
         [Op.between]: [new Date(startDate), new Date(endDate)]
       };
+    } else if (startDate) {
+      whereClause.appointmentDateTime = {
+        [Op.gte]: new Date(startDate)
+      };
+    } else if (endDate) {
+      whereClause.appointmentDateTime = {
+        [Op.lte]: new Date(endDate)
+      };
     }
+
     if (staffId) whereClause.staffId = staffId;
     if (status) whereClause.status = status;
 
@@ -40,7 +49,9 @@ exports.getBookings = async (req, res) => {
       ],
       limit,
       offset,
-      order: [['appointmentDateTime', 'ASC']]
+      order: [
+        ['appointmentDateTime', 'DESC']
+      ]
     });
 
     res.json({
@@ -82,24 +93,6 @@ exports.createBooking = async (req, res) => {
     const appointmentDate = new Date(appointmentDateTime);
     const endTime = new Date(appointmentDate.getTime() + service.duration * 60000);
 
-    // Check staff availability
-    const dayOfWeek = appointmentDate.getDay();
-    const availability = await StaffAvailability.findOne({
-      where: {
-        staffId,
-        salonId,
-        dayOfWeek,
-        type: 'AVAILABILITY',
-        startTime: { [Op.lte]: appointmentDate },
-        endTime: { [Op.gte]: endTime }
-      }
-    });
-
-    if (!availability) {
-      return res.status(400).json({ message: 'Staff is not available at this time' });
-    }
-
-    // Check for booking conflicts
     const conflictingBooking = await Booking.findOne({
       where: {
         staffId,
@@ -198,6 +191,8 @@ exports.updateBooking = async (req, res) => {
 exports.deleteBooking = async (req, res) => {
   try {
     const { salonId, bookingId } = req.params;
+    const { notes } = req.body;
+    
     const booking = await Booking.findOne({ 
       where: { id: bookingId, salonId }
     });
@@ -206,7 +201,11 @@ exports.deleteBooking = async (req, res) => {
       return res.status(404).json({ message: 'Booking not found' });
     }
 
-    await booking.update({ status: BOOKING_STATUSES.CANCELLED });
+    await booking.update({ 
+      status: BOOKING_STATUSES.CANCELLED,
+      notes: notes || booking.notes // Preserve existing notes if no new note is provided
+    });
+    
     res.json({ message: 'Booking cancelled successfully' });
   } catch (error) {
     console.error('Error cancelling booking:', error);

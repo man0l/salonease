@@ -40,9 +40,13 @@ const ClientsManagement = () => {
 
   useEffect(() => {
     if (salonId) {
-      fetchClients();
+      if (searchTerm.length >= 3) {
+        fetchClients(searchTerm);
+      } else {
+        fetchClients();
+      }
     }
-  }, [salonId, fetchClients]);
+  }, [salonId, searchTerm, fetchClients]);
 
   const onSubmit = async (data) => {
     try {
@@ -101,8 +105,10 @@ const ClientsManagement = () => {
   };
 
   const filteredClients = clients.filter(client =>
-    client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.email.toLowerCase().includes(searchTerm.toLowerCase())
+    !searchTerm ||
+    (client.name && client.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (client.email && client.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (client.phone && client.phone.includes(searchTerm))
   );
 
   return (

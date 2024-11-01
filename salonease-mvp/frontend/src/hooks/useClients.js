@@ -9,16 +9,18 @@ const useClients = () => {
   const [error, setError] = useState(null);
   const { selectedSalon } = useSalonContext();
 
-  const fetchClients = useCallback(async () => {
+  const fetchClients = useCallback(async (searchTerm = '') => {
     if (!selectedSalon) return;
     
     try {
       setLoading(true);
-      const response = await clientApi.getClients(selectedSalon.id);
+      const response = await clientApi.getClients(selectedSalon.id, searchTerm);
       setClients(response.data);
-      setError(null);
+      return response;
     } catch (err) {
       handleApiError(err);
+      setClients([]);
+      return { data: [] };
     } finally {
       setLoading(false);
     }
