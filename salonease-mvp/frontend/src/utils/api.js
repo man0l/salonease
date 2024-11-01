@@ -135,6 +135,7 @@ const bookingApi = {
     api.delete(`/bookings/${salonId}/${bookingId}`, { data: { notificationMessage } }),
   checkAvailability: (salonId, staffId, date) => 
     api.get(`/bookings/${salonId}/availability`, { params: { staffId, date } }),
+  createBooking: (salonId, bookingData) => api.post(`/bookings/${salonId}`, bookingData),
 };
 
 export { api, authApi, staffApi, serviceApi, clientApi, bookingApi };

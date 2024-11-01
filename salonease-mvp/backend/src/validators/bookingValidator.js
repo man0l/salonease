@@ -6,7 +6,6 @@ const createBookingSchema = Joi.object({
   staffId: Joi.string().uuid().required(),
   serviceId: Joi.string().uuid().required(),
   appointmentDateTime: Joi.date().iso().greater('now').required(),
-  endTime: Joi.date().iso().greater(Joi.ref('appointmentDateTime')).required(),
   salonId: Joi.string().uuid().required(),
   notes: Joi.string().max(500).allow('', null),
   status: Joi.string().valid(...Object.values(BOOKING_STATUSES)).default(BOOKING_STATUSES.PENDING)
@@ -17,7 +16,6 @@ const updateBookingSchema = Joi.object({
   staffId: Joi.string().uuid(),
   serviceId: Joi.string().uuid(),
   appointmentDateTime: Joi.date().iso().greater('now'),
-  endTime: Joi.date().iso().greater(Joi.ref('appointmentDateTime')),
   salonId: Joi.string().uuid(),
   status: Joi.string().valid(...Object.values(BOOKING_STATUSES)),
   notes: Joi.string().max(500).allow('', null)

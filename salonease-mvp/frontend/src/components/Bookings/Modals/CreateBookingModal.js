@@ -3,34 +3,62 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import DatePicker from 'react-datepicker';
-import { bookingApi } from '../../../utils/api';
 import { toast } from 'react-toastify';
 import "react-datepicker/dist/react-datepicker.css";
 import useClients from '../../../hooks/useClients';
-
+import { FaTrash } from 'react-icons/fa';
+import { bookingApi } from '../../../utils/api';
 const schema = yup.object().shape({
-  clientName: yup.string().required('Client name is required'),
-  clientEmail: yup.string().email('Invalid email format').required('Client email is required'),
-  clientPhone: yup.string().required('Client phone is required'),
+  clientMode: yup.string().oneOf(['existing', 'new']),
+  clientId: yup.string().when('clientMode', {
+    is: 'existing',
+    then: () => yup.string().required('Please select a client'),
+    otherwise: () => yup.string()
+  }),
+  clientName: yup.string().when('clientMode', {
+    is: 'new',
+    then: () => yup.string().required('Client name is required'),
+    otherwise: () => yup.string()
+  }),
+  clientEmail: yup.string().when('clientMode', {
+    is: 'new',
+    then: () => yup.string().email('Invalid email format'),
+    otherwise: () => yup.string()
+  }),
+  clientPhone: yup.string().when('clientMode', {
+    is: 'new',
+    then: () => yup.string().required('Client phone is required'),
+    otherwise: () => yup.string()
+  }),
   serviceId: yup.string().required('Service is required'),
   staffId: yup.string().required('Staff member is required'),
   notes: yup.string(),
+  appointmentDateTime: yup.date().required('Appointment date and time are required')
+    .min(new Date(), 'Appointment date and time must be in the future'),
 });
 
 const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services }) => {
-  const { clients, fetchClients } = useClients();
+  const { clients, fetchClients, addClient } = useClients();
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [availableSlots, setAvailableSlots] = useState([]);
   const [loading, setLoading] = useState(false);
   const [clientMode, setClientMode] = useState('existing');
   const [clientSearch, setClientSearch] = useState('');
   const [filteredClients, setFilteredClients] = useState([]);
 
-  const { register, handleSubmit, formState: { errors }, reset, watch } = useForm({
-    resolver: yupResolver(schema)
+  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      clientMode: 'existing',
+      clientId: '',
+      clientName: '',
+      clientEmail: '',
+      clientPhone: '',
+      serviceId: '',
+      staffId: '',
+      notes: '',
+      appointmentDateTime: new Date()
+    }
   });
-
-  const selectedStaffId = watch('staffId');
 
   useEffect(() => {
     if (show) {
@@ -38,40 +66,39 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
     }
   }, [show, fetchClients]);
 
-  useEffect(() => {
-    if (show && selectedStaffId && selectedDate) {
-      checkAvailability();
-    }
-  }, [show, selectedStaffId, selectedDate]);
-
-  const checkAvailability = async () => {
-    try {
-      setLoading(true);
-      const response = await bookingApi.checkAvailability(salonId, selectedStaffId, selectedDate);
-      setAvailableSlots(response.data);
-    } catch (error) {
-      toast.error('Failed to check availability');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      const bookingData = {
-        ...data,
-        appointmentDateTime: selectedDate,
-        salonId
-      };
+      let clientId = data.clientId;
+
+      if (clientMode === 'new') {
+        // Create new client first
+        const clientData = {
+          name: data.clientName,
+          email: data.clientEmail,
+          phone: data.clientPhone
+        };
+        
+        const newClient = await addClient(clientData);
+        clientId = newClient.id;
+        await fetchClients(); // Refresh clients list
+      }
       
-      await bookingApi.createBooking(bookingData);
-      toast.success('Booking created successfully');
-      reset();
-      onSuccess();
-      onClose();
+      const response = await bookingApi.createBooking(salonId, data);
+      if (response.data) {
+        toast.success('Booking created successfully');
+        onSuccess();
+        onClose();
+        reset();
+      }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to create booking');
+      if (error.response?.data?.errors) {
+        error.response.data.errors.forEach(errorMessage => {
+          toast.error(errorMessage);
+        });
+      } else {
+        toast.error(error.response?.data?.message || 'Failed to create booking');
+      }
     } finally {
       setLoading(false);
     }
@@ -93,6 +120,7 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
 
   const selectClient = (client) => {
     reset({
+      clientId: client.id,
       clientName: client.name,
       clientEmail: client.email,
       clientPhone: client.phone,
@@ -103,6 +131,12 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
     setClientSearch('');
   };
 
+  // Add this helper class for error styling
+  const inputClassName = (error) => `
+    w-full px-3 py-2 border rounded-md
+    ${error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary-500'}
+  `;
+
   if (!show) return null;
 
   return (
@@ -111,11 +145,16 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
         <h2 className="text-2xl font-bold mb-4">Create New Booking</h2>
         
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <input type="hidden" {...register('clientId')} />
+
           <div className="mb-4">
             <div className="flex space-x-4 mb-4">
               <button
                 type="button"
-                onClick={() => setClientMode('existing')}
+                onClick={() => {
+                  setClientMode('existing');
+                  setValue('clientMode', 'existing');
+                }}
                 className={`px-4 py-2 rounded-md ${
                   clientMode === 'existing' ? 'bg-primary-600 text-white' : 'bg-gray-200'
                 }`}
@@ -124,7 +163,10 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
               </button>
               <button
                 type="button"
-                onClick={() => setClientMode('new')}
+                onClick={() => {
+                  setClientMode('new');
+                  setValue('clientMode', 'new');
+                }}
                 className={`px-4 py-2 rounded-md ${
                   clientMode === 'new' ? 'bg-primary-600 text-white' : 'bg-gray-200'
                 }`}
@@ -133,58 +175,102 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
               </button>
             </div>
 
-            {clientMode === 'existing' ? (
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search clients by name, email, or phone..."
-                  onChange={(e) => setClientSearch(e.target.value)}
-                  className="w-full px-4 py-2 border rounded-md"
-                />
-                {clientSearch && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
-                    {filteredClients.map(client => (
-                      <div
-                        key={client.id}
-                        onClick={() => selectClient(client)}
-                        className="p-2 hover:bg-gray-100 cursor-pointer"
-                      >
-                        <div className="font-medium">{client.name}</div>
-                        <div className="text-sm text-gray-600">{client.phone}</div>
-                        <div className="text-sm text-gray-600">{client.email}</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+            {clientMode === 'new' ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Name:</label>
+                  <input
+                    {...register('clientName')}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                  {errors.clientName && (
+                    <p className="mt-1 text-sm text-red-600">{errors.clientName.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email:</label>
+                  <input
+                    type="email"
+                    {...register('clientEmail')}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                  {errors.clientEmail && (
+                    <p className="mt-1 text-sm text-red-600">{errors.clientEmail.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone:</label>
+                  <input
+                    {...register('clientPhone')}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                  {errors.clientPhone && (
+                    <p className="mt-1 text-sm text-red-600">{errors.clientPhone.message}</p>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Name *</label>
+                <div className="relative">
                   <input
                     type="text"
-                    required
-                    className="w-full px-4 py-2 border rounded-md"
-                    {...register('clientName')}
+                    value={clientSearch}
+                    placeholder="Search clients by name, email, or phone..."
+                    onChange={(e) => setClientSearch(e.target.value)}
+                    className={inputClassName(errors.clientId)}
                   />
+                  {errors.clientId && (
+                    <p className="mt-1 text-sm text-red-600">{errors.clientId.message}</p>
+                  )}
+                  {clientSearch && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
+                      {filteredClients.map(client => (
+                        <div
+                          key={client.id}
+                          onClick={() => selectClient(client)}
+                          className="p-2 hover:bg-gray-100 cursor-pointer"
+                        >
+                          <div className="font-medium">{client.name}</div>
+                          <div className="text-sm text-gray-600">{client.phone}</div>
+                          <div className="text-sm text-gray-600">{client.email}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Phone *</label>
-                  <input
-                    type="tel"
-                    required
-                    className="w-full px-4 py-2 border rounded-md"
-                    {...register('clientPhone')}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Email</label>
-                  <input
-                    type="email"
-                    className="w-full px-4 py-2 border rounded-md"
-                    {...register('clientEmail')}
-                  />
-                </div>
+
+                {watch('clientName') && (
+                  <div className="mt-4 p-4 bg-gray-50 rounded-md border border-gray-200">
+                    <div className="flex justify-between items-start">
+                      <h3 className="font-medium text-gray-700 mb-2">Selected Client</h3>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          reset({
+                            clientMode: 'existing',
+                            clientId: '',
+                            clientName: '',
+                            clientEmail: '',
+                            clientPhone: '',
+                            serviceId: watch('serviceId'),
+                            staffId: watch('staffId'),
+                            notes: watch('notes')
+                          });
+                          setClientMode('existing');
+                          setClientSearch('');
+                        }}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <FaTrash className="text-sm" />
+                      </button>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-gray-800">{watch('clientName')}</p>
+                      <p className="text-gray-600 text-sm">{watch('clientPhone')}</p>
+                      <p className="text-gray-600 text-sm">{watch('clientEmail')}</p>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -195,7 +281,7 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
             </label>
             <select
               {...register('serviceId')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className={inputClassName(errors.serviceId)}
             >
               <option value="">Select a service</option>
               {services.map(service => (
@@ -215,7 +301,7 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
             </label>
             <select
               {...register('staffId')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className={inputClassName(errors.staffId)}
             >
               <option value="">Select a staff member</option>
               {staff.map(member => (
@@ -235,17 +321,18 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
             </label>
             <DatePicker
               selected={selectedDate}
-              onChange={setSelectedDate}
+              onChange={(date) => {
+                setSelectedDate(date);
+                setValue('appointmentDateTime', date);
+              }}
               showTimeSelect
               dateFormat="Pp"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className={inputClassName(errors.appointmentDateTime)}
               minDate={new Date()}
-              filterTime={(time) => {
-                return availableSlots.some(slot => 
-                  new Date(slot).getTime() === time.getTime()
-                );
-              }}
             />
+            {errors.appointmentDateTime && (
+              <p className="mt-1 text-sm text-red-600">{errors.appointmentDateTime.message}</p>
+            )}
           </div>
 
           <div>
@@ -259,20 +346,19 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
             />
           </div>
 
-          <div className="mt-6 flex justify-end space-x-2">
+          <div className="flex justify-end gap-2 mt-6">
             <button
               type="button"
               onClick={onClose}
-              className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded transition duration-300"
+              className="px-4 py-2 text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={loading}
-              className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded transition duration-300"
+              className="px-4 py-2 text-white bg-primary-500 rounded-md hover:bg-primary-600"
             >
-              {loading ? 'Creating...' : 'Create Booking'}
+              Create Booking
             </button>
           </div>
         </form>
