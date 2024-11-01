@@ -50,6 +50,7 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
               New Appointment Date
             </label>
             <DatePicker
+              data-testid="reschedule-date-input"      
               id="newAppointmentDate"
               selected={newDateTime}
               onChange={handleDateChange}
