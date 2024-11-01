@@ -9,6 +9,24 @@ import useClients from '../../../hooks/useClients';
 import { FaTrash } from 'react-icons/fa';
 import { bookingApi } from '../../../utils/api';
 import { useDebounce } from '../../../hooks/useDebounce';
+
+const roundToNextFifteen = (date) => {
+  const minutes = date.getMinutes();
+  const remainder = minutes % 15;
+  const roundedMinutes = minutes + (15 - remainder);
+  const roundedDate = new Date(date);
+  roundedDate.setMinutes(roundedMinutes);
+  roundedDate.setSeconds(0);
+  roundedDate.setMilliseconds(0);
+  
+  if (roundedMinutes >= 60) {
+    roundedDate.setHours(roundedDate.getHours() + 1);
+    roundedDate.setMinutes(0);
+  }
+  
+  return roundedDate;
+};
+
 const schema = yup.object().shape({
   clientMode: yup.string().oneOf(['existing', 'new']),
   clientId: yup.string().when('clientMode', {
@@ -46,9 +64,12 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
   const [clientSearch, setClientSearch] = useState('');
   const [filteredClients, setFilteredClients] = useState([]);
 
+  const defaultDate = roundToNextFifteen(new Date());
+
   const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
+      appointmentDateTime: defaultDate,
       clientMode: 'existing',
       clientId: '',
       clientName: '',
@@ -57,7 +78,6 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
       serviceId: '',
       staffId: '',
       notes: '',
-      appointmentDateTime: null
     }
   });
 
@@ -66,6 +86,12 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
       fetchClients();
     }
   }, [show, fetchClients]);
+
+  useEffect(() => {
+    if (show) {
+      setValue('appointmentDateTime', defaultDate);
+    }
+  }, [show, setValue, defaultDate]);
 
   const resetForm = () => {
     reset({
@@ -77,7 +103,7 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
       serviceId: '',
       staffId: '',
       notes: '',
-      appointmentDateTime: null
+      appointmentDateTime: defaultDate
     });
     setClientMode('existing');
     setClientSearch('');
@@ -166,6 +192,8 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
     w-full px-3 py-2 border rounded-md
     ${error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary-500'}
   `;
+
+  const appointmentDateTime = watch('appointmentDateTime', defaultDate);
 
   if (!show) return null;
 
@@ -337,23 +365,65 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
               Appointment Date & Time
             </label>
-            <DatePicker
-              selected={watch('appointmentDateTime')}
-              onChange={(date) => {
-                setValue('appointmentDateTime', date, { shouldValidate: true });
-              }}
-              timeIntervals={15}
-              showTimeSelect
-              dateFormat="MM/dd/yyyy h:mm aa"
-              className={inputClassName(errors.appointmentDateTime)}
-              minDate={new Date()}
-            />
+            
+            <div className="sm:flex sm:space-x-4 space-y-4 sm:space-y-0">
+              <div className="flex-1">
+                <DatePicker
+                  selected={appointmentDateTime}
+                  onChange={(date) => {
+                    const newDate = new Date(date);
+                    if (appointmentDateTime) {
+                      newDate.setHours(appointmentDateTime.getHours());
+                      newDate.setMinutes(appointmentDateTime.getMinutes());
+                    }
+                    setValue('appointmentDateTime', newDate, {
+                      shouldValidate: true
+                    });
+                  }}
+                  dateFormat="MMMM d, yyyy"
+                  minDate={new Date()}
+                  className={`w-full px-3 py-2 border rounded-md ${
+                    errors.appointmentDateTime ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  calendarClassName="mobile-friendly-calendar"
+                  withPortal
+                />
+              </div>
+
+              <div className="flex-1">
+                <DatePicker
+                  selected={appointmentDateTime}
+                  onChange={(date) => {
+                    const newDate = new Date(appointmentDateTime || defaultDate);
+                    newDate.setHours(date.getHours());
+                    newDate.setMinutes(date.getMinutes());
+                    setValue('appointmentDateTime', newDate, {
+                      shouldValidate: true
+                    });
+                  }}
+                  showTimeSelect
+                  showTimeSelectOnly
+                  timeIntervals={15}
+                  timeCaption="Time"
+                  dateFormat="h:mm aa"
+                  className={`w-full px-3 py-2 border rounded-md ${
+                    errors.appointmentDateTime ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  withPortal
+                  minTime={roundToNextFifteen(new Date())}
+                  maxTime={new Date().setHours(20, 0)}
+                />
+              </div>
+            </div>
+
             {errors.appointmentDateTime && (
-              <p className="mt-1 text-sm text-red-600">{errors.appointmentDateTime.message}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {errors.appointmentDateTime.message}
+              </p>
             )}
           </div>
 
