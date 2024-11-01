@@ -61,7 +61,7 @@ describe('CancelBookingModal', () => {
     );
 
     const message = 'Cancellation due to emergency';
-    fireEvent.change(screen.getByLabelText(/notification message/i), {
+    fireEvent.change(screen.getByLabelText(/booking note/i), {
       target: { value: message },
     });
 

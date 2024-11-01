@@ -2,15 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import RescheduleModal from '../../Modals/RescheduleModal';
-import { bookingApi } from '../../../../utils/api';
 import { toast } from 'react-toastify';
-
-jest.mock('../../../../utils/api', () => ({
-  bookingApi: {
-    checkAvailability: jest.fn(),
-    exportClients: jest.fn(),
-  },
-}));
 
 jest.mock('react-toastify', () => ({
   toast: {
@@ -27,59 +19,122 @@ const mockBooking = {
 
 describe('RescheduleModal', () => {
   beforeEach(() => {
-    bookingApi.checkAvailability.mockResolvedValue({
-      data: ['2024-03-25T10:00:00Z', '2024-03-25T11:00:00Z'],
-    });
-    toast.error.mockClear();
+    jest.clearAllMocks();
   });
 
-  it('checks availability on date change', async () => {
-    await act(async () => {
-      render(
-        <RescheduleModal
-          show={true}
-          onClose={() => {}}
-          booking={mockBooking}
-          onReschedule={() => {}}
-          salonId="salon1"
-        />
-      );
-    });
+  it('renders nothing when show is false', () => {
+    render(
+      <RescheduleModal
+        show={false}
+        onClose={() => {}}
+        booking={mockBooking}
+        onReschedule={() => {}}
+        salonId="salon1"
+      />
+    );
+    expect(screen.queryByText('Reschedule Booking')).not.toBeInTheDocument();
+  });
 
-    const datePicker = screen.getByDisplayValue('03/20/2024, 12:00 PM');
+  it('validates future dates only', async () => {
+    const pastDate = new Date('2023-01-01T10:00:00Z');
+    
+    render(
+      <RescheduleModal
+        show={true}
+        onClose={() => {}}
+        booking={mockBooking}
+        onReschedule={() => {}}
+        salonId="salon1"
+      />
+    );
+
+    const datePicker = screen.getByRole('textbox');
     
     await act(async () => {
       fireEvent.change(datePicker, {
-        target: { value: '03/25/2024, 10:00 AM' },
+        target: { value: pastDate.toLocaleString() },
       });
     });
 
-    await waitFor(() => {
-      expect(bookingApi.checkAvailability).toHaveBeenCalledWith(
-        'salon1',
-        'staff1',
-        expect.any(Date)
-      );
-    });
+    const confirmButton = screen.getByText('Confirm Reschedule');
+    fireEvent.click(confirmButton);
+
+    expect(toast.error).toHaveBeenCalledWith('Appointment date and time must be in the future');
   });
 
-  it('handles availability check error', async () => {
-    bookingApi.checkAvailability.mockRejectedValueOnce(new Error('Failed to check availability'));
+  it('calls onReschedule with correct parameters when form is valid', async () => {
+    const mockOnReschedule = jest.fn();
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 1);
 
+    render(
+      <RescheduleModal
+        show={true}
+        onClose={() => {}}
+        booking={mockBooking}
+        onReschedule={mockOnReschedule}
+        salonId="salon1"
+      />
+    );
+
+    const datePicker = screen.getByRole('textbox');
+    
     await act(async () => {
-      render(
-        <RescheduleModal
-          show={true}
-          onClose={() => {}}
-          booking={mockBooking}
-          onReschedule={() => {}}
-          salonId="salon1"
-        />
-      );
+      fireEvent.change(datePicker, {
+        target: { value: futureDate.toLocaleString() },
+      });
     });
 
-    await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith('Failed to check availability');
-    });
+    const confirmButton = screen.getByText('Confirm Reschedule');
+    fireEvent.click(confirmButton);
+
+    expect(mockOnReschedule).toHaveBeenCalledWith(
+      mockBooking.id,
+      expect.any(String)
+    );
   });
-}); 
+
+  it('displays validation error when date is invalid', async () => {
+    render(
+      <RescheduleModal
+        show={true}
+        onClose={() => {}}
+        booking={mockBooking}
+        onReschedule={() => {}}
+        salonId="salon1"
+      />
+    );
+
+    const datePicker = screen.getByRole('textbox');
+    
+    await act(async () => {
+      fireEvent.change(datePicker, {
+        target: { value: 'invalid date' },
+      });
+    });
+
+    const confirmButton = screen.getByText('Confirm Reschedule');
+    fireEvent.click(confirmButton);
+
+    expect(toast.error).toHaveBeenCalledWith('Appointment date and time must be in the future');
+  });
+
+  it('calls onClose when close button is clicked', () => {
+    const mockOnClose = jest.fn();
+    
+    render(
+      <RescheduleModal
+        show={true}
+        onClose={mockOnClose}
+        booking={mockBooking}
+        onReschedule={() => {}}
+        salonId="salon1"
+      />
+    );
+
+    const closeButton = screen.getByText('Close');
+    fireEvent.click(closeButton);
+
+    expect(mockOnClose).toHaveBeenCalled();
+  });
+});
