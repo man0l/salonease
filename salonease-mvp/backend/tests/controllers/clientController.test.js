@@ -50,6 +50,25 @@ describe('Client Controller', () => {
       expect(res.statusCode).toBe(200);
       expect(res._getJSONData()).toHaveLength(0);
     });
+
+    it('should handle pagination correctly', async () => {
+      // Create 15 test clients
+      const clients = Array.from({ length: 15 }, (_, i) => ({
+        salonId: testSalon.id,
+        name: `Client ${i + 1}`,
+        email: `client${i + 1}@test.com`
+      }));
+      await Client.bulkCreate(clients);
+
+      req.params = { salonId: testSalon.id };
+      req.query = { page: 1, limit: 10 };
+
+      await getClients(req, res);
+
+      expect(res.statusCode).toBe(200);
+      expect(res._getJSONData()).toHaveLength(10);
+      expect(res._getHeaders()).toHaveProperty('x-total-count', '15');
+    });
   });
 
   describe('getClient', () => {

@@ -2,6 +2,7 @@ const { Booking, Staff, Service, Client, StaffAvailability } = require('../confi
 const { Op } = require('sequelize');
 const BOOKING_STATUSES = require('../config/bookingStatuses');
 const { validateCreateBooking, validateUpdateBooking } = require('../validators/bookingValidator');
+const sequelize = require('../config/db').sequelize;
 
 exports.getBookings = async (req, res) => {
   try {
@@ -78,13 +79,17 @@ exports.createBooking = async (req, res) => {
     const { salonId } = req.params;
 
     // Check if staff belongs to salon
-    const staff = await Staff.findOne({ where: { id: staffId, salonId } });
+    const staff = await Staff.findOne({ 
+      where: { id: staffId, salonId }
+    });
     if (!staff) {
       return res.status(404).json({ message: 'Staff not found in this salon' });
     }
 
     // Get service duration
-    const service = await Service.findOne({ where: { id: serviceId, salonId } });
+    const service = await Service.findOne({ 
+      where: { id: serviceId, salonId }
+    });
     if (!service) {
       return res.status(404).json({ message: 'Service not found in this salon' });
     }
@@ -93,6 +98,7 @@ exports.createBooking = async (req, res) => {
     const appointmentDate = new Date(appointmentDateTime);
     const endTime = new Date(appointmentDate.getTime() + service.duration * 60000);
 
+    // Check for conflicting bookings
     const conflictingBooking = await Booking.findOne({
       where: {
         staffId,
@@ -100,14 +106,14 @@ exports.createBooking = async (req, res) => {
         [Op.or]: [
           {
             appointmentDateTime: {
-              [Op.lt]: endTime,
-              [Op.gt]: appointmentDateTime
+              [Op.gte]: appointmentDateTime,
+              [Op.lt]: endTime
             }
           },
           {
             endTime: {
               [Op.gt]: appointmentDateTime,
-              [Op.lt]: endTime
+              [Op.lte]: endTime
             }
           }
         ]
@@ -118,17 +124,19 @@ exports.createBooking = async (req, res) => {
       return res.status(400).json({ message: 'Time slot is not available' });
     }
 
-    const booking = await Booking.create({
+    const result = await Booking.create({
       ...value,
       salonId,
       endTime,
       status: BOOKING_STATUSES.PENDING
     });
 
-    res.status(201).json(booking);
+    res.status(201).json(result);
   } catch (error) {
     console.error('Error creating booking:', error);
-    res.status(500).json({ message: 'Error creating booking', error: error.message });
+    const status = error.status || 500;
+    const message = error.status ? error.message : 'Error creating booking';
+    res.status(status).json({ message, errors: error.errors });
   }
 };
 

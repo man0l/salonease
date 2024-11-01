@@ -5,7 +5,8 @@ const { Op } = require('sequelize');
 exports.getClients = async (req, res) => {
   try {
     const { salonId } = req.params;
-    const { search } = req.query;
+    const { search, page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
 
     let whereClause = { salonId };
 
@@ -33,17 +34,19 @@ exports.getClients = async (req, res) => {
       };
     }
 
-    console.log('Search query:', search);
-    console.log('Where clause:', JSON.stringify(whereClause, null, 2));
+    // Get total count of clients
+    const totalCount = await Client.count({ where: whereClause });
 
+    // Get paginated clients
     const clients = await Client.findAll({
       where: whereClause,
       order: [['name', 'ASC']],
-      limit: 10
+      limit: parseInt(limit),
+      offset: parseInt(offset)
     });
 
-    console.log('Found clients:', clients.length);
-
+    // Set total count header
+    res.setHeader('x-total-count', totalCount.toString());
     res.json(clients);
   } catch (error) {
     console.error('Error in getClients:', error);

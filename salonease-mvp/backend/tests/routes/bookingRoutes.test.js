@@ -94,9 +94,7 @@ describe('Booking Routes', () => {
         staffId: staff.id,
         serviceId: service.id,
         appointmentDateTime: appointmentDateTime.toISOString(),
-        endTime: endTime.toISOString(),
-        status: BOOKING_STATUSES.PENDING,
-        salonId: salon.id
+        status: BOOKING_STATUSES.PENDING
       };
 
       const response = await request(app)
@@ -123,9 +121,7 @@ describe('Booking Routes', () => {
         staffId: staff.id,
         serviceId: service.id,
         appointmentDateTime: appointmentDateTime.toISOString(),
-        endTime: new Date(appointmentDateTime.getTime() + (service.duration * 60 * 1000)).toISOString(),
-        status: BOOKING_STATUSES.PENDING,
-        salonId: salon.id
+        status: BOOKING_STATUSES.PENDING
       };
 
       const response = await request(app)
@@ -143,12 +139,15 @@ describe('Booking Routes', () => {
       existingBookingTime.setDate(existingBookingTime.getDate() + 1);
       existingBookingTime.setHours(10, 0, 0, 0);
 
+      // Calculate endTime based on service duration
+      const endTime = new Date(existingBookingTime.getTime() + (service.duration * 60 * 1000));
+
       await Booking.create({
         clientId: client.id,
         staffId: staff.id,
         serviceId: service.id,
         appointmentDateTime: existingBookingTime,
-        endTime: new Date(existingBookingTime.getTime() + (service.duration * 60 * 1000)),
+        endTime: endTime,
         status: BOOKING_STATUSES.CONFIRMED,
         salonId: salon.id
       });
@@ -162,9 +161,7 @@ describe('Booking Routes', () => {
         staffId: staff.id,
         serviceId: service.id,
         appointmentDateTime: overlappingBookingTime.toISOString(),
-        endTime: new Date(overlappingBookingTime.getTime() + (service.duration * 60 * 1000)).toISOString(),
-        status: BOOKING_STATUSES.PENDING,
-        salonId: salon.id
+        status: BOOKING_STATUSES.PENDING
       };
 
       const response = await request(app)
@@ -173,7 +170,7 @@ describe('Booking Routes', () => {
         .send(bookingData);
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toBe('Staff is not available at this time');
+      expect(response.body.message).toBe('Time slot is not available');
     });
   });
 
