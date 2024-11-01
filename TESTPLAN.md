@@ -279,3 +279,115 @@
 - The invitation should not be accepted
 - The user should be prompted to contact the salon owner for a new invitation
 
+## 10. Bookings Management
+
+### Test Case 10.1: Create New Booking
+**Steps:**
+1. Navigate to the Bookings Management page
+2. Click "Create New Booking" button
+3. Select or enter client information (existing or new client)
+4. Select service, staff, and appointment date/time
+5. Submit the booking form
+
+**Expected Result:**
+- A success toast message should appear
+- The new booking should appear in the bookings list
+- The booking should be sorted by appointmentDateTime in descending order
+
+### Test Case 10.2: Reschedule Booking
+**Steps:**
+1. Find an existing booking
+2. Click the reschedule button
+3. Select a new date and time
+4. Confirm the reschedule
+
+**Expected Result:**
+- The RescheduleModal should open
+- Date validation should occur
+- A success message should appear after rescheduling
+- The booking should update with the new date/time
+
+### Test Case 10.3: Cancel Booking
+**Steps:**
+1. Find an existing booking
+2. Click the cancel button
+3. Add cancellation notes (optional)
+4. Confirm the cancellation
+
+**Expected Result:**
+- The CancelBookingModal should open
+- Notes field should be optional
+- A success message should appear after cancellation
+- The booking status should update to cancelled
+
+### Test Case 10.4: Reassign Staff
+**Steps:**
+1. Find an existing booking
+2. Click the reassign staff button
+3. Select a new staff member
+4. Confirm the reassignment
+
+**Expected Result:**
+- The ReassignStaffModal should open
+- Current staff should be displayed
+- A success message should appear after reassignment
+- The booking should update with the new staff member
+
+### Test Case 10.5: Filter Bookings
+**Steps:**
+1. Navigate to the Bookings Management page
+2. Apply date range filters
+3. Reset filters
+
+**Expected Result:**
+- Bookings should filter based on start and end dates
+- Bookings should display in descending order of appointmentDateTime
+- Reset should clear all filters
+
+## 11. Clients Management
+
+### Test Case 11.1: Search Clients
+**Steps:**
+1. Navigate to the Clients Management page
+2. Enter at least 3 characters in the search field
+3. Test searching by name, email, and phone number
+
+**Expected Result:**
+- Search should only activate with 3+ characters
+- Results should show matching clients
+- Results should update as search term changes
+
+### Test Case 11.2: Add New Client
+**Steps:**
+1. Click "Add New Client" button
+2. Enter client details including phone number
+3. Submit the form
+
+**Expected Result:**
+- Validation should check for existing clients with same email/phone
+- Phone number should be unique per salon
+- Success message should appear after adding client
+
+### Test Case 11.3: Delete Client
+**Steps:**
+1. Find an existing client
+2. Click the delete button
+3. Confirm deletion in the confirmation dialog
+
+**Expected Result:**
+- DeleteConfirmationDialog should appear
+- Success message should show after confirmation
+- Client should be removed from the list
+- Attempting to delete non-existent client should show error
+
+### Test Case 11.4: Export Clients
+**Steps:**
+1. Navigate to the Clients Management page
+2. Click the export button
+3. Choose export format (if applicable)
+
+**Expected Result:**
+- Client data should export successfully
+- Export should include all relevant client information
+- Success message should appear after export
+
