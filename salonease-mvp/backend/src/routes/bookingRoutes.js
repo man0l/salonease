@@ -3,7 +3,18 @@ const router = express.Router();
 const bookingController = require('../controllers/bookingController');
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
+const apiKeyMiddleware = require('../middleware/apiKeyMiddleware');
+const manychatWebhookMiddleware = require('../middleware/manychatWebhookMiddleware');
+const rateLimitMiddleware = require('../middleware/rateLimitMiddleware');
+
 const ROLES = require('../config/roles');
+
+router.post('/manychat',
+  apiKeyMiddleware,
+  manychatWebhookMiddleware,
+  rateLimitMiddleware,
+  bookingController.createManychatBooking
+); 
 
 router.use(authMiddleware);
 

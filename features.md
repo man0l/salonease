@@ -743,463 +743,162 @@ This staff availability management system provides salon owners with a powerful,
   - **Actions:**
     - Update booking details (e.g., reschedule, add notes).
 
-# 12.3. Audit Logs
-    
-    ## Frontend
-    
-    ### Audit Logs Page (/audit-logs)
-    - **Display a list of audit logs** with details such as action type, user, timestamp, and affected resources.
-    - **Filters:**
-      - Date range picker.
-      - Action type (e.g., login, data export).
-      - User selection.
-    
-    ### API Integration
-    - **GET /api/audit-logs**
-    
-    ## Backend
-    
-    ### Models
-    - **AuditLog.js**
-      - Fields: id, userId, actionType, resource, timestamp, details
-    
-    ### API Endpoints
-    - **GET /api/audit-logs**
-      - **Actions:**
-        - Retrieve audit logs based on filters.
-        - Store audit logs for significant actions (e.g., login, data export, data deletion).
-    
-    ### Security
-    - Ensure only authorized users can access audit logs.
-    - Log sensitive actions securely.
-    
-    # 13. User Feedback and Support
-    
-    ## 13.1. Feedback Collection
-    
-    ### Frontend
-    
-    #### Feedback Page (/feedback)
-    - **Form Fields:**
-      - Feedback Type (dropdown: Bug Report, Feature Request, General Feedback)
-      - Description (textarea)
-    - **Client-Side Validation:**
-      - All fields are required.
-    - **API Integration:**
-      - On form submission, send a POST request to /api/feedback.
-      - Display a success message upon submission.
-    
-    ### Backend
-    
-    #### API Endpoint: POST /api/feedback
-    - **Request Body:**
-      - feedbackType: string
-      - description: string
-    - **Actions:**
-      - Store feedback in the database.
-      - Send notification to the support team.
-    - **Response:**
-      - Success: { message: "Feedback submitted successfully." }
-      - Error: Appropriate error message.
-    
-    ## 13.2. Support Tickets
-    
-    ### Frontend
-    
-    #### Support Page (/support)
-    - **Form Fields:**
-      - Subject (text)
-      - Description (textarea)
-    - **Client-Side Validation:**
-      - All fields are required.
-    - **API Integration:**
-      - On form submission, send a POST request to /api/support/tickets.
-      - Display a success message upon submission.
-    
-    ### Backend
-    
-    #### API Endpoint: POST /api/support/tickets
-    - **Request Body:**
-      - subject: string
-      - description: string
-    - **Actions:**
-      - Create a new support ticket in the database.
-      - Send notification to the support team.
-    - **Response:**
-      - Success: { message: "Support ticket created successfully." }
-      - Error: Appropriate error message.
-    
-    # 14. Localization and Internationalization
-    
-    ## 14.1. Multi-Language Support
-    
-    ### Frontend
-    
-    #### Language Selector
-    - Dropdown to select the preferred language.
-    - Store the selected language in local storage or user profile.
-    - Use i18next or similar library for translations.
-    - Translate all UI components based on the selected language.
-    
-    ### Backend
-    
-    #### Localization Middleware
-    - Detect the preferred language from the request headers or user profile.
-    - Load appropriate language files for responses.
-    
-    #### Database
-    - Store localized content (e.g., service descriptions) in multiple languages.
-    
-    # 15. Performance Optimization
-    
-    ## 15.1. Frontend Optimization
-    
-    ### Code Splitting
-    - Use dynamic imports to split code into smaller bundles.
-    - Lazy load components that are not immediately needed.
-    
-    ### Caching
-    - Use service workers to cache static assets.
-    - Implement client-side caching for API responses.
-    
-    ### Minimize Re-renders
-    - Use React.memo and useCallback to prevent unnecessary re-renders.
-    
-    ## 15.2. Backend Optimization
-    
-    ### Database Indexing
-    - Create indexes on frequently queried fields.
-    - Optimize database queries to reduce load times.
-    
-    ### Caching
-    - Use Redis or similar caching mechanism for frequently accessed data.
-    
-    ### Load Balancing
-    - Distribute incoming requests across multiple servers to balance the load.
-    
-    ### Asynchronous Processing
-    - Use background jobs for time-consuming tasks (e.g., sending emails).
-    
-    # 16. Documentation and Help
-    
-    ## 16.1. User Documentation
-    
-    ### Frontend
-    
-    #### Help Center Page (/help)
-    - **Sections:**
-      - Getting Started
-      - User Guides
-      - FAQs
-    - **Search Functionality:**
-      - Allow users to search for specific topics.
-    
-    ### Backend
-    
-    #### API Endpoint: GET /api/help
-    - **Actions:**
-      - Retrieve help articles and documentation.
-      - Store documentation content in the database or as markdown files.
-    
-    ## 16.2. Developer Documentation
-    
-    ### API Documentation
-    - Use Swagger or similar tool to generate API documentation.
-    - Provide examples for each endpoint.
-    
-    ### Code Comments
-    - Ensure code is well-commented to explain complex logic.
-    
-    ### README Files
-    - Include README files in each project directory with setup instructions and usage guidelines.
+### 10.3. Public Salon Landing Page
 
-    ## 13. User Interface Design and Layout
+#### Overview
+The public landing page serves as the main entry point for potential clients, showcasing the salon's services and information in an attractive, user-friendly layout.
 
-### 13.1. Application Layout and Navigation
+#### Components
 
-- **Frontend**
-  - **Overall Layout:**
-    - Use a **responsive design** to ensure the application works well on various screen sizes.
-    - **Layout Structure:**
-      - **Header (Top Navigation Bar):**
-        - Contains the application logo and name.
-        - Includes a **user menu** on the right with options like Profile, Settings, and Logout.
-      - **Sidebar (Left Navigation Menu):**
-        - Contains navigation links to different sections of the application.
-        - **Collapsible** to save screen space on smaller devices.
-      - **Main Content Area:**
-        - Displays the content based on the selected menu option.
-      - **Footer (Optional):**
-        - Contains application version, copyright information.
-  - **Color Scheme and Theme:**
-    - **Primary Color:** `#4A90E2` (a shade of blue).
-    - **Secondary Color:** `#50E3C2` (a shade of teal).
-    - **Accent Color:** `#F5A623` (a shade of orange for highlights).
-    - **Background Color:** `#F9FAFB` (light grey for background).
-    - **Text Color:** `#333333` (dark grey for readability).
-    - **Tailwind CSS Theme Configuration:**
-      - Customize the default Tailwind theme to include these colors.
-      - Use Tailwind's `extend` in `tailwind.config.js` to add custom colors.
-  - **Typography:**
-    - **Primary Font:** 'Inter', sans-serif.
-    - **Font Sizes:**
-      - Use Tailwind's default font sizes or customize as needed.
-  - **Icons:**
-    - Use **Heroicons** for consistent and modern iconography.
-    - Install `@heroicons/react` package.
-  - **Sidebar Navigation Links:**
-    - **Dashboard**
-      - **Icon:** `HomeIcon`.
-      - **Route:** `/dashboard`.
-    - **Calendar**
-      - **Icon:** `CalendarIcon`.
-      - **Route:** `/salons/:salonId/calendar`.
-    - **Bookings**
-      - **Icon:** `ClipboardListIcon`.
-      - **Route:** `/salons/:salonId/bookings`.
-    - **Clients**
-      - **Icon:** `UsersIcon`.
-      - **Route:** `/salons/:salonId/clients`.
-    - **Staff**
-      - **Icon:** `UserGroupIcon`.
-      - **Route:** `/salons/:salonId/staff`.
-    - **Services**
-      - **Icon:** `ScissorsIcon` (use a custom icon if necessary).
-      - **Route:** `/salons/:salonId/services`.
-    - **Billing**
-      - **Icon:** `CreditCardIcon`.
-      - **Route:** `/billing`.
-    - **Reports**
-      - **Icon:** `ChartBarIcon`.
-      - **Route:** `/reports`.
-    - **Settings**
-      - **Icon:** `CogIcon`.
-      - **Route:** `/settings`.
-  - **Sidebar Design:**
-    - **Active Link Highlighting:**
-      - Use the **Accent Color** to highlight the active or hovered link.
-    - **Hover Effects:**
-      - Slight background color change on hover.
-    - **Collapsed Sidebar:**
-      - Provide an option to collapse the sidebar to icons only.
-      - Implement a toggle button at the bottom or top of the sidebar.
-  - **Header Design:**
-    - **User Menu:**
-      - Display the user's avatar or initials.
-      - Dropdown menu with options:
-        - **Profile**
-          - Route: `/profile`.
-        - **Notifications**
-          - Route: `/notifications`.
-        - **Logout**
-  - **Responsiveness:**
-    - On smaller screens (mobile devices):
-      - Sidebar collapses into a hamburger menu.
-      - Use **Drawer** or **Off-canvas** menu for sidebar navigation.
-    - Ensure all components adjust appropriately to different screen sizes.
-- **Backend**
-  - **Not directly applicable**, but ensure APIs provide data efficiently to support the frontend layout requirements.
+1. **Hero Section**
+   - Large banner image with gradient overlay
+   - Salon name and description
+   - Quick-action booking button
+   - Operating status indicator (Open/Closed)
 
-### 13.2. Tailwind CSS Configuration
+2. **Quick Info Bar**
+   - Contact information with click-to-call functionality
+   - Address with map link
+   - Working hours summary
+   - Social media links
 
-- **Installation:**
-  - Ensure Tailwind CSS is installed and configured in the project.
-- **Custom Theme in `tailwind.config.js`:**
-  - **Extend Colors:**
-    ```javascript
-    module.exports = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#4A90E2',
-            secondary: '#50E3C2',
-            accent: '#F5A623',
-            background: '#F9FAFB',
-            text: '#333333',
-          },
-        },
-      },
-      variants: {},
-      plugins: [],
-    };
-    ```
-  - **Fonts:**
-    - Include 'Inter' font via Google Fonts or import it in CSS.
-    - Configure in Tailwind:
-      ```javascript
-      module.exports = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-            },
-          },
-        },
-      };
-    ```
-- **Components Styling:**
-  - Use Tailwind utility classes to style components.
-  - Create reusable components (e.g., `Button`, `Card`) with consistent styling.
-- **Dark Mode (Optional):**
-  - Configure Tailwind to support dark mode if desired.
+3. **Services Grid**
+   - Category-based filtering system
+   - Service cards displaying:
+     - Service image (if available)
+     - Name and description
+     - Duration and price
+     - Direct booking button
+   - Promotional badges for special offers
+   - Responsive grid layout (3/2/1 columns based on screen size)
 
-### 13.3. Implementing Icons and SVGs
+4. **Location & Hours Section**
+   - Interactive Google Maps integration
+   - Detailed weekly schedule
+   - Special holiday hours
+   - Directions button
 
-- **Using Heroicons:**
-  - Install the package:
-    ```bash
-    npm install @heroicons/react
-    ```
-  - Import icons as needed:
-    ```javascript
-    import { HomeIcon, CalendarIcon, UsersIcon } from '@heroicons/react/outline';
-    ```
-  - **Icon Sizes:**
-    - Use Tailwind classes to set icon sizes, e.g., `h-6 w-6`.
-- **Custom Icons:**
-  - For icons not available in Heroicons (e.g., `ScissorsIcon`), import SVGs directly or use another icon set like **FontAwesome**.
-  - Example of importing an SVG:
-    ```javascript
-    import { ReactComponent as ScissorsIcon } from '../assets/icons/scissors.svg';
-    ```
+## API Integration
 
-### 13.4. Accessibility Considerations
+### Endpoint: GET /api/salons/:salonId/public
 
-- **Keyboard Navigation:**
-  - Ensure all interactive elements are accessible via keyboard (tab navigation).
-- **ARIA Labels:**
-  - Add appropriate `aria-label` attributes to icons and buttons.
-- **Contrast Ratios:**
-  - Use colors that meet WCAG AA standards for contrast.
-- **Alt Text:**
-  - Provide alt text for images and meaningful labels for icons.
-
-### 13.5. Responsive Design Breakpoints
-
-- **Tailwind Default Breakpoints:**
-  - `sm`: `640px`.
-  - `md`: `768px`.
-  - `lg`: `1024px`.
-  - `xl`: `1280px`.
-  - Use these breakpoints to adjust layouts and component visibility.
-
-### 13.6. Sample Sidebar Component Structure
-
-- **Sidebar Component (`Sidebar.js`):**
-  - **Structure:**
-    ```jsx
-    const navigation = [
-      { name: 'Dashboard', icon: HomeIcon, route: '/dashboard' },
-      { name: 'Calendar', icon: CalendarIcon, route: `/salons/${currentSalonId}/calendar` },
-      // ...other links
-    ];
-
-    function Sidebar() {
-      return (
-        <div className="h-full bg-white shadow-md">
-          <div className="p-4">
-            <Logo />
-          </div>
-          <nav>
-            {navigation.map((item) => (
-              <NavLink
-                key={item.name}
-                to={item.route}
-                className="flex items-center p-2 text-gray-700 hover:bg-gray-100"
-                activeClassName="bg-gray-200 text-primary"
-              >
-                <item.icon className="h-6 w-6 mr-3" />
-                <span>{item.name}</span>
-              </NavLink>
-            ))}
-          </nav>
-        </div>
-      );
+```json
+{
+  "salon": {
+    "id": "uuid",
+    "name": "Salon Name",
+    "address": "Address",
+    "contactNumber": "Phone",
+    "description": "Description",
+    "coverImage": "url",
+    "workingHours": {
+      "monday": { "open": "09:00", "close": "18:00" },
+      "tuesday": { "open": "09:00", "close": "18:00" }
+    },
+    "socialLinks": {
+      "facebook": "url",
+      "instagram": "url"
     }
-    ```
-  - **Collapsible Functionality:**
-    - Use state to manage whether the sidebar is expanded or collapsed.
-    - Adjust CSS classes based on the state.
-
-### 13.7. Sample Header Component Structure
-
-- **Header Component (`Header.js`):**
-  - **Structure:**
-    ```jsx
-    function Header() {
-      return (
-        <header className="flex items-center justify-between bg-white shadow px-4 py-2">
-          <div>
-            <h1 className="text-xl font-semibold text-gray-800">
-              {currentSalonName}
-            </h1>
-          </div>
-          <div className="flex items-center">
-            <button className="relative">
-              <BellIcon className="h-6 w-6 text-gray-600" />
-              {/* Notification Badge */}
-              <span className="absolute top-0 right-0 inline-flex items-center justify-center h-2 w-2 rounded-full bg-red-500"></span>
-            </button>
-            <Menu as="div" className="ml-3 relative">
-              <Menu.Button className="flex text-sm rounded-full">
-                <img
-                  className="h-8 w-8 rounded-full"
-                  src={userAvatarUrl}
-                  alt="User avatar"
-                />
-              </Menu.Button>
-              <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 bg-white shadow-lg">
-                <Menu.Item>
-                  {({ active }) => (
-                    <Link
-                      to="/profile"
-                      className={`block px-4 py-2 text-sm ${active ? 'bg-gray-100' : ''}`}
-                    >
-                      Profile
-                    </Link>
-                  )}
-                </Menu.Item>
-                {/* Other menu items */}
-                <Menu.Item>
-                  {({ active }) => (
-                    <button
-                      onClick={logout}
-                      className={`block w-full text-left px-4 py-2 text-sm ${active ? 'bg-gray-100' : ''}`}
-                    >
-                      Logout
-                    </button>
-                  )}
-                </Menu.Item>
-              </Menu.Items>
-            </Menu>
-          </div>
-        </header>
-      );
+  },
+  "services": [
+    {
+      "id": "uuid",
+      "name": "Service Name",
+      "description": "Description",
+      "price": 50,
+      "duration": 60,
+      "image": "url",
+      "category": "Hair",
+      "promotionalOffer": null
     }
-    ```
+  ]
+}
+```
 
-### 13.8. Component Library and Best Practices
+## Features
 
-- **Component Reusability:**
-  - Create reusable components like `Button`, `Input`, `Modal`, `Card` for consistency.
-- **State Management:**
-  - Use **Context API** or **Recoil** for global state.
-- **Code Organization:**
-  - Organize components by feature or common components in a `common` directory.
-- **Naming Conventions:**
-  - Use clear and consistent naming for components and files.
+1. **Service Categories**
+   - Dynamic category filtering
+   - Service count per category
+   - Smooth transitions between views
 
-### 13.9. Testing the Layout
+2. **Promotional Offers**
+   - Highlighted promotional services
+   - Special offer badges
+   - Savings calculator
 
-- **Responsiveness Testing:**
-  - Test the layout on various screen sizes and devices.
-- **Cross-Browser Compatibility:**
-  - Ensure the application works correctly on major browsers (Chrome, Firefox, Safari, Edge).
-- **Accessibility Testing:**
-  - Use tools like **axe-core** to check for accessibility issues.
+3. **Working Hours**
+   - Real-time open/closed status
+   - Next available time slot
+   - Holiday schedule handling
 
----
+4. **Responsive Design**
+   - Mobile-first approach
+   - Progressive image loading
+   - Touch-friendly interface
+   - Optimized for all screen sizes
 
-This detailed point provides specific instructions on how to design and implement the application's layout, including the sidebar, links, icons, color scheme, and Tailwind CSS theme. It includes code snippets and configuration examples to assist in development, making it suitable for use with AI coding assistants.
+## Implementation References
+
+For the header component implementation, see:
+```jsx:src/components/Public/SalonHeader.js
+const SalonHeader = ({ salon }) => {
+  // ... component code
+};
+```
+
+For the services grid implementation, see:
+```jsx:src/components/Public/ServicesList.js
+const ServicesList = ({ services }) => {
+  // ... component code
+};
+```
+
+This implementation provides a professional, conversion-optimized landing page that makes it easy for potential clients to learn about the salon's services and make bookings.
 
 
+## 14. Localization and Internationalization
+
+### 14.1. Multi-Language Support
+
+#### Frontend
+
+# #### Language Selector
+- Dropdown to select the preferred language.
+- Store the selected language in local storage or user profile.
+- Use i18next or similar library for translations.
+- Translate all UI components based on the selected language.
+
+### Backend
+
+# #### Localization Middleware
+- Detect the preferred language from the request headers or user profile.
+- Load appropriate language files for responses.
+
+# #### Database
+- Store localized content (e.g., service descriptions) in multiple languages.
+
+## 15. Performance Optimization
+
+### 15.1. Frontend Optimization
+
+### Code Splitting
+- Use dynamic imports to split code into smaller bundles.
+- Lazy load components that are not immediately needed.
+
+### Caching
+- Use service workers to cache static assets.
+- Implement client-side caching for API responses.
+
+### Minimize Re-renders
+- Use React.memo and useCallback to prevent unnecessary re-renders.
+
+
+## 16.2. Developer Documentation
+
+### API Documentation
+- Use Swagger or similar tool to generate API documentation.
+- Provide examples for each endpoint
+
+### README Files
+- Include README files in each project directory with setup instructions and usage guidelines.

@@ -5,6 +5,7 @@ const BOOKING_STATUSES = require('../../src/config/bookingStatuses');
 const jwt = require('jsonwebtoken');
 const ROLES = require('../../src/config/roles');
 const STAFF_AVAILABILITY_TYPES = require('../../src/config/staffAvailabilityTypes');
+const crypto = require('crypto');
 
 describe('Booking Routes', () => {
   let token, salon, staff, service, client;
@@ -322,6 +323,38 @@ describe('Booking Routes', () => {
 
       expect(response.status).toBe(403);
       expect(response.body.message).toBe('You do not have permission to access this salon as a salon owner');
+    });
+  });
+
+  describe('POST /api/bookings/manychat', () => {
+    it('should create a booking via Manychat webhook', async () => {
+      const timestamp = Math.floor(Date.now() / 1000);
+      const body = {
+        salonId: salon.id,
+        serviceId: service.id,
+        staffId: staff.id,
+        clientInfo: {
+          name: 'Test Client',
+          email: 'test@example.com',
+          phone: '1234567890'
+        },
+        appointmentDateTime: new Date().toISOString()
+      };
+
+      const signature = crypto
+        .createHmac('sha256', process.env.MANYCHAT_WEBHOOK_SECRET)
+        .update(`${timestamp}.${JSON.stringify(body)}`)
+        .digest('hex');
+
+      const response = await request(app)
+        .post('/api/bookings/manychat')
+        .set('x-api-key', process.env.MANYCHAT_API_KEY)
+        .set('x-manychat-signature', signature)
+        .set('x-manychat-timestamp', timestamp)
+        .send(body);
+
+      expect(response.status).toBe(201);
+      expect(response.body.booking).toBeDefined();
     });
   });
 });

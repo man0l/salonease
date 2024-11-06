@@ -219,4 +219,155 @@ exports.deleteBooking = async (req, res) => {
     console.error('Error cancelling booking:', error);
     res.status(500).json({ message: 'Error cancelling booking', error: error.message });
   }
+
 }; 
+
+
+exports.createManychatBooking = async (req, res) => {
+  const transaction = await sequelize.transaction();
+  
+  try {
+    const { salonId, serviceId, staffId, clientInfo, appointmentDateTime } = req.body;
+    
+    // Validate client info
+    if (!clientInfo || !clientInfo.name || !clientInfo.email || !clientInfo.phone) {
+      return res.status(400).json({ 
+        message: 'Missing required client information' 
+      });
+    }
+
+    // Find or create client
+    const [client] = await Client.findOrCreate({
+      where: { 
+        email: clientInfo.email,
+        salonId 
+      },
+      defaults: {
+        name: clientInfo.name,
+        phone: clientInfo.phone,
+        salonId
+      },
+      transaction
+    });
+
+    // Prepare booking data
+    const bookingData = {
+      salonId,
+      clientId: client.id,
+      serviceId,
+      staffId,
+      appointmentDateTime,
+      notes: clientInfo.notes || null
+    };
+
+    // Validate booking data using existing validator
+    const { error, value } = validateCreateBooking(bookingData);
+    if (error) {
+      await transaction.rollback();
+      const errorMessages = error.details.map(detail => detail.message);
+      return res.status(400).json({ 
+        message: 'Validation error', 
+        errors: errorMessages 
+      });
+    }
+
+    // Check if staff belongs to salon
+    const staff = await Staff.findOne({ 
+      where: { id: staffId, salonId },
+      transaction
+    });
+    if (!staff) {
+      await transaction.rollback();
+      return res.status(404).json({ 
+        message: 'Staff not found in this salon' 
+      });
+    }
+
+    // Get service duration
+    const service = await Service.findOne({ 
+      where: { id: serviceId, salonId },
+      transaction
+    });
+    if (!service) {
+      await transaction.rollback();
+      return res.status(404).json({ 
+        message: 'Service not found in this salon' 
+      });
+    }
+
+    // Calculate appointment end time
+    const appointmentDate = new Date(appointmentDateTime);
+    const endTime = new Date(appointmentDate.getTime() + service.duration * 60000);
+
+    // Check for conflicting bookings
+    const conflictingBooking = await Booking.findOne({
+      where: {
+        staffId,
+        status: [BOOKING_STATUSES.PENDING, BOOKING_STATUSES.CONFIRMED],
+        [Op.or]: [
+          {
+            appointmentDateTime: {
+              [Op.gte]: appointmentDateTime,
+              [Op.lt]: endTime
+            }
+          },
+          {
+            endTime: {
+              [Op.gt]: appointmentDateTime,
+              [Op.lte]: endTime
+            }
+          }
+        ]
+      },
+      transaction
+    });
+
+    if (conflictingBooking) {
+      await transaction.rollback();
+      return res.status(400).json({ 
+        message: 'Time slot is not available' 
+      });
+    }
+
+    // Create booking
+    const booking = await Booking.create({
+      ...value,
+      salonId,
+      endTime,
+      status: BOOKING_STATUSES.PENDING
+    }, { transaction });
+
+    await transaction.commit();
+
+    // Return success response with booking details
+    res.status(201).json({
+      booking: {
+        id: booking.id,
+        appointmentDateTime: booking.appointmentDateTime,
+        endTime: booking.endTime,
+        status: booking.status,
+        service: {
+          name: service.name,
+          duration: service.duration,
+          price: service.price
+        },
+        staff: {
+          name: staff.fullName
+        },
+        client: {
+          name: client.name,
+          email: client.email,
+          phone: client.phone
+        }
+      }
+    });
+
+  } catch (error) {
+    await transaction.rollback();
+    console.error('Error creating Manychat booking:', error);
+    res.status(500).json({ 
+      message: 'Error creating booking', 
+      error: error.message 
+    });
+  }
+};
