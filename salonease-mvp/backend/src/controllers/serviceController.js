@@ -23,10 +23,24 @@ exports.getServices = async (req, res) => {
   try {
     const services = await Service.findAll({
       where: { salonId: req.params.salonId },
-      include: [{ model: Category, as: 'category', attributes: ['id', 'name'] }]
+      include: [{
+        model: Category,
+        as: 'category',
+        attributes: ['id', 'name', 'parentId'],
+        include: [{
+          model: Category,
+          as: 'parent',
+          attributes: ['id', 'name', 'parentId']
+        }]
+      }],
+      order: [
+        [{ model: Category, as: 'category' }, 'name', 'ASC'],
+        ['name', 'ASC']
+      ]
     });
     res.json(services);
   } catch (error) {
+    console.error('Error fetching services:', error);
     res.status(500).json({ message: 'Error fetching services', error: error.message });
   }
 };

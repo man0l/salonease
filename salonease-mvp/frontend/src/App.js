@@ -26,6 +26,7 @@ import StaffAvailability from './components/Salon/StaffAvailability';
 import ServiceManagement from './components/Salon/ServiceManagement';
 import ClientsManagement from './components/Clients/ClientsManagement';
 import BookingsManagement from './components/Bookings/BookingsManagement';
+import PublicSalonPage from './components/Salon/PublicSalonPage';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -143,6 +144,7 @@ function AppContent() {
                   </PrivateRoute>
                 } 
               />
+              <Route path="/salon/:salonId" element={<PublicSalonPage />} />
             </Routes>
           </div>
         </main>
