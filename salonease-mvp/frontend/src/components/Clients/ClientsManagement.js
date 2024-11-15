@@ -129,7 +129,7 @@ const ClientsManagement = () => {
           </div>
         </div>
         <button
-          onClick={exportClients}
+          onClick={() => exportClients(selectedFields)}
           className="bg-secondary-500 hover:bg-secondary-600 text-white px-4 py-2 rounded-md transition duration-300 flex items-center"
         >
           <FaFileExport className="mr-2" /> Export Clients
