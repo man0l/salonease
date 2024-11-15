@@ -391,3 +391,66 @@
 - Export should include all relevant client information
 - Success message should appear after export
 
+## 12. Calendar Management
+
+### Test Case 12.1: View Calendar
+**Steps:**
+1. Navigate to the Bookings Calendar page
+2. Toggle between day and week views
+3. Verify staff filtering buttons
+4. Check booking display in calendar
+
+**Expected Result:**
+- Calendar should switch between day/week views correctly
+- Staff filtering should show/hide relevant bookings
+- Bookings should be color-coded by staff member
+- Booking status should be visually indicated (confirmed, pending, cancelled)
+
+### Test Case 12.2: Create Booking via Calendar
+**Steps:**
+1. Click on an empty time slot in the calendar
+2. Fill in booking details in the CreateBookingModal
+3. Submit the booking
+
+**Expected Result:**
+- CreateBookingModal should open with selected time slot
+- New booking should appear in calendar after creation
+- Booking should have correct visual styling based on staff member
+- Success message should appear
+
+### Test Case 12.3: Reschedule via Calendar
+**Steps:**
+1. Click on an existing booking in the calendar
+2. Modify the date/time in the RescheduleModal
+3. Confirm the reschedule
+
+**Expected Result:**
+- RescheduleModal should open with current booking details
+- Booking should move to new time slot after rescheduling
+- Visual styling should be preserved
+- Success message should appear
+
+### Test Case 12.4: Staff Filtering
+**Steps:**
+1. Click staff filter buttons above calendar
+2. Toggle multiple staff members on/off
+3. Verify booking visibility
+
+**Expected Result:**
+- Only bookings for selected staff should be visible
+- Toggling staff should instantly update calendar view
+- Multiple staff can be selected/deselected
+- Staff buttons should be color-coded matching bookings
+
+### Test Case 12.5: Date Range Navigation
+**Steps:**
+1. Use calendar navigation to change weeks/days
+2. Verify booking data loads for new date range
+3. Check loading states during data fetch
+
+**Expected Result:**
+- New bookings should load when date range changes
+- Loading indicator should show during data fetch
+- Bookings should maintain correct time slots
+- Date format should be consistent in header
+
