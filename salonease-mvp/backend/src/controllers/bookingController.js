@@ -8,7 +8,7 @@ const moment = require('moment');
 exports.getBookings = async (req, res) => {
   try {
     const { salonId } = req.params;
-    const { startDate, endDate, staffId, status, page = 1, limit = 10 } = req.query;
+    const { startDate, endDate, staffId, serviceId, status, page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
 
     const whereClause = { salonId };
@@ -31,6 +31,7 @@ exports.getBookings = async (req, res) => {
     }
 
     if (staffId) whereClause.staffId = staffId;
+    if (serviceId) whereClause.serviceId = serviceId;
     if (status) whereClause.status = status;
 
     const { count, rows: bookings } = await Booking.findAndCountAll({

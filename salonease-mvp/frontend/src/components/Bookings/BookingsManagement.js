@@ -49,7 +49,8 @@ const BookingsManagement = () => {
         startDate: formatDateForApi(filters.startDate),
         endDate: formatDateForApi(filters.endDate),
         page: currentPage,
-        limit: ITEMS_PER_PAGE
+        limit: ITEMS_PER_PAGE,
+        serviceId: filters.serviceId || undefined
       };
       const response = await bookingApi.getBookings(salonId, formattedFilters);
       setBookings(response.data.bookings || []);
@@ -316,7 +317,7 @@ const BookingsManagement = () => {
                   {/* Left Side - Client & Service Info */}
                   <div className="flex-1 grid sm:grid-cols-2 gap-4">
                     {/* Client Information */}
-                    <div className="space-y-2 border-l-4 border-primary-500 pl-4">
+                    <div className="space-y-2 pl-4">
                       <div className="flex flex-wrap items-center gap-2">
                         <h3 className="font-semibold text-lg">{booking.client?.name}</h3>
                         {booking.notes && (
