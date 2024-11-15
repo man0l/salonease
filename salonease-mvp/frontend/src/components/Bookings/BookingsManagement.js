@@ -7,11 +7,12 @@ import "react-datepicker/dist/react-datepicker.css";
 import RescheduleModal from './Modals/RescheduleModal';
 import CancelBookingModal from './Modals/CancelBookingModal';
 import CreateBookingModal from './Modals/CreateBookingModal';
-import { FaPlus, FaTrash, FaInfoCircle, FaCalendarAlt, FaUndo, FaChevronDown } from 'react-icons/fa';
+import { FaPlus, FaTrash, FaInfoCircle, FaCalendarAlt, FaUndo, FaChevronDown, FaCheck } from 'react-icons/fa';
 import useStaff from '../../hooks/useStaff';
 import useService from '../../hooks/useService';
 import { BOOKING_STATUSES } from '../../utils/constants';
 import ReassignStaffModal from './Modals/ReassignStaffModal';
+import ConfirmCompleteModal from './Modals/ConfirmCompleteModal';
 
 const BookingsManagement = () => {
   const { salonId } = useParams();
@@ -29,6 +30,7 @@ const BookingsManagement = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showReassignModal, setShowReassignModal] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
   const { staff, loading: staffLoading } = useStaff();
   const { services, loading: servicesLoading } = useService();
   const [currentPage, setCurrentPage] = useState(1);
@@ -174,6 +176,17 @@ const BookingsManagement = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return today;
+  };
+
+  const handleComplete = async (bookingId) => {
+    try {
+      await bookingApi.updateBooking(salonId, bookingId, { status: BOOKING_STATUSES.COMPLETED });
+      toast.success('Booking marked as completed');
+      fetchBookings();
+      setShowCompleteModal(false);
+    } catch (error) {
+      toast.error('Failed to complete booking');
+    }
   };
 
   return (
@@ -416,6 +429,16 @@ const BookingsManagement = () => {
                             role="button"
                             aria-label="Reschedule booking"
                           />
+                          <FaCheck
+                            onClick={() => {
+                              setSelectedBooking(booking);
+                              setShowCompleteModal(true);
+                            }}
+                            className="text-green-500 hover:text-green-600 cursor-pointer w-5 h-5 transition duration-300"
+                            title="Complete booking"
+                            role="button"
+                            aria-label="Complete booking"
+                          />
                           <FaTrash 
                             onClick={() => {
                               setSelectedBooking(booking);
@@ -502,6 +525,13 @@ const BookingsManagement = () => {
         booking={selectedBooking}
         staff={staffLoading ? [] : staff}
         onReassign={handleReassignStaff}
+      />
+
+      <ConfirmCompleteModal
+        show={showCompleteModal}
+        onClose={() => setShowCompleteModal(false)}
+        booking={selectedBooking}
+        onComplete={handleComplete}
       />
     </div>
   );

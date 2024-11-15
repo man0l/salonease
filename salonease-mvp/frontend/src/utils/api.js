@@ -156,4 +156,18 @@ const publicApi = {
     axios.post(`${api.defaults.baseURL}/public/salons/${salonId}/bookings`, bookingData),
 };
 
-export { api, authApi, staffApi, serviceApi, clientApi, bookingApi, publicApi };
+const dashboardApi = {
+  getStats: (salonId) => api.get(`/salons/${salonId}/dashboard/stats`),
+  getActivity: (salonId) => api.get(`/salons/${salonId}/dashboard/activity`),
+};
+
+export { 
+  api, 
+  authApi, 
+  staffApi, 
+  serviceApi, 
+  clientApi, 
+  bookingApi, 
+  publicApi,
+  dashboardApi 
+};
