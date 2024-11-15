@@ -3,6 +3,7 @@ const { Op } = require('sequelize');
 const BOOKING_STATUSES = require('../config/bookingStatuses');
 const { validateCreateBooking, validateUpdateBooking } = require('../validators/bookingValidator');
 const sequelize = require('../config/db').sequelize;
+const moment = require('moment');
 
 exports.getBookings = async (req, res) => {
   try {
@@ -14,15 +15,18 @@ exports.getBookings = async (req, res) => {
     
     if (startDate && endDate) {
       whereClause.appointmentDateTime = {
-        [Op.between]: [new Date(startDate), new Date(endDate)]
+        [Op.between]: [
+          moment(startDate).startOf('day').toDate(),
+          moment(endDate).endOf('day').toDate()
+        ]
       };
     } else if (startDate) {
       whereClause.appointmentDateTime = {
-        [Op.gte]: new Date(startDate)
+        [Op.gte]: moment(startDate).startOf('day').toDate()
       };
     } else if (endDate) {
       whereClause.appointmentDateTime = {
-        [Op.lte]: new Date(endDate)
+        [Op.lte]: moment(endDate).endOf('day').toDate()
       };
     }
 
