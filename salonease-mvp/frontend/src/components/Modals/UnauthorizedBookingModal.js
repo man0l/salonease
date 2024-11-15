@@ -149,14 +149,16 @@ const UnauthorizedBookingModal = ({ isOpen, onClose, salonId, service, staff }) 
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" role="form">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Name <span className="text-red-500">*</span>
             </label>
             <input
               {...register('clientName')}
+              data-testid="clientName"
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              placeholder="Enter your name"
             />
             <p className="mt-1 text-xs text-gray-500">Required field</p>
             {errors.clientName && (
@@ -170,6 +172,7 @@ const UnauthorizedBookingModal = ({ isOpen, onClose, salonId, service, staff }) 
             </label>
             <input
               type="email"
+              data-testid="clientEmail"
               {...register('clientEmail')}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             />
@@ -183,6 +186,7 @@ const UnauthorizedBookingModal = ({ isOpen, onClose, salonId, service, staff }) 
               Phone Number <span className="text-red-500">*</span>
             </label>
             <PhoneInput
+              data-testid="clientPhone"
               international
               defaultCountry={appConfig.phoneNumber.defaultCountry}
               value={watch('clientPhone')}
@@ -208,6 +212,7 @@ const UnauthorizedBookingModal = ({ isOpen, onClose, salonId, service, staff }) 
             </label>
             <select
               {...register('staffId')}
+              data-testid="staffId"
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             >
               <option value="">Select a staff member</option>
@@ -230,6 +235,7 @@ const UnauthorizedBookingModal = ({ isOpen, onClose, salonId, service, staff }) 
             
             <div className="sm:flex sm:space-x-4 space-y-4 sm:space-y-0">
               <DatePicker
+                customInput={<input data-testid="appointmentDateTime" />}
                 selected={appointmentDateTime}
                 onChange={(date) => setValue('appointmentDateTime', date)}
                 showTimeSelect
@@ -259,6 +265,7 @@ const UnauthorizedBookingModal = ({ isOpen, onClose, salonId, service, staff }) 
             <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
             <textarea
               {...register('notes')}
+              data-testid="notes"
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             />
             {errors.notes && (
@@ -269,6 +276,7 @@ const UnauthorizedBookingModal = ({ isOpen, onClose, salonId, service, staff }) 
           <div className="mt-4">
             <button
               type="submit"
+              data-testid="submitButton"
               className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               disabled={loading}
             >
