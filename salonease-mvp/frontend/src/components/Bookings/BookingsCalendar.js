@@ -11,6 +11,8 @@ import RescheduleModal from './Modals/RescheduleModal';
 import CreateBookingModal from './Modals/CreateBookingModal';
 import { BOOKING_STATUSES } from '../../utils/constants';
 import useBookings from '../../hooks/useBookings';
+import CancelBookingModal from './Modals/CancelBookingModal';
+import ReassignStaffModal from './Modals/ReassignStaffModal';
 
 const localizer = momentLocalizer(moment);
 
@@ -42,6 +44,10 @@ const BookingsCalendar = () => {
   });
 
   const { bookings, loading: bookingsLoading, fetchBookings, updateBooking, deleteBooking } = useBookings();
+
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showReassignModal, setShowReassignModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
     if (staff.length > 0) {
@@ -79,6 +85,7 @@ const BookingsCalendar = () => {
 
   const handleSelectSlot = (slotInfo) => {
     setShowCreateModal(true);
+    setSelectedDate(slotInfo.start);
   };
 
   const handleSelectEvent = (event) => {
@@ -218,12 +225,19 @@ const BookingsCalendar = () => {
           }}
           components={{
             event: (props) => (
-              <div className="text-xs">
-                <div className="font-bold">{props.event.title}</div>
-                {view === 'week' && props.event.resourceId && (
-                  <div>{staff.find(s => s.id === props.event.resourceId)?.fullName}</div>
-                )}
-                <div>{BOOKING_STATUSES[props.event.status]}</div>
+              <div className="text-xs h-full">
+                <div className="p-1 h-full flex flex-col justify-between">
+                  <div>
+                    <div className="font-bold truncate">{props.event.booking.client.name}</div>
+                    <div className="text-xs opacity-75 truncate">{props.event.booking.service.name}</div>
+                    {view === 'week' && props.event.resourceId && (
+                      <div className="truncate text-xs opacity-75">
+                        {staff.find(s => s.id === props.event.resourceId)?.fullName}
+                      </div>
+                    )}
+                    <div className="text-xs mt-0.5">{BOOKING_STATUSES[props.event.status]}</div>
+                  </div>
+                </div>
               </div>
             )
           }}
@@ -245,6 +259,7 @@ const BookingsCalendar = () => {
         onSuccess={fetchCalendarBookings}
         staff={staffLoading ? [] : staff}
         services={servicesLoading ? [] : services}
+        initialDate={selectedDate}
       />
     </div>
   );

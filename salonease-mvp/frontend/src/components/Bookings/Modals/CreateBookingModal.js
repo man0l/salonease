@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -56,15 +56,20 @@ const schema = yup.object().shape({
     .min(new Date(), 'Appointment date and time must be in the future'),
 });
 
-const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services }) => {
+const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services, initialDate }) => {
   const { clients, fetchClients, addClient } = useClients();
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const [loading, setLoading] = useState(false);
   const [clientMode, setClientMode] = useState('existing');
   const [clientSearch, setClientSearch] = useState('');
   const [filteredClients, setFilteredClients] = useState([]);
 
-  const defaultDate = roundToNextFifteen(new Date());
+  const defaultDate = useMemo(() => {
+    if (initialDate) {
+      const date = new Date(initialDate);
+      return roundToNextFifteen(date);
+    }
+    return roundToNextFifteen(new Date());
+  }, [initialDate]);
 
   const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
@@ -88,10 +93,11 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
   }, [show, fetchClients]);
 
   useEffect(() => {
-    if (show) {
-      setValue('appointmentDateTime', defaultDate);
+    if (show && initialDate) {
+      const roundedDate = roundToNextFifteen(new Date(initialDate));
+      setValue('appointmentDateTime', roundedDate, { shouldValidate: true });
     }
-  }, [show, setValue, defaultDate]);
+  }, [show]);
 
   const resetForm = () => {
     reset({
@@ -128,7 +134,16 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
         await fetchClients(); // Refresh clients list
       }
       
-      const response = await bookingApi.createBooking(salonId, { ...data, clientId });
+      // Remove clientMode and other unnecessary fields before sending
+      const bookingData = {
+        clientId,
+        serviceId: data.serviceId,
+        staffId: data.staffId,
+        appointmentDateTime: data.appointmentDateTime,
+        notes: data.notes
+      };
+      
+      const response = await bookingApi.createBooking(salonId, bookingData);
       if (response.data) {
         toast.success('Booking created successfully');
         onSuccess();
@@ -175,15 +190,24 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
   }, [show]);
 
   const selectClient = (client) => {
-    reset({
-      clientId: client.id,
-      clientName: client.name,
-      clientEmail: client.email,
-      clientPhone: client.phone,
-      serviceId: watch('serviceId'),
-      staffId: watch('staffId'),
-      notes: watch('notes')
-    });
+    // Preserve current values
+    const currentDateTime = watch('appointmentDateTime');
+    const currentServiceId = watch('serviceId');
+    const currentStaffId = watch('staffId');
+    const currentNotes = watch('notes');
+
+    // Update form with client info while preserving other fields
+    setValue('clientId', client.id);
+    setValue('clientName', client.name);
+    setValue('clientEmail', client.email);
+    setValue('clientPhone', client.phone);
+    
+    // Ensure we keep the existing values
+    setValue('appointmentDateTime', currentDateTime);
+    setValue('serviceId', currentServiceId);
+    setValue('staffId', currentStaffId);
+    setValue('notes', currentNotes);
+    
     setClientSearch('');
   };
 
@@ -373,16 +397,16 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
             <div className="sm:flex sm:space-x-4 space-y-4 sm:space-y-0">
               <div className="flex-1">
                 <DatePicker
-                  selected={appointmentDateTime}
+                  selected={watch('appointmentDateTime')}
                   onChange={(date) => {
+                    if (!date) return;
+                    const currentDate = watch('appointmentDateTime');
                     const newDate = new Date(date);
-                    if (appointmentDateTime) {
-                      newDate.setHours(appointmentDateTime.getHours());
-                      newDate.setMinutes(appointmentDateTime.getMinutes());
+                    if (currentDate) {
+                      newDate.setHours(currentDate.getHours());
+                      newDate.setMinutes(currentDate.getMinutes());
                     }
-                    setValue('appointmentDateTime', newDate, {
-                      shouldValidate: true
-                    });
+                    setValue('appointmentDateTime', newDate, { shouldValidate: true });
                   }}
                   dateFormat="MMMM d, yyyy"
                   minDate={new Date()}
@@ -396,14 +420,14 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
 
               <div className="flex-1">
                 <DatePicker
-                  selected={appointmentDateTime}
+                  selected={watch('appointmentDateTime')}
                   onChange={(date) => {
-                    const newDate = new Date(appointmentDateTime || defaultDate);
+                    if (!date) return;
+                    const currentDate = watch('appointmentDateTime');
+                    const newDate = new Date(currentDate || defaultDate);
                     newDate.setHours(date.getHours());
                     newDate.setMinutes(date.getMinutes());
-                    setValue('appointmentDateTime', newDate, {
-                      shouldValidate: true
-                    });
+                    setValue('appointmentDateTime', newDate, { shouldValidate: true });
                   }}
                   showTimeSelect
                   showTimeSelectOnly
@@ -414,7 +438,7 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
                     errors.appointmentDateTime ? 'border-red-500' : 'border-gray-300'
                   }`}
                   withPortal
-                  minTime={roundToNextFifteen(new Date())}
+                  minTime={new Date().setHours(8, 0)}
                   maxTime={new Date().setHours(20, 0)}
                 />
               </div>

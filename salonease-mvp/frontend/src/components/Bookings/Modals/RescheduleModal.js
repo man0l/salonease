@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import * as yup from 'yup';
 import { toast } from 'react-toastify';
+import "react-datepicker/dist/react-datepicker.css";
+import { publicApi } from '../../../utils/api';
 
 const schema = yup.object().shape({
   appointmentDateTime: yup
@@ -11,16 +13,69 @@ const schema = yup.object().shape({
 });
 
 const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
-  const [newDateTime, setNewDateTime] = useState(new Date(booking?.appointmentDateTime || Date.now()));
+  const [newDateTime, setNewDateTime] = useState(
+    new Date(booking?.appointmentDateTime || Date.now())
+  );
   const [error, setError] = useState(null);
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      if (!booking?.staffId || !newDateTime) return;
+      
+      try {
+        setLoading(true);
+        const date = new Date(newDateTime);
+        const formattedDate = date.toISOString().split('T')[0];
+        
+        const response = await publicApi.checkSalonAvailability(
+          salonId, 
+          booking.staffId,
+          formattedDate
+        );
+        
+        // Convert available slots strings to Date objects
+        const slots = (response.data.availableSlots || []).map(slot => new Date(slot));
+        setAvailableSlots(slots);
+      } catch (error) {
+        console.error('Failed to fetch availability:', error);
+        setAvailableSlots([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (show) {
+      fetchAvailability();
+    }
+  }, [show, booking?.staffId, newDateTime, salonId]);
 
   if (!show) return null;
 
   const handleDateChange = (date) => {
     setError(null);
     try {
-      schema.validateSync({ appointmentDateTime: date });
-      setNewDateTime(date);
+      const updatedDateTime = new Date(date);
+      updatedDateTime.setHours(newDateTime.getHours());
+      updatedDateTime.setMinutes(newDateTime.getMinutes());
+      
+      schema.validateSync({ appointmentDateTime: updatedDateTime });
+      setNewDateTime(updatedDateTime);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleTimeChange = (date) => {
+    setError(null);
+    try {
+      const updatedDateTime = new Date(newDateTime);
+      updatedDateTime.setHours(date.getHours());
+      updatedDateTime.setMinutes(date.getMinutes());
+      
+      schema.validateSync({ appointmentDateTime: updatedDateTime });
+      setNewDateTime(updatedDateTime);
     } catch (err) {
       setError(err.message);
     }
@@ -29,6 +84,17 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
   const handleReschedule = () => {
     try {
       schema.validateSync({ appointmentDateTime: newDateTime });
+      // Check if selected time is in available slots
+      const isTimeAvailable = availableSlots.some(slot => 
+        slot.getHours() === newDateTime.getHours() && 
+        slot.getMinutes() === newDateTime.getMinutes()
+      );
+
+      if (!isTimeAvailable) {
+        toast.error('Selected time slot is not available');
+        return;
+      }
+
       onReschedule(booking.id, newDateTime.toISOString());
       onClose();
     } catch (err) {
@@ -43,27 +109,53 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
         
         <div className="space-y-4">
           <div>
-            <label 
-              htmlFor="newAppointmentDate"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              New Appointment Date
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              New Appointment Date & Time
             </label>
-            <DatePicker
-              data-testid="reschedule-date-input"      
-              id="newAppointmentDate"
-              selected={newDateTime}
-              onChange={handleDateChange}
-              showTimeSelect
-              timeIntervals={15}
-              dateFormat="Pp"
-              className={`w-full px-3 py-2 border rounded-md ${
-                error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary-500'
-              }`}
-              minDate={new Date()}
-            />
+            
+            <div className="sm:flex sm:space-x-4 space-y-4 sm:space-y-0">
+              <div className="flex-1">
+                <DatePicker
+                  selected={newDateTime}
+                  onChange={handleDateChange}
+                  dateFormat="MMMM d, yyyy"
+                  minDate={new Date()}
+                  className={`w-full px-3 py-2 border rounded-md ${
+                    error ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  calendarClassName="mobile-friendly-calendar"
+                  withPortal
+                />
+              </div>
+
+              <div className="flex-1">
+                <DatePicker
+                  selected={newDateTime}
+                  onChange={handleTimeChange}
+                  showTimeSelect
+                  showTimeSelectOnly
+                  timeIntervals={15}
+                  timeCaption="Time"
+                  dateFormat="h:mm aa"
+                  className={`w-full px-3 py-2 border rounded-md ${
+                    error ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  withPortal
+                  includeTimes={availableSlots}
+                  placeholderText={loading ? "Loading..." : "Select time"}
+                  disabled={loading || availableSlots.length === 0}
+                />
+              </div>
+            </div>
+
             {error && (
               <p className="mt-1 text-sm text-red-600">{error}</p>
+            )}
+            
+            {availableSlots.length === 0 && !loading && (
+              <p className="mt-1 text-sm text-amber-600">
+                No available time slots for this date
+              </p>
             )}
           </div>
         </div>
@@ -78,7 +170,7 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
           <button
             onClick={handleReschedule}
             className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded transition duration-300"
-            disabled={!!error}
+            disabled={!!error || loading || availableSlots.length === 0}
           >
             Confirm Reschedule
           </button>
