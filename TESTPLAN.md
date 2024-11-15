@@ -454,3 +454,277 @@
 - Bookings should maintain correct time slots
 - Date format should be consistent in header
 
+## 13. Public Salon Landing Page
+
+### Test Case 13.1: Verify Initial Page Load Content
+**Precondition:**
+- Valid salon ID exists in the system
+- Salon has complete profile information
+
+**Steps:**
+1. Navigate to `/salon/{validSalonId}`
+2. Observe the hero section at the top
+3. Check the info bar below hero section
+4. Scroll through services section
+5. View staff section
+6. Check contact section at bottom
+
+**Expected Results:**
+- Hero section:
+  * Displays salon name
+  * Shows salon description
+  * Contains background image/gradient
+- Info bar:
+  * Shows valid phone number
+  * Displays complete address
+  * Lists current day's working hours
+- Services section:
+  * Shows categorized service list
+  * Each service displays name, duration, and price
+- Staff section:
+  * Lists all active staff members
+  * Shows staff photos or placeholders
+  * Displays staff names and roles
+- Contact section:
+  * Shows complete business hours
+  * Lists all social media links
+  * Displays map location
+
+### Test Case 13.2: Verify Page Loading States
+**Precondition:**
+- Test environment allows network throttling
+- Access to both valid and invalid salon IDs
+
+**Steps:**
+1. Loading State:
+   * Enable slow 3G network throttling
+   * Navigate to `/salon/{validSalonId}`
+   * Observe loading indicators
+
+2. Invalid ID:
+   * Navigate to `/salon/{invalidSalonId}`
+   * Observe error handling
+
+3. API Error:
+   * Configure API to return 500 error
+   * Navigate to `/salon/{validSalonId}`
+   * Observe error handling
+
+**Expected Results:**
+- Loading State:
+  * Shows spinning loader animation
+  * Placeholder content appears while loading
+  * Content loads progressively
+
+- Invalid ID:
+  * Displays user-friendly error message
+  * Suggests checking salon ID
+  * No broken UI elements visible
+
+- API Error:
+  * Shows generic error message
+  * Provides retry option if applicable
+  * Logs error details (check console)
+
+### Test Case 13.3: Test Service Category Navigation
+**Precondition:**
+- Salon has multiple service categories
+- Categories include subcategories
+- Services exist in different categories
+
+**Steps:**
+1. Category Expansion:
+   * Click on main category header
+   * Click on subcategory header
+   * Click again to collapse
+
+2. Visual Hierarchy:
+   * Observe main category styling
+   * Check subcategory indentation
+   * Verify service placement
+
+3. Interaction:
+   * Click rapidly between categories
+   * Expand multiple categories
+   * Collapse parent with open child
+
+**Expected Results:**
+- Category Expansion:
+  * Smooth animation on expand/collapse
+  * Chevron icon rotates correctly
+  * Content height adjusts properly
+
+- Visual Hierarchy:
+  * Main categories have distinct styling
+  * Subcategories clearly indented
+  * Services properly grouped
+
+- Interaction:
+  * No visual glitches during rapid clicks
+  * Multiple categories can be open
+  * Child categories collapse with parent
+
+### Test Case 13.4: Verify Service Booking Flow
+**Precondition:**
+- Service is available for booking
+- Staff members are assigned to service
+- Business hours are configured
+
+**Steps:**
+1. Initiate Booking:
+   * Locate a service card
+   * Click "choose" button
+   * Verify modal appears
+
+2. Form Completion:
+   * Enter client name: "Test Client"
+   * Enter email: "test@example.com"
+   * Enter phone: "+1234567890"
+   * Select staff member
+   * Choose available time slot
+
+3. Submit Booking:
+   * Review entered information
+   * Click submit button
+   * Observe confirmation
+
+**Expected Results:**
+- Modal Display:
+  * Shows service details correctly
+  * Pre-fills any known information
+  * All required fields marked
+
+- Form Interaction:
+  * Staff dropdown shows only relevant staff
+  * Time slots update based on staff selection
+  * Form accepts valid input formats
+
+- Submission:
+  * Shows loading state during submission
+  * Displays success message
+  * Closes modal after success
+
+### Test Case 13.5: Validate Booking Form Requirements
+**Precondition:**
+- Booking modal is open
+- Form is in initial state
+- Validation rules are active
+
+**Steps:**
+1. Required Fields:
+   * Leave all fields empty
+   * Click submit
+   * Observe error messages
+
+2. Email Validation:
+   * Enter "invalid.email"
+   * Enter "test@incomplete"
+   * Enter "test@example.com"
+
+3. Phone Validation:
+   * Enter "123" (too short)
+   * Enter "abcdefghijk" (non-numeric)
+   * Enter valid phone number
+
+4. Time Selection:
+   * Try submitting without time slot
+   * Select unavailable time
+   * Select valid time slot
+
+**Expected Results:**
+- Required Fields:
+  * Shows error for each empty required field
+  * Error messages are clear and specific
+  * Submit button remains disabled
+
+- Email Validation:
+  * Rejects invalid email formats
+  * Shows specific email error message
+  * Accepts valid email format
+
+- Phone Validation:
+  * Enforces minimum length
+  * Allows only valid characters
+  * Formats number correctly
+
+- Time Selection:
+  * Prevents submission without time
+  * Clearly indicates unavailable slots
+  * Allows selection of valid slots
+
+### Test Case 13.6: Test Time Slot Selection
+**Precondition:**
+- Staff member is selected
+- Current date is selected
+- Available slots exist
+
+**Steps:**
+1. Date Selection:
+   * Select current date
+   * Select future date
+   * Attempt past date selection
+
+2. Time Slots:
+   * View available slots
+   * View booked slots
+   * Select different time zones
+
+3. Staff Availability:
+   * Change staff member
+   * Check different day slots
+   * Verify 15-minute intervals
+
+**Expected Results:**
+- Date Selection:
+  * Prevents past date selection
+  * Shows available dates clearly
+  * Updates slots for selected date
+
+- Time Slots:
+  * Clearly marks available slots
+  * Disables booked/unavailable slots
+  * Shows correct time format
+
+- Staff Availability:
+  * Updates slots per staff member
+  * Respects business hours
+  * Maintains 15-minute spacing
+
+### Test Case 13.7: Verify Responsive Design
+**Precondition:**
+- Access to different devices/emulators
+- Various screen sizes available
+- Touch-enabled device available
+
+**Steps:**
+1. Desktop Testing (1920x1080):
+   * Check layout and spacing
+   * Test mouse interactions
+   * Verify content alignment
+
+2. Tablet Testing (768x1024):
+   * Verify column adjustments
+   * Test touch interactions
+   * Check image scaling
+
+3. Mobile Testing (375x667):
+   * Verify single column layout
+   * Test touch targets
+   * Check navigation usability
+
+**Expected Results:**
+- Desktop View:
+  * Clean, multi-column layout
+  * Proper spacing between elements
+  * No horizontal scrolling
+
+- Tablet View:
+  * Responsive grid adjustments
+  * Touch targets min 44x44px
+  * Maintains readability
+
+- Mobile View:
+  * Single column where appropriate
+  * Easy thumb navigation
+  * No overlapping elements
+
