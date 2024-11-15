@@ -352,7 +352,9 @@ const BookingsManagement = () => {
 
                     {/* Service Information */}
                     <div className="space-y-2">
-                      <div className="font-medium">{booking.serviceName}</div>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-lg">{booking.service.name}</span>
+                      </div>
                       <div 
                         className="text-gray-600 text-sm flex items-center gap-2 cursor-pointer hover:text-primary-500"
                         onClick={() => {
