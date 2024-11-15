@@ -1,5 +1,8 @@
-const { Salon, Service, Staff, Category } = require('../config/db');
+const { validateCreateBooking } = require('../validators/bookingValidator');
+const { Salon, Service, Staff, Category, Booking, Client } = require('../config/db');
 const { Op } = require('sequelize');
+const BOOKING_STATUSES = require('../config/bookingStatuses');
+const sequelize = require('../config/db').sequelize;
 
 exports.getSalonPublicProfile = async (req, res) => {
   try {
@@ -166,5 +169,259 @@ exports.getSalonServiceCategories = async (req, res) => {
   } catch (error) {
     console.error('Error fetching salon service categories:', error);
     res.status(500).json({ message: 'Error fetching salon service categories' });
+  }
+};
+
+exports.checkSalonAvailability = async (req, res) => {
+  try {
+    const { salonId } = req.params;
+    const { date, staffId } = req.query;
+
+    // Validate date
+    const selectedDate = new Date(date);
+    if (isNaN(selectedDate.getTime())) {
+      return res.status(400).json({ message: 'Invalid date format' });
+    }
+
+    const roundToNextFifteen = (date) => {
+      const minutes = date.getMinutes();
+      const remainder = minutes % 15;
+      const roundedMinutes = minutes + (15 - remainder);
+      const roundedDate = new Date(date);
+      roundedDate.setMinutes(roundedMinutes);
+      roundedDate.setSeconds(0);
+      roundedDate.setMilliseconds(0);
+      
+      if (roundedMinutes >= 60) {
+        roundedDate.setHours(roundedDate.getHours() + 1);
+        roundedDate.setMinutes(0);
+      }
+      
+      return roundedDate;
+    };
+
+    // Get salon's operating hours
+    const startHour = 9;
+    const endHour = 20;
+
+    // Get all bookings for the selected date with their associated services
+    const existingBookings = await Booking.findAll({
+      where: {
+        salonId,
+        appointmentDateTime: {
+          [Op.between]: [
+            new Date(selectedDate.setHours(startHour, 0, 0)),
+            new Date(selectedDate.setHours(endHour, 0, 0))
+          ]
+        },
+        ...(staffId && { staffId }),
+        status: {
+          [Op.notIn]: ['CANCELLED', 'COMPLETED']
+        }
+      },
+      attributes: ['appointmentDateTime'],
+      include: [{
+        model: Service,
+        as: 'service',
+        attributes: ['duration'],
+        required: true
+      }]
+    });
+
+    // Generate all possible 15-minute slots
+    const availableSlots = [];
+    const currentDate = new Date();
+    const roundedCurrentTime = roundToNextFifteen(currentDate);
+    
+    // If selected date is today, start from rounded current time
+    // Otherwise, start from salon opening time
+    let startTime = selectedDate.toDateString() === currentDate.toDateString() 
+      ? Math.max(roundedCurrentTime.getHours(), startHour)
+      : startHour;
+
+    for (let hour = startTime; hour < endHour; hour++) {
+      for (let minute = 0; minute < 60; minute += 15) {
+        const slotTime = new Date(selectedDate);
+        slotTime.setHours(hour, minute, 0, 0);
+
+        // Skip slots before rounded current time for today
+        if (selectedDate.toDateString() === currentDate.toDateString() && 
+            slotTime < roundedCurrentTime) {
+          continue;
+        }
+
+        // Check if slot conflicts with any existing booking
+        const isSlotAvailable = !existingBookings.some(booking => {
+          const bookingStart = new Date(booking.appointmentDateTime);
+          const bookingEnd = new Date(bookingStart.getTime() + (booking.service.duration * 60000));
+          return slotTime >= bookingStart && slotTime < bookingEnd;
+        });
+
+        if (isSlotAvailable) {
+          availableSlots.push(
+            `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
+          );
+        }
+      }
+    }
+
+    res.json({ availableSlots });
+  } catch (error) {
+    console.error('Error checking availability:', error);
+    res.status(500).json({ message: 'Error checking availability' });
+  }
+};
+
+exports.createPublicBooking = async (req, res) => {
+  const transaction = await sequelize.transaction();
+  
+  try {
+    const { salonId } = req.params;
+    const { 
+      clientName, 
+      clientEmail, 
+      clientPhone, 
+      serviceId, 
+      staffId, 
+      appointmentDateTime,
+      notes 
+    } = req.body;
+
+    // Validate using bookingValidator
+    const { error, value } = validateCreateBooking({
+      clientName,
+      clientEmail,
+      clientPhone,
+      serviceId,
+      staffId,
+      appointmentDateTime,
+      notes
+    });
+
+    if (error) {
+      await transaction.rollback();
+      const errorMessages = error.details.map(detail => detail.message);
+      return res.status(400).json({ 
+        message: 'Validation error', 
+        errors: errorMessages 
+      });
+    }
+
+    // Find or create client
+    const [client] = await Client.findOrCreate({
+      where: { 
+        email: clientEmail,
+        salonId 
+      },
+      defaults: {
+        name: clientName,
+        phone: clientPhone,
+        salonId
+      },
+      transaction
+    });
+
+    // Check if staff belongs to salon
+    const staff = await Staff.findOne({ 
+      where: { id: staffId, salonId },
+      transaction
+    });
+    if (!staff) {
+      await transaction.rollback();
+      return res.status(404).json({ 
+        message: 'Staff not found in this salon' 
+      });
+    }
+
+    // Get service and validate it belongs to salon
+    const service = await Service.findOne({ 
+      where: { id: serviceId, salonId },
+      transaction
+    });
+    if (!service) {
+      await transaction.rollback();
+      return res.status(404).json({ 
+        message: 'Service not found in this salon' 
+      });
+    }
+
+    // Calculate appointment end time
+    const appointmentDate = new Date(appointmentDateTime);
+    const endTime = new Date(appointmentDate.getTime() + service.duration * 60000);
+
+    // Check for conflicting bookings
+    const conflictingBooking = await Booking.findOne({
+      where: {
+        staffId,
+        status: [BOOKING_STATUSES.PENDING, BOOKING_STATUSES.CONFIRMED],
+        [Op.or]: [
+          {
+            appointmentDateTime: {
+              [Op.gte]: appointmentDateTime,
+              [Op.lt]: endTime
+            }
+          },
+          {
+            endTime: {
+              [Op.gt]: appointmentDateTime,
+              [Op.lte]: endTime
+            }
+          }
+        ]
+      },
+      transaction
+    });
+
+    if (conflictingBooking) {
+      await transaction.rollback();
+      return res.status(400).json({ 
+        message: 'Time slot is not available' 
+      });
+    }
+
+    // Create the booking using validated data
+    const booking = await Booking.create({
+      salonId,
+      clientId: client.id,
+      serviceId: value.serviceId,
+      staffId: value.staffId,
+      appointmentDateTime: value.appointmentDateTime,
+      endTime,
+      notes: value.notes,
+      status: BOOKING_STATUSES.PENDING
+    }, { transaction });
+
+    await transaction.commit();
+
+    // Return success response with booking details
+    res.status(201).json({
+      booking: {
+        id: booking.id,
+        appointmentDateTime: booking.appointmentDateTime,
+        endTime: booking.endTime,
+        status: booking.status,
+        service: {
+          name: service.name,
+          duration: service.duration,
+          price: service.price
+        },
+        staff: {
+          name: staff.fullName
+        },
+        client: {
+          name: client.name,
+          email: client.email,
+          phone: client.phone
+        }
+      }
+    });
+
+  } catch (error) {
+    await transaction.rollback();
+    console.error('Error creating public booking:', error);
+    res.status(500).json({ 
+      message: 'Error creating booking', 
+      error: error.message 
+    });
   }
 }; 

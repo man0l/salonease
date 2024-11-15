@@ -148,10 +148,12 @@ const publicApi = {
   getSalonStaff: (salonId) => axios.get(`${api.defaults.baseURL}/public/salons/${salonId}/staff`),
   getSalonServiceCategories: (salonId) => 
     axios.get(`${api.defaults.baseURL}/public/salons/${salonId}/service-categories`),
-  checkSalonAvailability: (salonId, date) => 
+  checkSalonAvailability: (salonId, staffId, date) => 
     axios.get(`${api.defaults.baseURL}/public/salons/${salonId}/availability`, { 
-      params: { date } 
+      params: { date, staffId } 
     }),
+  createBooking: (salonId, bookingData) => 
+    axios.post(`${api.defaults.baseURL}/public/salons/${salonId}/bookings`, bookingData),
 };
 
 export { api, authApi, staffApi, serviceApi, clientApi, bookingApi, publicApi };

@@ -81,7 +81,12 @@ const PublicSalonPage = () => {
           ) : services.length === 0 ? (
             <div className="text-center py-8">No services available at the moment. Please check back later!</div>
           ) : (
-            <ServiceCategories services={services} categories={categories} />
+            <ServiceCategories 
+              services={services} 
+              categories={categories}
+              staff={staff}
+              salonId={salonId}
+            />
           )}
         </section>
 

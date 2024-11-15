@@ -1,4 +1,6 @@
 import * as yup from 'yup';
+import { isPossiblePhoneNumber } from 'react-phone-number-input';
+import appConfig from '../config/appConfig';
 
 export const passwordSchema = yup.string()
   .min(8, 'Password must be at least 8 characters')
@@ -38,4 +40,24 @@ export const resetPasswordSchema = yup.object().shape({
   confirmPassword: yup.string()
     .oneOf([yup.ref('password'), null], 'Passwords must match')
     .required('Confirm Password is required'),
+});
+
+export const unauthorizedBookingSchema = yup.object({
+  clientName: yup.string().required('Name is required').max(100),
+  clientEmail: yup.string().email('Invalid email').nullable(),
+  clientPhone: yup.string()
+    .required('Phone number is required')
+    .test('phone', 'Invalid phone number', value => 
+      value ? 
+        isPossiblePhoneNumber(value, appConfig.phoneNumber.defaultCountry) &&
+        value.replace(/\D/g, '').length === appConfig.phoneNumber.length &&
+        value.startsWith(appConfig.phoneNumber.defaultCallingCode)
+      : false
+    )
+    .max(20),
+  staffId: yup.string()
+    .required('Staff selection is required')
+    .uuid('Invalid staff member selection'),
+  appointmentDateTime: yup.date().required('Appointment time is required'),
+  notes: yup.string().max(500).nullable()
 });

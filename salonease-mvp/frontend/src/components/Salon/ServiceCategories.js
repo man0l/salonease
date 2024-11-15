@@ -1,8 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { FaChevronRight, FaClock } from 'react-icons/fa';
 import { formatCurrency } from '../../utils/currencyFormatter';
+import UnauthorizedBookingModal from '../Modals/UnauthorizedBookingModal';
 
-const ServiceCategories = ({ services = [], categories = [] }) => {
+const ServiceCategories = ({ services = [], categories = [], staff = [], salonId }) => {
+  const [selectedService, setSelectedService] = useState(null);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+
   const buildCategoryTree = useMemo(() => {
     const categoryMap = new Map();
 
@@ -63,6 +67,11 @@ const ServiceCategories = ({ services = [], categories = [] }) => {
     );
   };
 
+  const handleServiceSelect = (service) => {
+    setSelectedService(service);
+    setShowBookingModal(true);
+  };
+
   const renderCategory = (category, depth = 0) => {
     const isExpanded = expandedCategories.includes(category.id);
     const hasSubcategories = category.subcategories.length > 0;
@@ -121,7 +130,10 @@ const ServiceCategories = ({ services = [], categories = [] }) => {
                   <span className="font-semibold text-gray-900 whitespace-nowrap">
                     {formatCurrency(service.price)}
                   </span>
-                  <button className="px-4 py-2 text-sm bg-primary-500 text-white rounded-md hover:bg-primary-600 transition-colors whitespace-nowrap">
+                  <button 
+                    onClick={() => handleServiceSelect(service)}
+                    className="px-4 py-2 text-sm bg-primary-500 text-white rounded-md hover:bg-primary-600 transition-colors whitespace-nowrap"
+                  >
                     choose
                   </button>
                 </div>
@@ -135,9 +147,22 @@ const ServiceCategories = ({ services = [], categories = [] }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg divide-y divide-gray-200">
-      {buildCategoryTree.map(category => renderCategory(category))}
-    </div>
+    <>
+      <div className="bg-white rounded-lg shadow-lg divide-y divide-gray-200">
+        {buildCategoryTree.map(category => renderCategory(category))}
+      </div>
+      
+      <UnauthorizedBookingModal
+        isOpen={showBookingModal}
+        onClose={() => {
+          setShowBookingModal(false);
+          setSelectedService(null);
+        }}
+        salonId={salonId}
+        service={selectedService}
+        staff={staff}
+      />
+    </>
   );
 };
 

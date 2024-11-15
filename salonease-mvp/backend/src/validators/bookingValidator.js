@@ -4,18 +4,16 @@ const BOOKING_STATUSES = require('../config/bookingStatuses');
 const createBookingSchema = Joi.object({
   clientId: Joi.string().uuid(),
   clientName: Joi.string().max(100),
-  clientEmail: Joi.string().email(),
-  clientPhone: Joi.string().max(20),
+  clientEmail: Joi.string().email().allow('', null),
+  clientPhone: Joi.string().max(13),
   staffId: Joi.string().uuid().required(),
   serviceId: Joi.string().uuid().required(),
   appointmentDateTime: Joi.date().iso().greater('now').required(),
   notes: Joi.string().max(500).allow('', null),
   status: Joi.string().valid(...Object.values(BOOKING_STATUSES)).default(BOOKING_STATUSES.PENDING)
 }).custom((value, helpers) => {
-  if (!value.clientId && (!value.clientName || !value.clientEmail || !value.clientPhone)) {
-    return helpers.error('any.custom', {
-      message: 'Either clientId or complete client information (name, email, and phone) must be provided'
-    });
+  if (!value.clientId && (!value.clientName || !value.clientPhone)) {
+    return helpers.message('Either clientId or both clientName and clientPhone must be provided');
   }
   return value;
 });
