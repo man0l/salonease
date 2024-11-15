@@ -7,7 +7,7 @@ import { useSalonContext } from '../contexts/SalonContext';
 const navigation = [
   { name: 'Dashboard', icon: HomeIcon, route: '/dashboard', roles: ['SalonOwner', 'SuperAdmin', 'Staff'], alwaysEnabled: true },
   { name: 'Salon Management', icon: BuildingStorefrontIcon, route: '/salons', roles: ['SalonOwner', 'SuperAdmin'], alwaysEnabled: true },
-  { name: 'Calendar', icon: CalendarDaysIcon, route: '/salons/:salonId/calendar', roles: ['SalonOwner', 'Staff'] },
+  { name: 'Calendar', icon: CalendarDaysIcon, route: '/salons/:salonId/bookings-calendar', roles: ['SalonOwner', 'Staff'] },
   { name: 'Bookings', icon: ClipboardDocumentListIcon, route: '/salons/:salonId/bookings', roles: ['SalonOwner', 'Staff'] },
   { name: 'Clients', icon: UserGroupIcon, route: '/salons/:salonId/clients', roles: ['SalonOwner', 'Staff'] },
   { name: 'Staff', icon: UserGroupIcon, route: '/salons/:salonId/staff', roles: ['SalonOwner', 'SuperAdmin'] },
