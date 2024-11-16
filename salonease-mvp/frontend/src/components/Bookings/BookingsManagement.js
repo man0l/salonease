@@ -14,6 +14,7 @@ import { BOOKING_STATUSES } from '../../utils/constants';
 import ReassignStaffModal from './Modals/ReassignStaffModal';
 import ConfirmCompleteModal from './Modals/ConfirmCompleteModal';
 import moment from 'moment-timezone';
+import useBookings from '../../hooks/useBookings';
 
 const BookingsManagement = () => {
   const { salonId } = useParams();
@@ -39,12 +40,13 @@ const BookingsManagement = () => {
   const [totalItems, setTotalItems] = useState(0);
   const ITEMS_PER_PAGE = 2;
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const { fetchBookings } = useBookings();
 
   useEffect(() => {
-    fetchBookings();
+    fetchBookingsData();
   }, [filters, salonId, currentPage]);
 
-  const fetchBookings = async () => {
+  const fetchBookingsData = async () => {
     try {
       setLoading(true);
       const formattedFilters = {
@@ -55,10 +57,10 @@ const BookingsManagement = () => {
         limit: ITEMS_PER_PAGE,
         serviceId: filters.serviceId || undefined
       };
-      const response = await bookingApi.getBookings(salonId, formattedFilters);
-      setBookings(response.data.bookings || []);
-      setTotalPages(response.data.totalPages);
-      setTotalItems(response.data.totalItems);
+      const response = await fetchBookings(formattedFilters);
+      setBookings(response.bookings || []);
+      setTotalPages(response.totalPages);
+      setTotalItems(response.totalItems);
     } catch (error) {
       toast.error('Failed to fetch bookings');
       setBookings([]);
@@ -90,7 +92,7 @@ const BookingsManagement = () => {
     try {
       await bookingApi.updateBooking(salonId, bookingId, { appointmentDateTime: newDateTime });
       toast.success('Booking rescheduled successfully');
-      fetchBookings();
+      fetchBookingsData();
       setShowRescheduleModal(false);
     } catch (error) {
       toast.error('Failed to reschedule booking');
@@ -101,7 +103,7 @@ const BookingsManagement = () => {
     try {
       await bookingApi.deleteBooking(salonId, bookingId, { notes: note });
       toast.success('Booking cancelled successfully');
-      fetchBookings();
+      fetchBookingsData();
       setShowCancelModal(false);
     } catch (error) {
       toast.error('Failed to cancel booking');
@@ -155,7 +157,7 @@ const BookingsManagement = () => {
     try {
       await bookingApi.updateBooking(salonId, bookingId, { staffId: newStaffId });
       toast.success('Staff reassigned successfully');
-      fetchBookings();
+      fetchBookingsData();
       setShowReassignModal(false);
     } catch (error) {
       toast.error('Failed to reassign staff');
@@ -181,7 +183,7 @@ const BookingsManagement = () => {
     try {
       await bookingApi.updateBooking(salonId, bookingId, { status: BOOKING_STATUSES.COMPLETED });
       toast.success('Booking marked as completed');
-      fetchBookings();
+      fetchBookingsData();
       setShowCompleteModal(false);
     } catch (error) {
       toast.error('Failed to complete booking');
@@ -513,7 +515,7 @@ const BookingsManagement = () => {
         show={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         salonId={salonId}
-        onSuccess={fetchBookings}
+        onSuccess={fetchBookingsData}
         staff={staffLoading ? [] : staff}
         services={servicesLoading ? [] : services}
       />
