@@ -7,6 +7,8 @@ const appConfig = {
     decimalPlaces: 2
   },
   defaultCountry: 'BG', // Bulgaria as default country
+  defaultTimezone: 'Europe/Sofia',
+  defaultLocale: 'bg-BG',
   phoneNumber: {
     defaultCountry: 'BG',
     defaultCallingCode: '+359',

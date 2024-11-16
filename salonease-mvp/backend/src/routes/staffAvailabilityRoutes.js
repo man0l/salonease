@@ -7,17 +7,17 @@ const ROLES = require('../config/roles');
 
 router.use(authMiddleware);
 
-router.get('/', 
-  roleMiddleware([ROLES.SALON_OWNER, ROLES.STAFF]), 
+router.get('/:salonId', 
+  roleMiddleware([ROLES.SALON_OWNER, ROLES.STAFF]),
   staffAvailabilityController.getStaffAvailability
 );
 
-router.post('/', 
+router.post('/:salonId', 
   roleMiddleware([ROLES.SALON_OWNER]), 
   staffAvailabilityController.createOrUpdateStaffAvailability
 );
 
-router.delete('/:availabilityId', 
+router.delete('/:salonId/:availabilityId', 
   roleMiddleware([ROLES.SALON_OWNER]), 
   staffAvailabilityController.deleteStaffAvailability
 );

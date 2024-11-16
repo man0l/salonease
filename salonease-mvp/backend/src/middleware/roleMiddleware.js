@@ -27,6 +27,7 @@ const roleMiddleware = (allowedRoles) => {
       if (!staff) {
         return res.status(403).json({ message: 'You do not have permission to access this salon as a staff member' });
       }
+      req.staffMember = staff;
     }
 
     next();

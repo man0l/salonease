@@ -4,6 +4,7 @@ const BOOKING_STATUSES = require('../config/bookingStatuses');
 const { validateCreateBooking, validateUpdateBooking } = require('../validators/bookingValidator');
 const sequelize = require('../config/db').sequelize;
 const moment = require('moment');
+const ROLES = require('../config/roles');
 
 exports.getBookings = async (req, res) => {
   try {
@@ -13,6 +14,10 @@ exports.getBookings = async (req, res) => {
 
     const whereClause = { salonId };
     
+    if (staffId) {
+      whereClause.staffId = staffId;
+    }
+    
     if (startDate && endDate) {
       whereClause.appointmentDateTime = {
         [Op.between]: [
@@ -20,17 +25,8 @@ exports.getBookings = async (req, res) => {
           moment(endDate).endOf('day').toDate()
         ]
       };
-    } else if (startDate) {
-      whereClause.appointmentDateTime = {
-        [Op.gte]: moment(startDate).startOf('day').toDate()
-      };
-    } else if (endDate) {
-      whereClause.appointmentDateTime = {
-        [Op.lte]: moment(endDate).endOf('day').toDate()
-      };
     }
 
-    if (staffId) whereClause.staffId = staffId;
     if (serviceId) whereClause.serviceId = serviceId;
     if (status) whereClause.status = status;
 
@@ -59,6 +55,8 @@ exports.getBookings = async (req, res) => {
         ['appointmentDateTime', 'DESC']
       ]
     });
+
+    console.log('whereClause', whereClause);
 
     res.json({
       bookings,

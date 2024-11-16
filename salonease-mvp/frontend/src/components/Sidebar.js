@@ -7,9 +7,9 @@ import { useSalonContext } from '../contexts/SalonContext';
 const navigation = [
   { name: 'Dashboard', icon: HomeIcon, route: '/dashboard', roles: ['SalonOwner', 'SuperAdmin', 'Staff'], alwaysEnabled: true },
   { name: 'Salon Management', icon: BuildingStorefrontIcon, route: '/salons', roles: ['SalonOwner', 'SuperAdmin'], alwaysEnabled: true },
-  { name: 'Calendar', icon: CalendarDaysIcon, route: '/salons/:salonId/bookings-calendar', roles: ['SalonOwner', 'Staff'] },
-  { name: 'Bookings', icon: ClipboardDocumentListIcon, route: '/salons/:salonId/bookings', roles: ['SalonOwner', 'Staff'] },
-  { name: 'Clients', icon: UserGroupIcon, route: '/salons/:salonId/clients', roles: ['SalonOwner', 'Staff'] },
+  { name: 'Calendar', icon: CalendarDaysIcon, route: '/salons/:salonId/bookings-calendar', roles: ['SalonOwner', 'Staff'], alwaysEnabled: true },
+  { name: 'Bookings', icon: ClipboardDocumentListIcon, route: '/salons/:salonId/bookings', roles: ['SalonOwner', 'Staff'], alwaysEnabled: true },
+  { name: 'Clients', icon: UserGroupIcon, route: '/salons/:salonId/clients', roles: ['SalonOwner', 'Staff'], alwaysEnabled: true },
   { name: 'Staff', icon: UserGroupIcon, route: '/salons/:salonId/staff', roles: ['SalonOwner', 'SuperAdmin'] },
   { name: 'Staff Availability', icon: CalendarDaysIcon, route: '/salons/:salonId/staff-availability', roles: ['SalonOwner', 'SuperAdmin'] },
   { name: 'Services', icon: () => <span className="text-xl">✂️</span>, route: '/salons/:salonId/services', roles: ['SalonOwner'] },
@@ -61,7 +61,7 @@ function Sidebar() {
                     ? 'bg-primary-50 text-primary-700 border-l-4 border-primary-500'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-primary-600'
                 } ${
-                  (!user.onboardingCompleted && !item.alwaysEnabled)
+                  (!user.onboardingCompleted && !item.alwaysEnabled && user.role !== 'Staff')
                     ? 'opacity-50 pointer-events-none'
                     : ''
                 }`

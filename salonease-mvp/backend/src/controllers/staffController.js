@@ -4,10 +4,13 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const ROLES = require('../config/roles');
 exports.getStaff = async (req, res) => {
+  const whereClause = {
+    salonId: req.params.salonId
+  }
+
   try {
-    const { salonId } = req.params;
     const staff = await Staff.findAll({
-      where: { salonId },
+      where: whereClause,
       attributes: ['id', 'email', 'fullName', 'isActive'] // Explicitly specify the columns
     });
     res.json(staff);

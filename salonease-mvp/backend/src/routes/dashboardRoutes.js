@@ -6,16 +6,16 @@ const roleMiddleware = require('../middleware/roleMiddleware');
 const ROLES = require('../config/roles');
 
 router.get(
-  '/salons/:salonId/dashboard/stats',
+  '/salons/:salonId/stats',
   authMiddleware,
-  roleMiddleware([ROLES.SALON_OWNER]),
+  roleMiddleware([ROLES.SALON_OWNER, ROLES.STAFF]),
   dashboardController.getDashboardStats
 );
 
 router.get(
-  '/salons/:salonId/dashboard/activity',
+  '/salons/:salonId/activity',
   authMiddleware,
-  roleMiddleware([ROLES.SALON_OWNER]),
+  roleMiddleware([ROLES.SALON_OWNER, ROLES.STAFF]),
   dashboardController.getDashboardActivity
 );
 

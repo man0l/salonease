@@ -99,10 +99,10 @@ const staffApi = {
   deleteStaff: (salonId, staffId) => api.delete(`/staff/${salonId}/staff/${staffId}`),
   acceptInvitation: (data) => axios.post(`${api.defaults.baseURL}/auth/accept-invitation`, data),
   getAssociatedSalon: () => api.get('/staff/my-salon'),
-  getStaffAvailability: (salonId) => api.get(`/salons/${salonId}/staff-availability`),
-  createStaffAvailability: (salonId, availabilityData) => api.post(`/salons/${salonId}/staff-availability`, availabilityData),
-  updateStaffAvailability: (salonId, availabilityId, availabilityData) => api.put(`/salons/${salonId}/staff-availability/${availabilityId}`, availabilityData),
-  deleteStaffAvailability: (salonId, availabilityId) => api.delete(`/salons/${salonId}/staff-availability/${availabilityId}`),
+  getStaffAvailability: (salonId) => api.get(`/staff-availability/${salonId}`),
+  createStaffAvailability: (salonId, availabilityData) => api.post(`/staff-availability/${salonId}`, availabilityData),
+  updateStaffAvailability: (salonId, availabilityId, availabilityData) => api.put(`/staff-availability/${salonId}/${availabilityId}`, availabilityData),
+  deleteStaffAvailability: (salonId, availabilityId) => api.delete(`/staff-availability/${salonId}/${availabilityId}`),
 };
 
 const serviceApi = {
@@ -157,8 +157,8 @@ const publicApi = {
 };
 
 const dashboardApi = {
-  getStats: (salonId) => api.get(`/salons/${salonId}/dashboard/stats`),
-  getActivity: (salonId) => api.get(`/salons/${salonId}/dashboard/activity`),
+  getStats: (salonId) => api.get(`/dashboard/salons/${salonId}/stats`),
+  getActivity: (salonId) => api.get(`/dashboard/salons/${salonId}/activity`),
 };
 
 export { 

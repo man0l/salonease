@@ -11,7 +11,7 @@ router.use(authMiddleware);
 router.get('/my-salon', roleMiddleware([ROLES.STAFF]), staffController.getAssociatedSalon);
 
 // Protected routes for staff management
-router.get('/:salonId', roleMiddleware([ROLES.SUPER_ADMIN, ROLES.SALON_OWNER]), staffController.getStaff);
+router.get('/:salonId', roleMiddleware([ROLES.SUPER_ADMIN, ROLES.SALON_OWNER, ROLES.STAFF]), staffController.getStaff);
 router.post('/:salonId/invite', roleMiddleware([ROLES.SUPER_ADMIN, ROLES.SALON_OWNER]), staffController.inviteStaff);
 router.put('/:salonId/:staffId', roleMiddleware([ROLES.SUPER_ADMIN, ROLES.SALON_OWNER]), staffController.updateStaff);
 

@@ -13,14 +13,15 @@ import useService from '../../hooks/useService';
 import { BOOKING_STATUSES } from '../../utils/constants';
 import ReassignStaffModal from './Modals/ReassignStaffModal';
 import ConfirmCompleteModal from './Modals/ConfirmCompleteModal';
+import moment from 'moment-timezone';
 
 const BookingsManagement = () => {
   const { salonId } = useParams();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
-    startDate: new Date().setHours(0, 0, 0, 0),
-    endDate: new Date().setHours(23, 59, 59, 999),
+    startDate: moment().startOf('day').toDate(),
+    endDate: moment().endOf('day').toDate(),
     staffId: '',
     serviceId: '',
   });
@@ -69,20 +70,20 @@ const BookingsManagement = () => {
   const formatDateForApi = (date) => {
     if (!date) return null;
     
-    // Create a new date object to avoid mutating the original
-    const formattedDate = new Date(date);
+    const momentDate = moment(date);
+    const timezone = moment.tz.guess(); // Gets local timezone
     
-    // For start date: set time to start of day (00:00:00)
+    // For start date: set time to start of day
     if (date === filters.startDate) {
-      formattedDate.setHours(0, 0, 0, 0);
+      return moment.tz(momentDate.startOf('day'), timezone).format('YYYY-MM-DD HH:mm:ss');
     }
     
-    // For end date: set time to end of day (23:59:59.999)
+    // For end date: set time to end of day
     if (date === filters.endDate) {
-      formattedDate.setHours(23, 59, 59, 999);
+      return moment.tz(momentDate.endOf('day'), timezone).format('YYYY-MM-DD HH:mm:ss');
     }
     
-    return formattedDate.toISOString();
+    return moment.tz(momentDate, timezone).format('YYYY-MM-DD HH:mm:ss');
   };
 
   const handleReschedule = async (bookingId, newDateTime) => {
@@ -173,9 +174,7 @@ const BookingsManagement = () => {
 
   // Helper function to get today's date
   const getToday = () => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return today;
+    return moment().startOf('day').toDate();
   };
 
   const handleComplete = async (bookingId) => {
