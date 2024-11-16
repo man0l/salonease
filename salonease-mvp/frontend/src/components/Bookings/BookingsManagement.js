@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { bookingApi } from '../../utils/api';
 import { toast } from 'react-toastify';
@@ -15,10 +15,10 @@ import ReassignStaffModal from './Modals/ReassignStaffModal';
 import ConfirmCompleteModal from './Modals/ConfirmCompleteModal';
 import moment from 'moment-timezone';
 import useBookings from '../../hooks/useBookings';
+import { useDebounce } from '../../hooks/useDebounce';
 
 const BookingsManagement = () => {
   const { salonId } = useParams();
-  const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     startDate: moment().startOf('day').toDate(),
@@ -40,13 +40,10 @@ const BookingsManagement = () => {
   const [totalItems, setTotalItems] = useState(0);
   const ITEMS_PER_PAGE = 2;
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const { fetchBookings } = useBookings();
+  const { fetchBookings, bookings } = useBookings();
 
-  useEffect(() => {
-    fetchBookingsData();
-  }, [filters, salonId, currentPage]);
-
-  const fetchBookingsData = async () => {
+  // Define fetchBookingsData first
+  const fetchBookingsData = useCallback(async () => {
     try {
       setLoading(true);
       const formattedFilters = {
@@ -58,16 +55,22 @@ const BookingsManagement = () => {
         serviceId: filters.serviceId || undefined
       };
       const response = await fetchBookings(formattedFilters);
-      setBookings(response.bookings || []);
       setTotalPages(response.totalPages);
       setTotalItems(response.totalItems);
     } catch (error) {
       toast.error('Failed to fetch bookings');
-      setBookings([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, currentPage, fetchBookings]);
+
+  // Then create the debounced version
+  const [debouncedFetch] = useDebounce(fetchBookingsData, 300);
+
+  // Finally use it in useEffect
+  useEffect(() => {
+    debouncedFetch();
+  }, [filters, salonId, currentPage]);
 
   const formatDateForApi = (date) => {
     if (!date) return null;
