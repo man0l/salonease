@@ -38,7 +38,7 @@ const BookingsManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const ITEMS_PER_PAGE = 2;
+  const ITEMS_PER_PAGE = 10;
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const { fetchBookings, bookings } = useBookings();
 
