@@ -41,10 +41,7 @@ exports.getSalonPublicServices = async (req, res) => {
         ['name', 'ASC']
       ]
     });
-
-    // Log the structure before sending
-    console.log('Services with categories:', JSON.stringify(services, null, 2));
-
+    
     res.json(services);
   } catch (error) {
     console.error('Error fetching salon services:', error);

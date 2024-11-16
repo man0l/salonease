@@ -126,7 +126,6 @@ const clientApi = {
   }),
   addClient: (salonId, clientData) => api.post(`/clients/${salonId}`, clientData),
   deleteClient: (salonId, clientId) => {
-    console.log('Deleting client:', { salonId, clientId });
     return api.delete(`/clients/${salonId}/${clientId}`);
   },
 };

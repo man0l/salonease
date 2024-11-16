@@ -55,9 +55,7 @@ exports.getBookings = async (req, res) => {
         ['appointmentDateTime', 'DESC']
       ]
     });
-
-    console.log('whereClause', whereClause);
-
+    
     res.json({
       bookings,
       currentPage: parseInt(page),

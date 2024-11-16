@@ -61,7 +61,6 @@ const ChatBooking = ({ isOpen, onClose, salonId, services, selectedService, staf
           date={selectedDate}
           duration={selectedService.duration}
           onSelect={(time) => {
-            console.log("Time selected:", time);
             actions.updateCustomState({ selectedTime: time });            
           }}
         />

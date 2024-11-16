@@ -10,7 +10,6 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUser = useCallback(async () => {
     if (loading) return;
-    console.log('fetching user');
     try {
       setLoading(true);
       const response = await authApi.me();

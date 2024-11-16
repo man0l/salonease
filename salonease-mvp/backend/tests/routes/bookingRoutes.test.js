@@ -103,11 +103,6 @@ describe('Booking Routes', () => {
         .set('Authorization', `Bearer ${token}`)
         .send(bookingData);
 
-      if (response.status !== 201) {
-        console.log('Response body:', response.body);
-        console.log('Attempted booking time:', appointmentDateTime);
-      }
-
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('id');
       expect(response.body.status).toBe(BOOKING_STATUSES.PENDING);
