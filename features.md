@@ -852,9 +852,98 @@ For the services grid implementation, see:
 const ServicesList = ({ services }) => {
   // ... component code
 };
-```
+``
 
-This implementation provides a professional, conversion-optimized landing page that makes it easy for potential clients to learn about the salon's services and make bookings.
+## 11. Reports and Analytics
+
+
+### 11.2. Financial Reports
+
+#### Frontend
+
+**Reports Dashboard (/salons/:salonId/reports/financial):**
+
+- **Revenue Overview:**
+  - Interactive charts showing revenue trends
+  - Filterable by date range (daily/weekly/monthly)
+  - Export options for reports (CSV, PDF)
+  - Real-time data updates using WebSocket
+  - Customizable dashboard layouts using react-grid-layout
+
+- **Report Components:**
+  - Revenue breakdown by:
+    - Service category with trend analysis
+    - Staff member performance metrics
+    - Time period comparison with growth indicators
+    - Regular vs promotional services impact
+    - Payment method distribution
+    - Refund and cancellation impact
+  
+- **API Integration:**
+  - GET `/api/salons/:salonId/reports/revenue`
+  - GET `/api/salons/:salonId/reports/revenue/staff`
+  - GET `/api/salons/:salonId/reports/revenue/services`
+
+#### Backend
+
+**API Endpoints:**
+
+- **GET /api/salons/:salonId/reports/revenue**
+  - **Rate Limit:** 100 requests per hour
+  - **Cache Duration:** 15 minutes
+  - **Query Parameters:**
+    - `startDate`: string (ISO date)
+    - `endDate`: string (ISO date)
+    - `groupBy`: string (day|week|month)
+    - `includeComparison`: boolean
+    - `timezone`: string
+  - **Response:**
+    ```json
+    {
+      "totalRevenue": number,
+      "periodComparison": {
+        "current": number,
+        "previous": number,
+        "percentageChange": number,
+        "trend": "UP" | "DOWN" | "STABLE"
+      },
+      "breakdown": [
+        {
+          "date": string,
+          "revenue": number,
+          "bookingCount": number,
+          "averageTicket": number,
+          "refunds": number,
+          "netRevenue": number
+        }
+      ]
+    }
+    ```
+
+### 11.3. Booking Analytics
+
+#### Frontend
+
+**Booking Analytics Page (/salons/:salonId/reports/bookings):**
+
+- **Performance Metrics:**
+  ```typescript
+  interface BookingMetrics {
+    completionRate: number;
+    cancellationRate: number;
+    noShowRate: number;
+    rebookingRate: number;
+    averageLeadTime: number;
+    peakHourUtilization: number;
+  }
+  ```
+
+- **Interactive Components:**
+  - Heat map for peak hours/days using react-heatmap-grid
+  - Service comparison charts with react-chartjs-2
+  - Custom date range picker
+  - Real-time updates for current day statistics
+  - Export functionality with progress tracking
 
 
 ## 14. Localization and Internationalization

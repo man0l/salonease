@@ -20,6 +20,7 @@ const clientRoutes = require('./routes/clientRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const publicRoutes = require('./routes/publicRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const reportRoutes = require('./routes/reportRoutes');
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -32,6 +33,7 @@ app.use('/api/clients', clientRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/public', publicRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Basic route
 app.get('/', (req, res) => {
