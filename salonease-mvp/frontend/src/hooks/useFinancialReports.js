@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import moment from 'moment-timezone';
 import { reportsApi } from '../utils/api';
@@ -9,36 +9,43 @@ const useFinancialReports = (salonId) => {
   const [reportData, setReportData] = useState(null);
   const [staffMetrics, setStaffMetrics] = useState(null);
   const [serviceMetrics, setServiceMetrics] = useState(null);
+  const [dateRange, setDateRange] = useState('month');
+  const [customRange, setCustomRange] = useState(null);
 
-  const getDateRange = (range) => {
+  const getDateRange = (range, customRange = null) => {
     const timezone = moment.tz.guess();
     const now = moment().tz(timezone);
     let startDate, endDate;
 
-    switch (range) {
-      case 'today':
-        startDate = now.clone().startOf('day');
-        endDate = now.clone().endOf('day');
-        break;
-      case 'week':
-        startDate = now.clone().startOf('isoWeek');
-        endDate = now.clone().endOf('isoWeek');
-        break;
-      case 'month':
-        startDate = now.clone().startOf('month');
-        endDate = now.clone().endOf('month');
-        break;
-      case 'quarter':
-        startDate = now.clone().startOf('quarter');
-        endDate = now.clone().endOf('quarter');
-        break;
-      case 'year':
-        startDate = now.clone().startOf('year');
-        endDate = now.clone().endOf('year');
-        break;
-      default:
-        startDate = now.clone().startOf('month');
-        endDate = now.clone().endOf('month');
+    if (range === 'custom' && customRange) {
+      startDate = moment(customRange.startDate).startOf('day');
+      endDate = moment(customRange.endDate).endOf('day');
+    } else {
+      switch (range) {
+        case 'today':
+          startDate = now.clone().startOf('day');
+          endDate = now.clone().endOf('day');
+          break;
+        case 'week':
+          startDate = now.clone().startOf('isoWeek');
+          endDate = now.clone().endOf('isoWeek');
+          break;
+        case 'month':
+          startDate = now.clone().startOf('month');
+          endDate = now.clone().endOf('month');
+          break;
+        case 'quarter':
+          startDate = now.clone().startOf('quarter');
+          endDate = now.clone().endOf('quarter');
+          break;
+        case 'year':
+          startDate = now.clone().startOf('year');
+          endDate = now.clone().endOf('year');
+          break;
+        default:
+          startDate = now.clone().startOf('month');
+          endDate = now.clone().endOf('month');
+      }
     }
 
     return {
@@ -66,12 +73,12 @@ const useFinancialReports = (salonId) => {
     }
   };
 
-  const fetchReportData = useCallback(async (dateRange) => {
+  const fetchReportData = useCallback(async (dateRange, customRange) => {
     try {
       setLoading(true);
       setError(null);
 
-      const { startDate, endDate, timezone } = getDateRange(dateRange);
+      const { startDate, endDate, timezone } = getDateRange(dateRange, customRange);
       const params = {
         startDate,
         endDate,
@@ -97,6 +104,10 @@ const useFinancialReports = (salonId) => {
       setLoading(false);
     }
   }, [salonId]);
+
+  useEffect(() => {
+    fetchReportData(dateRange, customRange);
+  }, [dateRange, customRange, fetchReportData]);
 
   return {
     loading,

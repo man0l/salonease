@@ -4,7 +4,8 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 
 const DateRangeSelector = ({ value, onChange }) => {
-  const [customDate, setCustomDate] = useState(null);
+  const [customStartDate, setCustomStartDate] = useState(null);
+  const [customEndDate, setCustomEndDate] = useState(null);
   
   const ranges = [
     { id: 'today', label: 'Today' },
@@ -14,9 +15,23 @@ const DateRangeSelector = ({ value, onChange }) => {
     { id: 'year', label: 'This Year' },
   ];
 
-  const handleDateChange = (date) => {
-    setCustomDate(date);
-    onChange('custom', date);
+  const handleDateRangeChange = (start, end) => {
+    setCustomStartDate(start);
+    setCustomEndDate(end);
+    
+    if (start && end) {
+      onChange('custom', { startDate: start, endDate: end });
+    } else if (!start && !end) {
+      onChange('month');
+    }
+  };
+
+  const handleStartDateChange = (date) => {
+    handleDateRangeChange(date, customEndDate);
+  };
+
+  const handleEndDateChange = (date) => {
+    handleDateRangeChange(customStartDate, date);
   };
 
   return (
@@ -30,7 +45,8 @@ const DateRangeSelector = ({ value, onChange }) => {
           <button
             key={range.id}
             onClick={() => {
-              setCustomDate(null);
+              setCustomStartDate(null);
+              setCustomEndDate(null);
               onChange(range.id);
             }}
             className={`px-4 py-2 rounded-md transition-colors ${
@@ -42,16 +58,36 @@ const DateRangeSelector = ({ value, onChange }) => {
             {range.label}
           </button>
         ))}
-        <div className="relative">
+        <div className="flex gap-2">
           <DatePicker
-            selected={customDate}
-            onChange={handleDateChange}
+            selected={customStartDate}
+            onChange={handleStartDateChange}
+            selectsStart
+            startDate={customStartDate}
+            endDate={customEndDate}
             className={`px-4 py-2 rounded-md border transition-colors ${
               value === 'custom'
                 ? 'border-primary-500 bg-primary-50'
                 : 'border-gray-200 hover:border-gray-300'
             }`}
-            placeholderText="Custom Date"
+            placeholderText="Start Date"
+            dateFormat="MMM d, yyyy"
+            isClearable
+            maxDate={new Date()}
+          />
+          <DatePicker
+            selected={customEndDate}
+            onChange={handleEndDateChange}
+            selectsEnd
+            startDate={customStartDate}
+            endDate={customEndDate}
+            minDate={customStartDate}
+            className={`px-4 py-2 rounded-md border transition-colors ${
+              value === 'custom'
+                ? 'border-primary-500 bg-primary-50'
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+            placeholderText="End Date"
             dateFormat="MMM d, yyyy"
             isClearable
             maxDate={new Date()}

@@ -11,6 +11,7 @@ import useFinancialReports from '../../hooks/useFinancialReports';
 const FinancialReports = () => {
   const { salonId } = useParams();
   const [dateRange, setDateRange] = useState('month');
+  const [customRange, setCustomRange] = useState(null);
   const { 
     loading, 
     error, 
@@ -23,8 +24,8 @@ const FinancialReports = () => {
   } = useFinancialReports(salonId);
 
   useEffect(() => {
-    fetchReportData(dateRange);
-  }, [dateRange, fetchReportData]);
+    fetchReportData(dateRange, customRange);
+  }, [dateRange, customRange, fetchReportData]);
 
   const handleExport = async (format) => {
     try {
@@ -58,6 +59,11 @@ const FinancialReports = () => {
     }
   };
 
+  const handleDateRangeChange = (range, customDates = null) => {
+    setDateRange(range);
+    setCustomRange(customDates);
+  };
+
   if (error) {
     return <div className="text-red-500">Error loading reports: {error}</div>;
   }
@@ -76,7 +82,10 @@ const FinancialReports = () => {
         </div>
       </div>
 
-      <DateRangeSelector value={dateRange} onChange={setDateRange} />
+      <DateRangeSelector 
+        value={dateRange} 
+        onChange={handleDateRangeChange} 
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <RevenueChart data={reportData} loading={loading} />
