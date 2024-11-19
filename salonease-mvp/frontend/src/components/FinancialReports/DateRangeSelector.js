@@ -16,22 +16,25 @@ const DateRangeSelector = ({ value, onChange }) => {
   ];
 
   const handleDateRangeChange = (start, end) => {
+    if (!start || !end) return;
+    
     setCustomStartDate(start);
     setCustomEndDate(end);
-    
-    if (start && end) {
-      onChange('custom', { startDate: start, endDate: end });
-    } else if (!start && !end) {
-      onChange('month');
-    }
+    onChange('custom', { startDate: start, endDate: end });
   };
 
   const handleStartDateChange = (date) => {
-    handleDateRangeChange(date, customEndDate);
+    setCustomStartDate(date);
+    if (customEndDate && date) {
+      handleDateRangeChange(date, customEndDate);
+    }
   };
 
   const handleEndDateChange = (date) => {
-    handleDateRangeChange(customStartDate, date);
+    setCustomEndDate(date);
+    if (customStartDate && date) {
+      handleDateRangeChange(customStartDate, date);
+    }
   };
 
   return (
@@ -40,7 +43,8 @@ const DateRangeSelector = ({ value, onChange }) => {
         <FaCalendar className="text-primary-500" />
         <span className="font-medium">Select Date Range</span>
       </div>
-      <div className="flex flex-wrap gap-2 items-center">
+      
+      <div className="flex flex-wrap gap-2 mb-4">
         {ranges.map((range) => (
           <button
             key={range.id}
@@ -58,23 +62,35 @@ const DateRangeSelector = ({ value, onChange }) => {
             {range.label}
           </button>
         ))}
-        <div className="flex gap-2">
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="relative">
           <DatePicker
             selected={customStartDate}
             onChange={handleStartDateChange}
             selectsStart
             startDate={customStartDate}
             endDate={customEndDate}
-            className={`px-4 py-2 rounded-md border transition-colors ${
-              value === 'custom'
-                ? 'border-primary-500 bg-primary-50'
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
+            className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-primary-500"
             placeholderText="Start Date"
             dateFormat="MMM d, yyyy"
             isClearable
             maxDate={new Date()}
+            popperClassName="react-datepicker-left"
+            popperModifiers={[
+              {
+                name: "preventOverflow",
+                options: {
+                  rootBoundary: "viewport",
+                  tether: false,
+                  altAxis: true
+                }
+              }
+            ]}
           />
+        </div>
+        <div className="relative">
           <DatePicker
             selected={customEndDate}
             onChange={handleEndDateChange}
@@ -82,15 +98,22 @@ const DateRangeSelector = ({ value, onChange }) => {
             startDate={customStartDate}
             endDate={customEndDate}
             minDate={customStartDate}
-            className={`px-4 py-2 rounded-md border transition-colors ${
-              value === 'custom'
-                ? 'border-primary-500 bg-primary-50'
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
+            className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-primary-500"
             placeholderText="End Date"
             dateFormat="MMM d, yyyy"
             isClearable
             maxDate={new Date()}
+            popperClassName="react-datepicker-right"
+            popperModifiers={[
+              {
+                name: "preventOverflow",
+                options: {
+                  rootBoundary: "viewport",
+                  tether: false,
+                  altAxis: true
+                }
+              }
+            ]}
           />
         </div>
       </div>
