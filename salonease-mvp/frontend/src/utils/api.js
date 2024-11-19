@@ -160,6 +160,23 @@ const dashboardApi = {
   getActivity: (salonId) => api.get(`/dashboard/salons/${salonId}/activity`),
 };
 
+const reportsApi = {
+  getRevenueReport: (salonId, params) => 
+    api.get(`/reports/${salonId}/revenue`, { params }),
+  getStaffPerformance: (salonId, params) => 
+    api.get(`/reports/${salonId}/staff-performance`, { params }),
+  getServiceBreakdown: (salonId, params) => 
+    api.get(`/reports/${salonId}/service-breakdown`, { params }),
+  exportReport: (salonId, params) => 
+    api.get(`/reports/${salonId}/export`, { 
+      params,
+      responseType: 'blob',
+      headers: {
+        'Accept': params.format === 'csv' ? 'text/csv' : 'application/pdf'
+      }
+    })
+};
+
 export { 
   api, 
   authApi, 
@@ -168,5 +185,6 @@ export {
   clientApi, 
   bookingApi, 
   publicApi,
-  dashboardApi 
+  dashboardApi,
+  reportsApi 
 };

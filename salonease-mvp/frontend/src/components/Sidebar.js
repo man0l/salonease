@@ -14,7 +14,7 @@ const navigation = [
   { name: 'Staff Availability', icon: CalendarDaysIcon, route: '/salons/:salonId/staff-availability', roles: ['SalonOwner', 'SuperAdmin'] },
   { name: 'Services', icon: () => <span className="text-xl">✂️</span>, route: '/salons/:salonId/services', roles: ['SalonOwner'] },
   { name: 'Billing', icon: CreditCardIcon, route: '/billing', roles: ['SalonOwner'] },
-  { name: 'Reports', icon: ChartBarIcon, route: '/reports', roles: ['SalonOwner', 'SuperAdmin'] },
+  { name: 'Financial Reports', icon: ChartBarIcon, route: '/salons/:salonId/reports/financial', roles: ['SalonOwner'] },
   { name: 'Settings', icon: Cog6ToothIcon, route: '/settings', roles: ['SalonOwner', 'SuperAdmin', 'Staff'] },
   { name: 'Admin Dashboard', icon: HomeIcon, route: '/admin-dashboard', roles: ['SuperAdmin'] },
 ];

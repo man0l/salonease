@@ -28,6 +28,7 @@ import ClientsManagement from './components/Clients/ClientsManagement';
 import BookingsManagement from './components/Bookings/BookingsManagement';
 import PublicSalonPage from './components/Salon/PublicSalonPage';
 import BookingsCalendar from './components/Bookings/BookingsCalendar';
+import FinancialReports from './components/FinancialReports/FinancialReports';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -154,6 +155,14 @@ function AppContent() {
                 } 
               />
               <Route path="/salon/:salonId" element={<PublicSalonPage />} />
+              <Route 
+                path="/salons/:salonId/reports/financial" 
+                element={
+                  <PrivateRoute allowedRoles={[ROLES.SALON_OWNER]}>
+                    <FinancialReports />
+                  </PrivateRoute>
+                } 
+              />
             </Routes>
           </div>
         </main>
