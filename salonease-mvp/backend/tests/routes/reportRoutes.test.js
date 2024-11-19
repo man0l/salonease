@@ -69,7 +69,7 @@ describe('Report Routes', () => {
     });
   });
 
-  describe('GET /api/reports/salons/:salonId/revenue', () => {
+  describe('GET /api/reports/:salonId/revenue', () => {
     it('should get revenue report for a salon', async () => {
       // Create completed booking
       const appointmentDateTime = new Date();
@@ -90,7 +90,7 @@ describe('Report Routes', () => {
       const endDate = moment().format('YYYY-MM-DD');
 
       const response = await request(app)
-        .get(`/api/reports/salons/${salon.id}/revenue`)
+        .get(`/api/reports/${salon.id}/revenue`)
         .query({
           startDate,
           endDate,
@@ -107,7 +107,7 @@ describe('Report Routes', () => {
 
     it('should return 401 when accessing without token', async () => {
       const response = await request(app)
-        .get(`/api/reports/salons/${salon.id}/revenue`);
+        .get(`/api/reports/${salon.id}/revenue`);
 
       expect(response.status).toBe(401);
     });
@@ -127,7 +127,7 @@ describe('Report Routes', () => {
       );
 
       const response = await request(app)
-        .get(`/api/reports/salons/${salon.id}/revenue`)
+        .get(`/api/reports/${salon.id}/revenue`)
         .query({
           startDate: moment().subtract(1, 'day').format('YYYY-MM-DD'),
           endDate: moment().format('YYYY-MM-DD'),
@@ -140,7 +140,7 @@ describe('Report Routes', () => {
 
     it('should return 400 for invalid date range', async () => {
       const response = await request(app)
-        .get(`/api/reports/salons/${salon.id}/revenue`)
+        .get(`/api/reports/${salon.id}/revenue`)
         .query({
           startDate: 'invalid-date',
           endDate: new Date().toISOString()

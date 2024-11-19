@@ -1,6 +1,34 @@
 const FinancialReportService = require('../services/FinancialReportService');
 const { validateDateRange } = require('../validators/reportValidator');
 
+function convertReportToCSV(reportData) {
+  if (!reportData || !reportData.revenue || !reportData.staffMetrics || !reportData.serviceMetrics) {
+    throw new Error('Invalid report data structure');
+  }
+
+  const rows = [];
+  
+  // Add headers
+  rows.push(['Type', 'Metric', 'Value']);
+  
+  // Add revenue data
+  rows.push(['Revenue', 'Total', reportData.revenue.totalRevenue]);
+  
+  // Add staff metrics
+  reportData.staffMetrics.forEach(staff => {
+    rows.push(['Staff', staff.name, staff.revenue]);
+    rows.push(['Staff Bookings', staff.name, staff.bookingCount]);
+  });
+  
+  // Add service metrics
+  reportData.serviceMetrics.forEach(service => {
+    rows.push(['Service', service.name, service.revenue]);
+    rows.push(['Service Bookings', service.name, service.bookingCount]);
+  });
+  
+  return rows.map(row => row.join(',')).join('\n');
+}
+
 exports.getRevenueReport = async (req, res) => {
   try {
       const { salonId } = req.params;
@@ -46,8 +74,7 @@ exports.getStaffPerformance = async (req, res) => {
     );
 
     res.json(staffMetrics);
-  } catch (error) {
-    console.error('Error generating staff performance report:', error);
+  } catch (error) {    
     res.status(500).json({ message: 'Error generating staff performance report' });
   }
 };
@@ -72,7 +99,6 @@ exports.getServiceBreakdown = async (req, res) => {
 
     res.json(serviceMetrics);
   } catch (error) {
-    console.error('Error generating service breakdown report:', error);
     res.status(500).json({ message: 'Error generating service breakdown report' });
   }
 };
@@ -88,6 +114,10 @@ exports.exportReport = async (req, res) => {
       return res.status(400).json({ message: error.message });
     }
 
+    if (format !== 'csv') {
+      return res.status(400).json({ message: 'Invalid export format' });
+    }
+
     // Get report data
     const reportData = await FinancialReportService.getReportData(
       salonId,
@@ -96,64 +126,15 @@ exports.exportReport = async (req, res) => {
       timezone
     );
 
-    if (format === 'csv') {
-      const csvData = convertReportToCSV(reportData);
-      res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', `attachment; filename=financial-report-${value.startDate}-${value.endDate}.csv`);
-      return res.send(csvData);
-    }
-
-    // Handle invalid format
-    res.status(400).json({ message: 'Invalid export format' });
+    const csvData = convertReportToCSV(reportData);
+    
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader(
+      'Content-Disposition', 
+      `attachment; filename=financial-report-${value.startDate}-${value.endDate}.csv`
+    );
+    return res.send(csvData);
   } catch (error) {
-    console.error('Export error:', error);
     res.status(500).json({ message: 'Error exporting report' });
   }
-};
-
-const convertReportToCSV = (reportData) => {
-  const { revenue, staffMetrics, serviceMetrics } = reportData;
-  
-  // Revenue Section
-  const revenueRows = revenue.breakdown.map(entry => ({
-    date: entry.date,
-    revenue: entry.revenue,
-  }));
-
-  // Staff Performance Section
-  const staffRows = staffMetrics.map(staff => ({
-    name: staff.name,
-    appointments: staff.bookingCount || 0,
-    revenue: staff.revenue || 0,
-    avgRating: staff.averageRating || 'N/A'
-  }));
-
-  // Service Breakdown Section
-  const serviceRows = serviceMetrics.map(service => ({
-    name: service.name,
-    bookings: service.bookingCount || 0,
-    revenue: service.revenue || 0
-  }));
-
-  // Create CSV content
-  const csvContent = [
-    // Revenue Section
-    'Revenue Report',
-    'Date,Revenue',
-    ...revenueRows.map(row => `${row.date},${row.revenue}`),
-    '', // Empty line for separation
-
-    // Staff Section
-    'Staff Performance',
-    'Name,Appointments,Revenue,Average Rating',
-    ...staffRows.map(row => `${row.name},${row.appointments},${row.revenue},${row.avgRating}`),
-    '',
-
-    // Services Section
-    'Service Breakdown',
-    'Service Name,Total Bookings,Total Revenue',
-    ...serviceRows.map(row => `${row.name},${row.bookings},${row.revenue}`)
-  ].join('\n');
-
-  return csvContent;
 };

@@ -192,5 +192,72 @@ describe('Financial Report Service', () => {
       expect(report.totalRevenue).toBe(100);
       expect(report.breakdown[0].bookingCount).toBe(1);
     });
+
+    it('should handle DST transitions correctly', async () => {
+      const startDate = new Date('2024-03-09'); // Day before DST
+      const endDate = new Date('2024-03-11');   // Day after DST
+      const timezone = 'America/New_York';
+
+      await Booking.create({
+        salonId: salon.id,
+        serviceId: service.id,
+        clientId: client.id,
+        staffId: staff.id,
+        appointmentDateTime: new Date('2024-03-10T02:30:00Z'),
+        endTime: new Date('2024-03-10T03:30:00Z'),
+        status: BOOKING_STATUSES.COMPLETED
+      });
+
+      const report = await FinancialReportService.getRevenueReport(
+        salon.id,
+        startDate,
+        endDate,
+        'day',
+        timezone
+      );
+
+      expect(report.breakdown).toBeDefined();
+      expect(report.breakdown.length).toBe(1);
+    });
+
+    it('should calculate period comparison metrics correctly', async () => {
+      const startDate = new Date('2024-01-15');
+      const endDate = new Date('2024-01-31');
+
+      // Current period booking
+      await Booking.create({
+        salonId: salon.id,
+        serviceId: service.id,
+        clientId: client.id,
+        staffId: staff.id,
+        appointmentDateTime: new Date('2024-01-20T10:00:00'),
+        endTime: new Date('2024-01-20T11:00:00'),
+        status: BOOKING_STATUSES.COMPLETED
+      });
+
+      // Previous period booking
+      await Booking.create({
+        salonId: salon.id,
+        serviceId: service.id,
+        clientId: client.id,
+        staffId: staff.id,
+        appointmentDateTime: new Date('2024-01-01T10:00:00'),
+        endTime: new Date('2024-01-01T11:00:00'),
+        status: BOOKING_STATUSES.COMPLETED
+      });
+
+      const report = await FinancialReportService.getRevenueReport(
+        salon.id,
+        startDate,
+        endDate
+      );
+
+      expect(report.periodComparison).toEqual({
+        current: 100,
+        previous: 100,
+        percentageChange: 0,
+        trend: 'STABLE'
+      });
+    });
   });
 });
