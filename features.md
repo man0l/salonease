@@ -920,32 +920,6 @@ const ServicesList = ({ services }) => {
     }
     ```
 
-### 11.3. Booking Analytics
-
-#### Frontend
-
-**Booking Analytics Page (/salons/:salonId/reports/bookings):**
-
-- **Performance Metrics:**
-  ```typescript
-  interface BookingMetrics {
-    completionRate: number;
-    cancellationRate: number;
-    noShowRate: number;
-    rebookingRate: number;
-    averageLeadTime: number;
-    peakHourUtilization: number;
-  }
-  ```
-
-- **Interactive Components:**
-  - Heat map for peak hours/days using react-heatmap-grid
-  - Service comparison charts with react-chartjs-2
-  - Custom date range picker
-  - Real-time updates for current day statistics
-  - Export functionality with progress tracking
-
-
 ## 14. Localization and Internationalization
 
 ### 14.1. Multi-Language Support
