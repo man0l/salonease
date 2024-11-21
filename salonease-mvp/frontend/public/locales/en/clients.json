@@ -1,0 +1,14 @@
+{
+  "label.name": "Name",
+  "label.email": "Email",
+  "label.phone": "Phone",
+  "notes": "Notes",
+  "title.client_management": "Client Management",
+  "title.client_list": "Client List",
+  "no_clients_found": "No clients found.",
+  "error.error_deleting_client": "Error deleting client",
+  "search_clients": "Search clients",
+  "name_is_required": "Name is required",
+  "phone_is_required": "Phone is required",
+  "error.invalid_email_format": "Invalid email format"
+}

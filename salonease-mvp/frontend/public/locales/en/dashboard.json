@@ -1,0 +1,23 @@
+{
+  "title.super_admin_dashboard": "Super Admin Dashboard",
+  "title.staff_dashboard": "Staff Dashboard",
+  "manage_availability": "Manage Availability",
+  "view_appointments": "View Appointments",
+  "action.update_profile": "Update Profile",
+  "recent_activity": "Recent Activity",
+  "today_s_appointments": "Today's Appointments",
+  "next_appointment": "Next Appointment",
+  "no_upcoming_appointments": "No upcoming appointments",
+  "set_your_schedule": "Set your schedule",
+  "check_your_bookings": "Check your bookings",
+  "manage_your_details": "Manage your details",
+  "title.staff_management": "Staff Management",
+  "services": "Services",
+  "calendar": "Calendar",
+  "clients": "Clients",
+  "revenue_this_week": "Revenue This Week",
+  "manage_your_team": "Manage your team",
+  "manage_offerings": "Manage offerings",
+  "view_schedule": "View schedule",
+  "manage_clients": "Manage clients"
+}
