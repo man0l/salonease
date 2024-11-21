@@ -63,5 +63,22 @@
   "action.confirm_password": "Confirm Password",
   "accept_invitation": "Accept Invitation",
   "accepting": "Accepting...",
-  "error.an_unexpected_error_occurred_while_accepting_the_invitation": "An unexpected error occurred while accepting the invitation"
+  "error.an_unexpected_error_occurred_while_accepting_the_invitation": "An unexpected error occurred while accepting the invitation",
+  "action.set_up_your_first_salon": "Set Up Your First Salon",
+  "action.salon_management": "Salon Management",
+  "action.hide_form": "Hide Form",
+  "action.add_new_salon": "Add New Salon",
+  "action.edit_salon": "Edit Salon",
+  "action.update_salon": "Update Salon",
+  "action.add_salon": "Add Salon",
+  "action.are_you_sure_you_want_to_delete_this_salon": "Are you sure you want to delete this salon?",
+  "label.your_salons": "Your Salons",
+  "success.salon_updated": "Salon updated successfully",
+  "error.failed_to_update_salon": "Failed to update salon",
+  "success.salon_added": "Salon added successfully",
+  "success.onboarding_completed": "Onboarding completed successfully!",
+  "error.failed_to_add_salon": "Failed to add salon",
+  "error.failed_to_save_salon": "Failed to save salon. Please try again.",
+  "success.salon_deleted": "Salon deleted successfully",
+  "error.failed_to_delete_salon": "Failed to delete salon. Please try again."
 }

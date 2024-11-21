@@ -11,8 +11,8 @@ import { useTranslation } from 'react-i18next';
 
 const schema = yup.object().shape({
   name: yup.string().required(t('name_is_required')),
-  email: yup.string().email(t('error.invalid_email')),
-  phone: yup.string().required(t('phone_number_is_required')),
+  email: yup.string().email(t('error.invalid_email_format')),
+  phone: yup.string().required(t('phone_is_required')),
   notes: yup.string(),
 });
 
@@ -125,7 +125,7 @@ const ClientsManagement = () => {
           <div className="relative">
             <input
               type="text"
-              placeholder={t('action.search_clients')}
+              placeholder={t('search_clients')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -230,7 +230,7 @@ const ClientsManagement = () => {
           {t('title.client_list')}
         </h3>
         {filteredClients.length === 0 ? (
-          <p className="text-gray-600">{t('message.no_clients_found')}</p>
+          <p className="text-gray-600">{t('no_clients_found')}</p>
         ) : (
           <ul className="space-y-4">
             {filteredClients.map((client) => (

@@ -29,6 +29,8 @@ const SalonManagement = ({ isOnboarding = false }) => {
     resolver: yupResolver(schema),
   });
 
+  const { t } = useTranslation('salon');
+
   useEffect(() => {
     if (error) {
       toast.error(error);
@@ -40,32 +42,32 @@ const SalonManagement = ({ isOnboarding = false }) => {
       if (editingSalon) {
         const updatedSalon = await updateSalon(editingSalon.id, data);
         if (updatedSalon) {
-          toast.success('Salon updated successfully');
+          toast.success(t('success.salon_updated'));
           reset(updatedSalon);
           setEditingSalon(null);
           await fetchSalons();
           setShowForm(false);
         } else {
-          throw new Error('Failed to update salon');
+          throw new Error(t('error.failed_to_update_salon'));
         }
       } else {
         const newSalon = await addSalon(data);
         if (newSalon) {
-          toast.success('Salon added successfully');
+          toast.success(t('success.salon_added'));
           reset();
           await fetchSalons();
           setShowForm(false);
           if (isOnboarding) {
             await updateUser({ ...user, onboardingCompleted: true });
-            toast.success('Onboarding completed successfully!');
+            toast.success(t('success.onboarding_completed'));
             navigate('/dashboard');
           }
         } else {
-          throw new Error('Failed to add salon');
+          throw new Error(t('error.failed_to_add_salon'));
         }
       }
     } catch (err) {
-      toast.error(err.message || 'Failed to save salon. Please try again.');
+      toast.error(t('error.failed_to_save_salon'));
     }
   };
 
@@ -96,12 +98,12 @@ const SalonManagement = ({ isOnboarding = false }) => {
     
     try {
       await deleteSalon(salonToDelete);
-      toast.success('Salon deleted successfully');
+      toast.success(t('success.salon_deleted'));
       setIsDeleteDialogOpen(false);
       setSalonToDelete(null);
       await fetchSalons();
     } catch (err) {
-      toast.error(err.message || 'Failed to delete salon. Please try again.');
+      toast.error(t('error.failed_to_delete_salon'));
     }
   }, [deleteSalon, salonToDelete, fetchSalons]);
 

@@ -16,6 +16,7 @@ import ConfirmCompleteModal from './Modals/ConfirmCompleteModal';
 import moment from 'moment-timezone';
 import useBookings from '../../hooks/useBookings';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useTranslation } from 'react-i18next';
 
 const BookingsManagement = () => {
   const { salonId } = useParams();
@@ -41,6 +42,7 @@ const BookingsManagement = () => {
   const ITEMS_PER_PAGE = 10;
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const { fetchBookings, bookings } = useBookings();
+  const { t } = useTranslation('bookings');
 
   // Define fetchBookingsData first
   const fetchBookingsData = useCallback(async () => {
@@ -58,7 +60,7 @@ const BookingsManagement = () => {
       setTotalPages(response.totalPages);
       setTotalItems(response.totalItems);
     } catch (error) {
-      toast.error('Failed to fetch bookings');
+      toast.error(t('error.failed_to_fetch_bookings'));
     } finally {
       setLoading(false);
     }
@@ -94,22 +96,22 @@ const BookingsManagement = () => {
   const handleReschedule = async (bookingId, newDateTime) => {
     try {
       await bookingApi.updateBooking(salonId, bookingId, { appointmentDateTime: newDateTime });
-      toast.success('Booking rescheduled successfully');
+      toast.success(t('success.booking_rescheduled'));
       fetchBookingsData();
       setShowRescheduleModal(false);
     } catch (error) {
-      toast.error('Failed to reschedule booking');
+      toast.error(t('error.failed_to_reschedule_booking'));
     }
   };
 
   const handleCancel = async (bookingId, note) => {
     try {
       await bookingApi.deleteBooking(salonId, bookingId, { notes: note });
-      toast.success('Booking cancelled successfully');
+      toast.success(t('success.booking_cancelled'));
       fetchBookingsData();
       setShowCancelModal(false);
     } catch (error) {
-      toast.error('Failed to cancel booking');
+      toast.error(t('error.failed_to_cancel_booking'));
     }
   };
 
@@ -159,11 +161,11 @@ const BookingsManagement = () => {
   const handleReassignStaff = async (bookingId, newStaffId) => {
     try {
       await bookingApi.updateBooking(salonId, bookingId, { staffId: newStaffId });
-      toast.success('Staff reassigned successfully');
+      toast.success(t('success.staff_reassigned'));
       fetchBookingsData();
       setShowReassignModal(false);
     } catch (error) {
-      toast.error('Failed to reassign staff');
+      toast.error(t('error.failed_to_reassign_staff'));
     }
   };
 
@@ -185,39 +187,39 @@ const BookingsManagement = () => {
   const handleComplete = async (bookingId) => {
     try {
       await bookingApi.updateBooking(salonId, bookingId, { status: BOOKING_STATUSES.COMPLETED });
-      toast.success('Booking marked as completed');
+      toast.success(t('success.booking_completed'));
       fetchBookingsData();
       setShowCompleteModal(false);
     } catch (error) {
-      toast.error('Failed to complete booking');
+      toast.error(t('error.failed_to_complete_booking'));
     }
   };
 
   return (
     <div className="container mx-auto px-4">
       <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
-        <h1 className="text-2xl font-bold">Bookings Management</h1>
+        <h1 className="text-2xl font-bold">{t('title.bookings_management')}</h1>
         <button
           onClick={showCreateModal ? () => setShowCreateModal(false) : handleAddNewBooking}
           className="bg-primary-500 hover:bg-primary-600 text-white px-3 sm:px-4 py-2 rounded-full transition duration-300 flex items-center whitespace-nowrap"
         >
           <FaPlus className="mr-1 sm:mr-2" />
-          <span className="hidden sm:inline">Add Booking</span>
-          <span className="sm:hidden">Add</span>
+          <span className="hidden sm:inline">{t('action.add_booking')}</span>
+          <span className="sm:hidden">{t('action.add')}</span>
         </button>
       </div>
       
       {/* Filters */}
       <div className="mb-4">
         <div className="flex justify-between items-center mb-2">
-          <h2 className="text-lg font-semibold">Filters</h2>
+          <h2 className="text-lg font-semibold">{t('title.filters')}</h2>
           <button
             onClick={handleResetFilters}
             className="flex items-center gap-2 text-gray-600 hover:text-primary-500 transition-colors duration-200"
-            title="Reset filters"
+            title={t('action.reset_filters')}
           >
             <FaUndo className="w-4 h-4" />
-            <span className="text-sm sm:inline hidden">Reset</span>
+            <span className="text-sm sm:inline hidden">{t('action.reset')}</span>
           </button>
         </div>
         
@@ -227,7 +229,7 @@ const BookingsManagement = () => {
             onClick={() => setShowMobileFilters(prev => !prev)}
             className="w-full flex justify-between items-center px-4 py-2 bg-white border border-gray-300 rounded-md"
           >
-            <span>Show Filters</span>
+            <span>{t('action.show_filters')}</span>
             <FaChevronDown className={`transform transition-transform ${showMobileFilters ? 'rotate-180' : ''}`} />
           </button>
         </div>
@@ -238,7 +240,7 @@ const BookingsManagement = () => {
           <div className="space-y-4 sm:space-y-0 sm:flex sm:gap-2 md:block md:space-y-4 col-span-2">
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Start Date
+                {t('label.start_date')}
               </label>
               <DatePicker
                 selected={filters.startDate}
@@ -247,14 +249,14 @@ const BookingsManagement = () => {
                 startDate={filters.startDate}
                 endDate={filters.endDate}
                 maxDate={filters.endDate}
-                placeholderText="Select start date"
+                placeholderText={t('placeholder.select_start_date')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                 dateFormat="MM/dd/yyyy"
               />
             </div>
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                End Date
+                {t('label.end_date')}
               </label>
               <DatePicker
                 selected={filters.endDate}
@@ -263,7 +265,7 @@ const BookingsManagement = () => {
                 startDate={filters.startDate}
                 endDate={filters.endDate}
                 minDate={filters.startDate}
-                placeholderText="Select end date"
+                placeholderText={t('placeholder.select_end_date')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                 dateFormat="MM/dd/yyyy"
               />
@@ -274,7 +276,7 @@ const BookingsManagement = () => {
           <div className="space-y-4 col-span-2">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Staff Member
+                {t('label.staff_member')}
               </label>
               <select
                 value={filters.staffId}
@@ -282,7 +284,7 @@ const BookingsManagement = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                 disabled={staffLoading}
               >
-                <option value="">All Staff</option>
+                <option value="">{t('label.all_staff')}</option>
                 {staff?.map(member => (
                   <option key={member.id} value={member.id}>
                     {member.fullName}
@@ -292,7 +294,7 @@ const BookingsManagement = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Service
+                {t('label.service')}
               </label>
               <select
                 value={filters.serviceId}
@@ -300,7 +302,7 @@ const BookingsManagement = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                 disabled={servicesLoading}
               >
-                <option value="">All Services</option>
+                <option value="">{t('label.all_services')}</option>
                 {services?.map(service => (
                   <option key={service.id} value={service.id}>
                     {service.name}
@@ -318,7 +320,7 @@ const BookingsManagement = () => {
           <div 
             className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"
             role="status"
-            aria-label="Loading"
+            aria-label={t('loading.bookings')}
           />
         </div>
       ) : (
@@ -342,7 +344,7 @@ const BookingsManagement = () => {
                             className="text-xs bg-gray-100 px-2 py-1 rounded-full cursor-help"
                             title={booking.notes}
                           >
-                            📝 Notes
+                            📝 {t('label.notes')}
                           </span>
                         )}
                       </div>
@@ -353,7 +355,7 @@ const BookingsManagement = () => {
                             className="text-gray-600 text-sm flex items-center gap-2 hover:text-primary-500"
                           >
                             <span>📱</span>
-                            {booking.client.phone}
+                            {t('label.phone')}: {booking.client.phone}
                           </a>
                         )}
                         {booking.client?.email && (
@@ -362,7 +364,7 @@ const BookingsManagement = () => {
                             className="text-gray-600 text-sm flex items-center gap-2 hover:text-primary-500 break-all"
                           >
                             <span>✉️</span>
-                            {booking.client.email}
+                            {t('label.email')}: {booking.client.email}
                           </a>
                         )}
                       </div>
@@ -392,7 +394,7 @@ const BookingsManagement = () => {
                       </div>
                       <div className="text-gray-600 text-sm flex items-center gap-2">
                         <span>⏱️</span>
-                        {booking.service.duration} minutes
+                        {t('label.duration_minutes', { duration: booking.service.duration })}
                       </div>
                     </div>
                   </div>
@@ -412,7 +414,7 @@ const BookingsManagement = () => {
                       <div className={`flex items-center gap-2 ${getStatusColor(booking.status)}`}>
                         <span>{getStatusIcon(booking.status)}</span>
                         <span className="font-medium">
-                          {booking.status.charAt(0) + booking.status.slice(1).toLowerCase()}
+                          {t(`status.${booking.status.toLowerCase()}`)}
                         </span>
                       </div>
                     </div>
@@ -429,9 +431,9 @@ const BookingsManagement = () => {
                               setShowRescheduleModal(true);
                             }}
                             className="text-secondary-500 hover:text-secondary-600 cursor-pointer w-5 h-5 transition duration-300"
-                            title="Reschedule booking"
+                            title={t('action.reschedule')}
                             role="button"
-                            aria-label="Reschedule booking"
+                            aria-label={t('action.reschedule')}
                           />
                           <FaCheck
                             onClick={() => {
@@ -439,9 +441,9 @@ const BookingsManagement = () => {
                               setShowCompleteModal(true);
                             }}
                             className="text-green-500 hover:text-green-600 cursor-pointer w-5 h-5 transition duration-300"
-                            title="Complete booking"
+                            title={t('action.complete')}
                             role="button"
-                            aria-label="Complete booking"
+                            aria-label={t('action.complete')}
                           />
                           <FaTrash 
                             onClick={() => {
@@ -449,9 +451,9 @@ const BookingsManagement = () => {
                               setShowCancelModal(true);
                             }}
                             className="text-red-500 hover:text-red-600 cursor-pointer w-5 h-5 transition duration-300"
-                            title="Cancel booking"
+                            title={t('action.cancel')}
                             role="button"
-                            aria-label="Cancel booking"
+                            aria-label={t('action.cancel')}
                           />
                         </>
                       )}
@@ -462,7 +464,7 @@ const BookingsManagement = () => {
             ))
           ) : (
             <div className="text-center py-8 text-gray-500">
-              No bookings found for the selected filters
+              {t('error.no_bookings')}
             </div>
           )}
         </div>
@@ -476,23 +478,27 @@ const BookingsManagement = () => {
               disabled={currentPage === 1}
               className="px-2 sm:px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
             >
-              <span className="hidden sm:inline">Previous</span>
-              <span className="sm:hidden">Prev</span>
+              <span className="hidden sm:inline">{t('action.previous')}</span>
+              <span className="sm:hidden">{t('action.prev')}</span>
             </button>
             <span className="text-sm text-gray-600">
-              Page {currentPage} of {totalPages}
+              {t('action.page')} {currentPage} {t('action.of')} {totalPages}
             </span>
             <button
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
               className="px-2 sm:px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
             >
-              <span className="hidden sm:inline">Next</span>
-              <span className="sm:hidden">Next</span>
+              <span className="hidden sm:inline">{t('action.next')}</span>
+              <span className="sm:hidden">{t('action.next')}</span>
             </button>
           </div>
           <div className="text-xs sm:text-sm text-gray-600 text-center">
-            Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, totalItems)} of {totalItems} bookings
+            {t('label.showing_bookings', { 
+              start: ((currentPage - 1) * ITEMS_PER_PAGE) + 1, 
+              end: Math.min(currentPage * ITEMS_PER_PAGE, totalItems), 
+              total: totalItems 
+            })}
           </div>
         </div>
       )}

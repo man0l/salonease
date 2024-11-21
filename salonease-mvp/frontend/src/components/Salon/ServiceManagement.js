@@ -7,17 +7,18 @@ import useService from '../../hooks/useService';
 import { formatCurrency } from '../../utils/currencyFormatter';
 import { toast } from 'react-toastify';
 import CategorySelector from '../CategorySelector';
+import { useTranslation } from 'react-i18next';
 
 const schema = yup.object().shape({
-  name: yup.string().required('Service name is required'),
-  categoryId: yup.number().required('Category is required'),
-  price: yup.number().positive('Price must be positive').required('Price is required'),
-  duration: yup.number().positive('Duration must be positive').required('Duration is required'),
+  name: yup.string().required(t('validation.name_required')),
+  category: yup.string().required(t('validation.category_required')),
+  duration: yup.number().required(t('validation.duration_required')),
+  price: yup.number().positive(t('validation.price_positive')).required(t('validation.price_required')),
   description: yup.string(),
-  promotionalOffer: yup.string(),
 });
 
 const ServiceManagement = ({ salonId }) => {
+  const { t } = useTranslation('service');
   const [showForm, setShowForm] = useState(false);
   const [editingService, setEditingService] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -41,14 +42,16 @@ const ServiceManagement = ({ salonId }) => {
     try {
       if (editingService) {
         await updateService(editingService.id, data);
+        toast.success(t('success.service_updated'));
       } else {
         await addService(data);
+        toast.success(t('success.service_added'));
       }
       reset();
       setEditingService(null);
       setShowForm(false);
-    } catch (err) {
-      // Error handling is managed by useService
+    } catch (error) {
+      toast.error(editingService ? t('error.failed_to_update') : t('error.failed_to_add'));
     }
   };
 
@@ -111,28 +114,28 @@ const ServiceManagement = ({ salonId }) => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-card">
-      <h1 className="text-3xl font-bold mb-6 text-primary-700">Service Management</h1>
+      <h1 className="text-3xl font-bold mb-6 text-primary-700">
+        {t('title.service_management')}
+      </h1>
       
       <button
-        onClick={() => {
-          setShowForm(!showForm);
-          setEditingService(null);
-          reset({ name: '', price: '', duration: '', description: '', promotionalOffer: '' });
-        }}
+        onClick={showForm ? () => setShowForm(false) : handleAddNewService}
         className="mb-6 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-full transition duration-300 flex items-center"
       >
         {showForm ? <FaMinus className="mr-2" /> : <FaPlus className="mr-2" />}
-        {showForm ? 'Hide Form' : 'Add New Service'}
+        {showForm ? t('action.hide_form') : t('action.add_new_service')}
       </button>
 
       {showForm && (
         <div className="bg-background rounded-lg shadow-card p-6 mb-8 animate-slide-in">
           <h3 className="text-xl font-semibold mb-4 text-primary-600">
-            {editingService ? 'Edit Service' : 'Add New Service'}
+            {editingService ? t('action.edit_service') : t('action.add_service')}
           </h3>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Service Name:</label>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('label.name')}
+              </label>
               <input
                 id="name"
                 type="text"
@@ -184,20 +187,22 @@ const ServiceManagement = ({ salonId }) => {
             </div>           
             <button type="submit" className="w-full bg-secondary-600 text-white py-2 px-4 rounded-md hover:bg-secondary-700 transition duration-300 flex items-center justify-center">
               <FaPlus className="mr-2" />
-              {editingService ? 'Update Service' : 'Add Service'}
+              {editingService ? t('action.update_service') : t('action.add_service')}
             </button>
           </form>
         </div>
       )}
 
       <div className="bg-background rounded-lg shadow-card p-6">
-        <h3 className="text-xl font-semibold mb-4 text-primary-600">Current Services</h3>
+        <h3 className="text-xl font-semibold mb-4 text-primary-600">
+          {t('title.current_services')}
+        </h3>
         {loading ? (
-          <p className="text-gray-600">Loading services...</p>
+          <p className="text-gray-600">{t('loading.services')}</p>
         ) : error ? (
           <p className="text-red-500">{error}</p>
         ) : !services ? (
-          <p className="text-gray-600">No services available.</p>
+          <p className="text-gray-600">{t('error.no_services')}</p>
         ) : (
           <ul className="space-y-4">
             {services.map((service) => (
@@ -205,21 +210,23 @@ const ServiceManagement = ({ salonId }) => {
                 <div>
                   <span className="font-semibold text-primary-600">{service.name}</span>
                   <span className="ml-2 text-sm text-gray-600">{service?.category?.name}</span>
-                  <p className="text-sm text-gray-600">Price: {formatCurrency(service.price)} | Duration: {service.duration} minutes</p>
-                  {service.promotionalOffer && <p className="text-sm text-green-600">Offer: {service.promotionalOffer}</p>}
+                  <p className="text-sm text-gray-600">
+                    {t('label.price')}: {formatCurrency(service.price)} | {t('label.duration')}: {service.duration} {t('label.minutes')}
+                  </p>
+                  {service.promotionalOffer && <p className="text-sm text-green-600">{t('label.offer')}: {service.promotionalOffer}</p>}
                 </div>
                 <div className="space-x-2">
                   <button
                     onClick={() => handleEdit(service)}
                     className="bg-secondary-500 hover:bg-secondary-600 text-white py-1 px-3 rounded-md text-sm transition duration-300"
-                    aria-label="Edit"
+                    aria-label={t('action.edit')}
                   >
                     <FaEdit />
                   </button>
                   <button
                     onClick={() => handleDelete(service.id)}
                     className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md text-sm transition duration-300"
-                    aria-label="Delete"
+                    aria-label={t('action.delete_service')}
                   >
                     <FaTrash />
                   </button>
