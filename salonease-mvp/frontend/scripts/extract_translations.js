@@ -16,7 +16,21 @@ const TEXT_PATTERNS = {
     // Add patterns for staff-specific content
     tableHeader: /(?<=<th[^>]*>)\s*([^<>{}\n]+?)\s*(?=<\/th>)/g,
     tableCell: /(?<=<td[^>]*>)\s*([^<>{}\n]+?)\s*(?=<\/td>)/g,
-    listItem: /(?<=<li[^>]*>)\s*([^<>{}\n]+?)\s*(?=<\/li>)/g
+    listItem: /(?<=<li[^>]*>)\s*([^<>{}\n]+?)\s*(?=<\/li>)/g,
+    // Add new patterns for general text content
+    generalText: /(?<=<p[^>]*>)\s*([^<>{}\n]+?)\s*(?=<\/p>)/g,
+    // Enhanced heading pattern to capture h2/h3 with classes
+    heading: /(?<=<h[1-6][^>]*>)\s*([^<>{}\n]+?)\s*(?=<\/h[1-6]>)/g,
+    // Pattern for text with required asterisk
+    requiredField: /(?<=>)[^<>]*?<span[^>]*text-red-500[^>]*>\s*\*\s*<\/span>/g,
+    // Pattern for loading/state text
+    conditionalText: /(?<=\{)\s*loading\s*\?\s*['"]([^'"]+)['"]\s*:\s*['"]([^'"]+)['"]\s*(?=\})/g,
+    // Pattern for error messages
+    errorText: /(?<=toast\.error\()\s*['"]([^'"]+)['"]\s*(?=\))/g,
+    // Pattern for placeholder text
+    placeholderText: /placeholderText=["']([^"'{}]+?)["']/g,
+    // Pattern for service details
+    serviceDetails: /(?<=<p[^>]*>)(Duration:|Price:)\s*\{[^}]+\}(?=<\/p>)/g
   },
   props: {
     // Capture only user-facing prop text
@@ -25,7 +39,11 @@ const TEXT_PATTERNS = {
     title: /title=["']([^"'{}]+?)["']/g,
     // Add patterns for staff-specific attributes
     alt: /alt=["']([^"'{}]+?)["']/g,
-    'data-testid': /data-testid=["']([^"'{}]+?)["']/g
+    'data-testid': /data-testid=["']([^"'{}]+?)["']/g,
+    // Add pattern for aria-required
+    'aria-required': /aria-required=["']([^"'{}]+?)["']/g,
+    // Add pattern for error messages in data attributes
+    'data-error': /data-error=["']([^"'{}]+?)["']/g
   },
   messages: {
     // Capture toast messages
@@ -36,7 +54,36 @@ const TEXT_PATTERNS = {
     confirmation: /confirm\(\s*["']([^"']+?)["']\s*\)/g,
     // Add patterns for staff-specific messages
     modal: /setModalMessage\(["']([^"']+?)["']\)/g,
-    alert: /alert\(["']([^"']+?)["']\)/g
+    alert: /alert\(["']([^"']+?)["']\)/g,
+    // Add pattern for validation messages
+    validationError: /errors\.[a-zA-Z]+\.message/g,
+    // Add pattern for toast messages with template literals
+    toastTemplate: /toast\.(error|success|info|warning)\(`([^`]+)`\)/g,
+    // Capture Yup validation messages
+    yupMessages: {
+      // Direct validation messages
+      required: /\.required\(['"]([^'"]+)['"]\)/g,
+      email: /\.email\(['"]([^'"]+)['"]\)/g,
+      min: /\.min\(\d+,\s*['"]([^'"]+)['"]\)/g,
+      max: /\.max\(\d+,\s*['"]([^'"]+)['"]\)/g,
+      matches: /\.matches\([^,]+,\s*['"]([^'"]+)['"]\)/g,
+      oneOf: /\.oneOf\(\[[^\]]+\],\s*['"]([^'"]+)['"]\)/g,
+      
+      // Test validation messages
+      test: /\.test\([^,]+,\s*['"]([^'"]+)['"]/g,
+      
+      // Schema validation messages from validation schemas file
+      schemaMessages: /export const \w+Schema = yup\.(?:string|object)\(\)(?:\s*\.\s*[a-zA-Z]+\([^)]*\))*\s*\.\s*[a-zA-Z]+\(['"]([^'"]+)['"]\)/g,
+    },
+    
+    // Component-level schema validations
+    componentSchema: {
+      // Direct schema definitions in components
+      inlineSchema: /const schema = yup\.object\(\)\.shape\({[\s\S]*?}\);/g,
+      
+      // Schema validation messages
+      messages: /['"]([^'"]+)['"]\s*(?:,\s*{|$)/g
+    }
   }
 };
 
@@ -134,23 +181,33 @@ function generateTranslationKey(text) {
   return cleanText;
 }
 
-function extractTextFromComponent(filePath) {
-  const content = fs.readFileSync(filePath, 'utf8');
-  const extractedTexts = new Set();
-  
-  Object.entries(TEXT_PATTERNS).forEach(([, patterns]) => {
-    Object.entries(patterns).forEach(([, pattern]) => {
-      const matches = content.matchAll(pattern);
-      for (const match of matches) {
-        const text = match[1];
-        if (shouldTranslateText(text)) {
-          extractedTexts.add(text);
+function extractTextFromComponent(componentPath) {
+  try {
+    const content = fs.readFileSync(componentPath, 'utf8');
+    const texts = new Set();
+
+    // Process each pattern type
+    Object.entries(TEXT_PATTERNS).forEach(([type, patterns]) => {
+      Object.entries(patterns).forEach(([name, pattern]) => {
+        if (typeof pattern === 'object' && !pattern.test) {
+          // Skip nested pattern objects (like yupMessages)
+          return;
         }
-      }
+        const matches = content.matchAll(pattern);
+        for (const match of matches) {
+          const text = match[1];
+          if (text && shouldTranslateText(text)) {
+            texts.add(text);
+          }
+        }
+      });
     });
-  });
-  
-  return Array.from(extractedTexts);
+
+    return Array.from(texts);
+  } catch (error) {
+    console.error(`Error processing file ${componentPath}:`, error);
+    return [];
+  }
 }
 
 function shouldProcessFile(filePath) {
@@ -280,32 +337,51 @@ function getComponentGroup(componentPath) {
 }
 
 function processComponent(componentPath) {
-  const componentGroup = getComponentGroup(componentPath);
-  const frontendDir = path.resolve(process.cwd(), 'salonease-mvp/frontend');
-  const localesDir = path.join(frontendDir, 'public/locales/en');
-  const translationFile = path.join(localesDir, `${componentGroup}.json`);
-  
-  const extractedTexts = extractTextFromComponent(componentPath);
-  if (extractedTexts.length === 0) {
-    return;
-  }
-
-  // Load existing translations if file exists
-  let translations = {};
-  if (fs.existsSync(translationFile)) {
-    translations = JSON.parse(fs.readFileSync(translationFile, 'utf8'));
-  }
-
-  // Add new translations
-  extractedTexts.forEach(text => {
-    const key = generateTranslationKey(text);
-    if (!translations[key]) {
-      translations[key] = text;
+  try {
+    const content = fs.readFileSync(componentPath, 'utf8');
+    const componentGroup = getComponentGroup(componentPath);
+    const frontendDir = path.resolve(process.cwd(), 'salonease-mvp/frontend');
+    const localesDir = path.join(frontendDir, 'public/locales/en');
+    
+    if (!fs.existsSync(localesDir)) {
+      fs.mkdirSync(localesDir, { recursive: true });
     }
-  });
+    
+    const translationFile = path.join(localesDir, `${componentGroup}.json`);
+    
+    // Extract regular texts and validation messages
+    const extractedTexts = extractTextFromComponent(componentPath);
+    const validationMessages = extractYupValidationMessages(content);
+    
+    if (extractedTexts.length === 0 && validationMessages.length === 0) return;
 
-  fs.writeFileSync(translationFile, JSON.stringify(translations, null, 2));
-  console.log(`Updated translations for ${componentGroup}`);
+    // Load existing translations
+    let translations = {};
+    if (fs.existsSync(translationFile)) {
+      translations = JSON.parse(fs.readFileSync(translationFile, 'utf8'));
+    }
+
+    // Add regular texts
+    extractedTexts.forEach(text => {
+      const key = generateTranslationKey(text);
+      if (!translations[key]) {
+        translations[key] = text;
+      }
+    });
+
+    // Add validation messages with prefix
+    validationMessages.forEach(([type, text]) => {
+      const key = generateTranslationKey(text, type);
+      if (!translations[key]) {
+        translations[key] = text;
+      }
+    });
+
+    fs.writeFileSync(translationFile, JSON.stringify(translations, null, 2));
+    console.log(`Updated translations for ${componentGroup}: ${componentPath}`);
+  } catch (error) {
+    console.error(`Error processing component ${componentPath}:`, error);
+  }
 }
 
 function main() {
@@ -325,6 +401,47 @@ function main() {
   componentFiles.forEach(file => {
     processComponent(file);
   });
+}
+
+function extractYupValidationMessages(content) {
+  const messages = new Set();
+
+  // Process validation schemas file
+  if (content.includes('export const') && content.includes('yup.')) {
+    const schemaMatches = content.match(TEXT_PATTERNS.messages.yupMessages.schemaMessages);
+    if (schemaMatches) {
+      schemaMatches.forEach(match => {
+        const message = match.match(/['"]([^'"]+)['"]/)?.[1];
+        if (message) messages.add(['yupMessages', message]);
+      });
+    }
+  }
+
+  // Process component-level schemas
+  const schemaBlocks = content.match(/const schema = yup\.object\(\)\.shape\({[\s\S]*?}\);/g);
+  if (schemaBlocks) {
+    schemaBlocks.forEach(block => {
+      const messageRegexes = [
+        /\.required\(['"]([^'"]+)['"]\)/g,
+        /\.email\(['"]([^'"]+)['"]\)/g,
+        /\.min\(\d+,\s*['"]([^'"]+)['"]\)/g,
+        /\.max\(\d+,\s*['"]([^'"]+)['"]\)/g,
+        /\.matches\([^,]+,\s*['"]([^'"]+)['"]\)/g,
+        /\.oneOf\(\[[^\]]+\],\s*['"]([^'"]+)['"]\)/g,
+        /\.positive\(['"]([^'"]+)['"]\)/g,
+        /\.test\([^,]+,\s*['"]([^'"]+)['"]\)/g
+      ];
+
+      messageRegexes.forEach(regex => {
+        const matches = block.matchAll(regex);
+        for (const match of matches) {
+          if (match[1]) messages.add(['yupMessages', match[1]]);
+        }
+      });
+    });
+  }
+
+  return Array.from(messages);
 }
 
 main();
