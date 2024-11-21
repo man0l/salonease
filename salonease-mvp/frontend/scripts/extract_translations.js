@@ -75,6 +75,11 @@ function shouldTranslateText(text) {
     /\{\{.*?\}\}/
   ];
 
+  if (text.includes('${')) {
+    // Extract static parts of template literals
+    return true;
+  }
+
   return !ignorePatterns.some(pattern => pattern.test(text));
 }
 
