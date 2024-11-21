@@ -158,34 +158,59 @@ function shouldProcessFile(filePath) {
 
 function getComponentGroup(componentPath) {
   const groupMappings = {
-    'Auth': ['Login', 'Register', 'ForgotPassword', 'VerifyEmail'],
+    'Layout': [
+      'Sidebar',
+      'Header',
+      'Footer',
+      'SearchInput',
+      'Navigation',
+      'SalonSelector'
+    ],
+    'Dashboard': [
+      'AdminDashboard',
+      'StaffDashboard',      // Reference: StaffDashboard.js lines 6-99
+      'SalonOwnerDashboard', // Reference: SalonOwnerDashboard.js lines 8-97
+      'DashboardStats',
+      'ActivityFeed'
+    ],
+    'Legal': [
+      'Terms',
+      'PrivacyPolicy',
+      'CookiePolicy'
+    ],
+    'Auth': [
+      'Login',
+      'Register',
+      'ForgotPassword',
+      'VerifyEmail'
+    ],
     'Salon': [
-      'SalonManagement', 
-      'ServiceManagement', 
-      'StaffManagement', 
+      'SalonManagement',
+      'ServiceManagement',
+      'StaffManagement',     // Reference: StaffManagement.js lines 14-193
       'ServiceCategories',
       'Staff',
       'StaffList',
       'StaffForm',
-      'StaffAvailability',
-      'PublicSalonPage',
-      'StaffProfile'
+      'StaffAvailability',   // Reference: StaffAvailability.js lines 24-188
+      'PublicSalonPage'      // Reference: PublicSalonPage.js lines 93-116
     ],
     'Bookings': [
-      'BookingsManagement', 
-      'BookingForm', 
+      'BookingsManagement',  // Reference: BookingsManagement.js lines 20-498
+      'BookingForm',
       'BookingCalendar',
       'BookingSuccess',
       'RescheduleModal',
       'CancelBookingModal',
       'ReassignStaffModal',
-      'CreateBookingModal'
+      'UnauthorizedBookingModal'
     ],
     'Modals': [
-      'UnauthorizedBookingModal',
-      'AddAvailabilityDialog',
+      'DeleteConfirmationDialog',
       'ConfirmationModal',
-      'DeleteConfirmationModal'
+      'AddAvailabilityModal',
+      'ErrorModal',
+      'SuccessModal'
     ],
     'Reports': [
       'FinancialReports',
@@ -194,27 +219,47 @@ function getComponentGroup(componentPath) {
       'ServiceAnalytics'
     ],
     'Clients': [
-      'ClientsManagement', 
-      'ClientForm', 
+      'ClientsManagement',
+      'ClientForm',
       'ClientList',
-      'ClientProfile'
+      'ClientProfile',
+      'ClientHistory'
+    ],
+    'Settings': [
+      'ProfileSettings',
+      'SalonSettings',
+      'NotificationSettings',
+      'SecuritySettings'
+    ],
+    'Common': [
+      'Pagination',
+      'SearchInput',
+      'FilterBar',
+      'SortSelect',
+      'LoadingSpinner'
     ]
   };
 
-  // Check both the directory name and file name
-  const dirName = path.basename(path.dirname(componentPath));
-  const fileName = path.basename(componentPath, path.extname(componentPath))
-    .replace('.test', '');
-
-  // First check if the file is in a specific component directory
+  // Directory mappings for specific paths
   const directoryMappings = {
+    'components': 'common',
+    'Layout': 'layout',
+    'Dashboard': 'dashboard',
+    'Legal': 'legal',
+    'Auth': 'auth',
     'Salon': 'salon',
     'Bookings': 'bookings',
     'Modals': 'common',
     'Reports': 'reports',
-    'Clients': 'clients'
+    'Clients': 'clients',
+    'Settings': 'settings'
   };
 
+  const dirName = path.basename(path.dirname(componentPath));
+  const fileName = path.basename(componentPath, path.extname(componentPath))
+    .replace('.test', '');
+
+  // First check directory mapping
   if (directoryMappings[dirName]) {
     return directoryMappings[dirName];
   }
