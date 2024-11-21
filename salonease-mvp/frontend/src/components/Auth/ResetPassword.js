@@ -5,9 +5,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { authApi } from '../../utils/api';
 import { toast } from 'react-toastify';
 import { resetPasswordSchema } from '../../utils/validationSchemas';
+import { useTranslation } from 'react-i18next';
 
 const ResetPassword = () => {
-  const { register, handleSubmit, formState: { errors }, watch } = useForm({
+  const { t } = useTranslation('auth');
+  const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(resetPasswordSchema)
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,10 +23,10 @@ const ResetPassword = () => {
 
     try {
       const response = await authApi.resetPassword(token, data.password);
-      toast.success(response.data.message);
+      toast.success(t('success.password_reset'));
       navigate('/login');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'An error occurred. Please try again.');
+      toast.error(error.response?.data?.message || t('error.password_reset_failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -34,7 +36,7 @@ const ResetPassword = () => {
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Reset Your Password
+          {t('label.reset_your_password')}
         </h2>
       </div>
 
@@ -43,7 +45,7 @@ const ResetPassword = () => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                New Password
+                {t('label.new_password')}
               </label>
               <div className="mt-1">
                 <input
@@ -58,7 +60,7 @@ const ResetPassword = () => {
 
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirm New Password
+                {t('action.confirm_new_password')}
               </label>
               <div className="mt-1">
                 <input
@@ -77,7 +79,7 @@ const ResetPassword = () => {
                 disabled={isSubmitting}
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
-                {isSubmitting ? 'Resetting...' : 'Reset Password'}
+                {isSubmitting ? t('action.resetting') : t('action.reset_password')}
               </button>
             </div>
           </form>
