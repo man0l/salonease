@@ -1,0 +1,17 @@
+{
+  "menu": "Menu",
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "salon_management": "Salon Management",
+    "calendar": "Calendar",
+    "bookings": "Bookings",
+    "clients": "Clients",
+    "staff": "Staff",
+    "staff_availability": "Staff Availability",
+    "services": "Services",
+    "billing": "Billing",
+    "financial_reports": "Financial Reports",
+    "settings": "Settings",
+    "admin_dashboard": "Admin Dashboard"
+  }
+}

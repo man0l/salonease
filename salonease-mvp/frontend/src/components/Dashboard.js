@@ -1,10 +1,13 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 function Dashboard() {
+  const { t } = useTranslation(['dashboard']);
+
   return (
     <div>
-      <h1 className="text-3xl font-bold">Dashboard</h1>
-      <p>Welcome to your dashboard. Here you can manage your salon operations.</p>
+      <h1 className="text-3xl font-bold">{t('dashboard:title')}</h1>
+      <p>{t('dashboard:welcome')}</p>
     </div>
   );
 }

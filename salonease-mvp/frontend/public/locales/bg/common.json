@@ -30,5 +30,28 @@
     },
     "time": {
       "minutes": "минути"
+    },
+    "footer": {
+      "copyright": "© 2024 SalonEase. All rights reserved.",
+      "links": {
+        "terms": "Terms",
+        "privacy": "Privacy Policy"
+      }
+    },
+    "header": {
+      "brand": "SalonEase",
+      "notifications": "Notifications",
+      "profile": "Profile",
+      "logout": "Logout",
+      "login": "Login",
+      "signup": "Sign Up"
+    },
+    "nav": {
+      "brand": "SalonEase",
+      "features": "Features",
+      "pricing": "Pricing",
+      "contact": "Contact",
+      "login": "Login",
+      "signup": "Sign Up"
     }
   }

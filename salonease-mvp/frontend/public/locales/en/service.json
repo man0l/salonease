@@ -31,5 +31,10 @@
   },
   "duration": {
     "minutes": "{{duration}} min."
+  },
+  "category": {
+    "expand": "Expand category",
+    "collapse": "Collapse category",
+    "select": "Select category"
   }
 }

@@ -2,9 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BellIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 import SalonSelector from './SalonSelector';
 
 function Header() {
+  const { t } = useTranslation(['common']);
   const { user, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -28,14 +30,14 @@ function Header() {
 
   const renderUserMenu = () => (
     <>
-      <button className="relative text-text hover:text-primary transition-colors">
+      <button 
+        className="relative text-text hover:text-primary transition-colors"
+        aria-label={t('common:header.notifications')}
+      >
         <BellIcon className="h-6 w-6" />
         <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-accent"></span>
       </button>
-      <div 
-        className="relative"
-        ref={dropdownRef}
-      >
+      <div className="relative" ref={dropdownRef}>
         <button
           className="flex items-center space-x-2 text-text hover:text-primary transition-colors"
           onClick={handleToggleDropdown}
@@ -49,15 +51,13 @@ function Header() {
           <ChevronDownIcon className="h-4 w-4" />
         </button>
         {isDropdownOpen && (
-          <div
-            className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"
-          >
+          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
             <Link
               to="/profile"
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               onClick={() => setIsDropdownOpen(false)}
             >
-              Profile
+              {t('common:header.profile')}
             </Link>
             <button
               onClick={() => {
@@ -66,7 +66,7 @@ function Header() {
               }}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
-              Logout
+              {t('common:header.logout')}
             </button>
           </div>
         )}
@@ -79,11 +79,13 @@ function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           <div className="flex-shrink-0">
-            <Link to="/" className="text-2xl font-bold text-primary-600">SalonEase</Link>
+            <Link to="/" className="text-2xl font-bold text-primary-600">
+              {t('common:header.brand')}
+            </Link>
           </div>
           {user && user.role === 'SalonOwner' && (
-            <div className="flex-grow flex justify-center">              
-                <SalonSelector />              
+            <div className="flex-grow flex justify-center">
+              <SalonSelector />
             </div>
           )}
           <div className="flex items-center space-x-4">
@@ -91,8 +93,12 @@ function Header() {
               renderUserMenu()
             ) : (
               <div className="space-x-4">
-                <Link to="/login" className="text-text hover:text-primary-600 transition-colors">Login</Link>
-                <Link to="/register" className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition-colors">Sign Up</Link>
+                <Link to="/login" className="text-text hover:text-primary-600 transition-colors">
+                  {t('common:header.login')}
+                </Link>
+                <Link to="/register" className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition-colors">
+                  {t('common:header.signup')}
+                </Link>
               </div>
             )}
           </div>

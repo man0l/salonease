@@ -1,7 +1,9 @@
 import React from 'react';
 import { FaChevronRight, FaChevronDown } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 
 const CategoryItem = ({ category, depth, search, isExpanded, toggleExpand, onSelect }) => {
+  const { t } = useTranslation(['service']);
   const hasChildren = category.children && category.children.length > 0;
   const showChildren = isExpanded || !!search;
   const isLevel1 = depth === 0;
@@ -17,6 +19,7 @@ const CategoryItem = ({ category, depth, search, isExpanded, toggleExpand, onSel
               e.stopPropagation();
               toggleExpand(category.id);
             }}
+            aria-label={isExpanded ? t('service:category.collapse') : t('service:category.expand')}
           >
             {isExpanded ? <FaChevronDown className="h-4 w-4" /> : <FaChevronRight className="h-4 w-4" />}
           </button>
@@ -28,6 +31,7 @@ const CategoryItem = ({ category, depth, search, isExpanded, toggleExpand, onSel
           } ${isLevel1 ? 'font-semibold text-gray-500 cursor-default' : 'hover:bg-gray-100'}`}
           onClick={() => !isLevel1 && onSelect(category.id)}
           disabled={isLevel1}
+          aria-label={t('service:category.select')}
         >
           {category.name}
         </button>
