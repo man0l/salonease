@@ -5,33 +5,28 @@ const glob = require('glob');
 // Patterns to identify translatable text
 const TEXT_PATTERNS = {
   jsx: {
-    // Improved label pattern to avoid capturing code
-    label: /(?<=<label[^>]*>)\s*([^<>{}\n]+?)\s*(?=<\/label>)/g,
-    // Improved button pattern to avoid capturing code
+    // Capture label text with colon handling
+    label: /(?<=<label[^>]*>)\s*([^<>{}\n]+?)(:)?\s*(?=<\/label>)/g,
+    // Capture button text without newlines
     button: /(?<=<button[^>]*>)\s*([^<>{}\n]+?)\s*(?=<\/button>)/g,
-    // Capture text content more precisely
-    text: /(?<=>)\s*([^<>{}\n]+?)\s*(?=<)/g,
+    // Capture heading text
+    heading: /(?<=<h[1-6][^>]*>)\s*([^<>{}\n]+?)\s*(?=<\/h[1-6]>)/g,
+    // Capture specific div/span text that looks like labels
+    labelLike: /(?<=<(?:div|span)[^>]*>)\s*([^<>{}\n]+?:)\s*(?=<\/(?:div|span)>)/g
   },
   props: {
-    // More specific prop patterns
-    placeholder: /placeholder=["']([^"'{}]+)["']/g,
-    title: /title=["']([^"'{}]+)["']/g,
-    'aria-label': /aria-label=["']([^"'{}]+)["']/g,
-    alt: /alt=["']([^"'{}]+)["']/g
+    // Capture only user-facing prop text
+    placeholder: /placeholder=["']([^"'{}]+?)["']/g,
+    'aria-label': /aria-label=["']([^"'{}]+?)["']/g,
+    title: /title=["']([^"'{}]+?)["']/g
   },
   messages: {
-    // Improved toast pattern to capture the message part only
-    toast: /toast\.[^(]+\(["']([^"']+)["']\)/g,
-    // Improved error pattern to avoid capturing code
-    error: /(?<!\/\/).*?new Error\(["']([^"']+)["']\)/g,
-    // Improved validation pattern
-    validation: /message:\s*["']([^"']+)["']/g
-  },
-  test: {
-    // More precise test patterns
-    getByText: /getByText\(\/([^\/]+)\/i?\)/g,
-    getByLabelText: /getByLabelText\(["']([^"']+)["']\)/g,
-    getByRole: /getByRole\([^,]+,\s*{\s*name:\s*\/([^\/]+)\/i?\s*}\)/g
+    // Capture toast messages
+    toast: /toast\.(success|error|info|warning)\(\s*["']([^"']+?)["']\s*\)/g,
+    // Capture validation messages
+    validation: /(?:message|error):\s*["']([^"']+?)["']/g,
+    // Capture confirmation messages
+    confirmation: /confirm\(\s*["']([^"']+?)["']\s*\)/g
   }
 };
 
