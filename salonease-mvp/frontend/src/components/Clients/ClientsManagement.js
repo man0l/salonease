@@ -7,11 +7,12 @@ import { toast } from 'react-toastify';
 import { FaSearch, FaFileExport, FaEdit, FaSave, FaPlus, FaMinus, FaTrash } from 'react-icons/fa';
 import useClients from '../../hooks/useClients';
 import DeleteConfirmationDialog from '../common/DeleteConfirmationDialog';
+import { useTranslation } from 'react-i18next';
 
 const schema = yup.object().shape({
-  name: yup.string().required('Name is required'),
-  email: yup.string().email('Invalid email format'),
-  phone: yup.string().required('Phone is required'),
+  name: yup.string().required(t('name_is_required')),
+  email: yup.string().email(t('error.invalid_email')),
+  phone: yup.string().required(t('phone_number_is_required')),
   notes: yup.string(),
 });
 
@@ -38,6 +39,8 @@ const ClientsManagement = () => {
     deleteClient 
   } = useClients();
 
+  const { t } = useTranslation('clients');
+
   useEffect(() => {
     if (salonId) {
       if (searchTerm.length >= 3) {
@@ -52,7 +55,7 @@ const ClientsManagement = () => {
     try {
       if (selectedClient) {
         await updateClient(selectedClient.id, data);
-        toast.success('Client updated successfully');
+        toast.success(t('success.client_updated'));
       } else {
         await addClient(data);
       }
@@ -61,7 +64,7 @@ const ClientsManagement = () => {
       setShowForm(false);
       reset();
     } catch (error) {
-      toast.error(selectedClient ? 'Error updating client' : 'Error adding client');
+      toast.error(selectedClient ? t('error.updating_client') : t('error.adding_client'));
     }
   };
 
@@ -94,10 +97,10 @@ const ClientsManagement = () => {
       const success = await deleteClient(salonId, clientToDelete.id);
       if (success) {
         await fetchClients();
-        toast.success('Client deleted successfully');
+        toast.success(t('success.client_deleted'));
       }
     } catch (error) {
-      toast.error('Error deleting client');
+      toast.error(t('error.deleting_client'));
     } finally {
       setIsDeleteDialogOpen(false);
       setClientToDelete(null);
@@ -113,14 +116,16 @@ const ClientsManagement = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-card">
-      <h1 className="text-3xl font-bold mb-6 text-primary-700">Client Management</h1>
+      <h1 className="text-3xl font-bold mb-6 text-primary-700">
+        {t('title.client_management')}
+      </h1>
 
       <div className="mb-6 flex items-center space-x-4">
         <div className="flex-grow">
           <div className="relative">
             <input
               type="text"
-              placeholder="Search clients"
+              placeholder={t('action.search_clients')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -132,14 +137,14 @@ const ClientsManagement = () => {
           onClick={() => exportClients(selectedFields)}
           className="bg-secondary-500 hover:bg-secondary-600 text-white px-4 py-2 rounded-md transition duration-300 flex items-center"
         >
-          <FaFileExport className="mr-2" /> Export Clients
+          <FaFileExport className="mr-2" /> {t('action.export_clients')}
         </button>
         <button
           onClick={showForm ? () => setShowForm(false) : handleAddNewClient}
           className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-full transition duration-300 flex items-center"
         >
           {showForm ? <FaMinus className="mr-2" /> : <FaPlus className="mr-2" />}
-          {showForm ? 'Hide Form' : 'Add Client'}
+          {showForm ? t('action.hide_form') : t('action.add_client')}
         </button>
       </div>
 
@@ -162,11 +167,13 @@ const ClientsManagement = () => {
       {showForm && (
         <div className="bg-background rounded-lg shadow-card p-6 mb-8 animate-slide-in">
           <h3 className="text-xl font-semibold mb-4 text-primary-600">
-            {selectedClient ? 'Edit Client' : 'Add New Client'}
+            {selectedClient ? t('title.edit_client') : t('title.add_new_client')}
           </h3>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Name:</label>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('label.name')}:
+              </label>
               <input
                 id="name"
                 type="text"
@@ -176,7 +183,9 @@ const ClientsManagement = () => {
               {errors.name && <span className="text-red-500 text-sm">{errors.name.message}</span>}
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email:</label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('label.email')}:
+              </label>
               <input
                 id="email"
                 type="email"
@@ -186,7 +195,9 @@ const ClientsManagement = () => {
               {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}
             </div>
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone:</label>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('label.phone')}:
+              </label>
               <input
                 id="phone"
                 type="tel"
@@ -196,7 +207,9 @@ const ClientsManagement = () => {
               {errors.phone && <span className="text-red-500 text-sm">{errors.phone.message}</span>}
             </div>
             <div>
-              <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">Notes:</label>
+              <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('notes')}:
+              </label>
               <textarea
                 id="notes"
                 {...register('notes')}
@@ -206,16 +219,18 @@ const ClientsManagement = () => {
             </div>
             <button type="submit" className="w-full bg-secondary-600 text-white py-2 px-4 rounded-md hover:bg-secondary-700 transition duration-300 flex items-center justify-center">
               <FaSave className="mr-2" />
-              {selectedClient ? 'Update Client' : 'Add Client'}
+              {selectedClient ? t('action.update_client') : t('action.add_client')}
             </button>
           </form>
         </div>
       )}
 
       <div className="bg-background rounded-lg shadow-card p-6">
-        <h3 className="text-xl font-semibold mb-4 text-primary-600">Client List</h3>
+        <h3 className="text-xl font-semibold mb-4 text-primary-600">
+          {t('title.client_list')}
+        </h3>
         {filteredClients.length === 0 ? (
-          <p className="text-gray-600">No clients found.</p>
+          <p className="text-gray-600">{t('message.no_clients_found')}</p>
         ) : (
           <ul className="space-y-4">
             {filteredClients.map((client) => (

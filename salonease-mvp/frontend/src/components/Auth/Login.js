@@ -17,14 +17,14 @@ function Login() {
     try {
       const success = await login(data.email, data.password);
       if (success) {
-        toast.success('Login successful');
+        toast.success(t('success.login_successful'));
         navigate('/dashboard');
       } else {
-        toast.error('Invalid email or password');
+        toast.error(t('error.invalid_email_or_password'));
       }
     } catch (error) {
       console.error('Login error:', error);
-      toast.error(error.response?.data?.message || 'An error occurred. Please try again.');
+      toast.error(error.response?.data?.message || t('error.general'));
       setIsSubmitting(false);
     } finally {
       setIsSubmitting(false);
