@@ -12,13 +12,20 @@ const TEXT_PATTERNS = {
     // Capture heading text
     heading: /(?<=<h[1-6][^>]*>)\s*([^<>{}\n]+?)\s*(?=<\/h[1-6]>)/g,
     // Capture specific div/span text that looks like labels
-    labelLike: /(?<=<(?:div|span)[^>]*>)\s*([^<>{}\n]+?:)\s*(?=<\/(?:div|span)>)/g
+    labelLike: /(?<=<(?:div|span)[^>]*>)\s*([^<>{}\n]+?:)\s*(?=<\/(?:div|span)>)/g,
+    // Add patterns for staff-specific content
+    tableHeader: /(?<=<th[^>]*>)\s*([^<>{}\n]+?)\s*(?=<\/th>)/g,
+    tableCell: /(?<=<td[^>]*>)\s*([^<>{}\n]+?)\s*(?=<\/td>)/g,
+    listItem: /(?<=<li[^>]*>)\s*([^<>{}\n]+?)\s*(?=<\/li>)/g
   },
   props: {
     // Capture only user-facing prop text
     placeholder: /placeholder=["']([^"'{}]+?)["']/g,
     'aria-label': /aria-label=["']([^"'{}]+?)["']/g,
-    title: /title=["']([^"'{}]+?)["']/g
+    title: /title=["']([^"'{}]+?)["']/g,
+    // Add patterns for staff-specific attributes
+    alt: /alt=["']([^"'{}]+?)["']/g,
+    'data-testid': /data-testid=["']([^"'{}]+?)["']/g
   },
   messages: {
     // Capture toast messages
@@ -26,7 +33,10 @@ const TEXT_PATTERNS = {
     // Capture validation messages
     validation: /(?:message|error):\s*["']([^"']+?)["']/g,
     // Capture confirmation messages
-    confirmation: /confirm\(\s*["']([^"']+?)["']\s*\)/g
+    confirmation: /confirm\(\s*["']([^"']+?)["']\s*\)/g,
+    // Add patterns for staff-specific messages
+    modal: /setModalMessage\(["']([^"']+?)["']\)/g,
+    alert: /alert\(["']([^"']+?)["']\)/g
   }
 };
 
@@ -149,16 +159,69 @@ function shouldProcessFile(filePath) {
 function getComponentGroup(componentPath) {
   const groupMappings = {
     'Auth': ['Login', 'Register', 'ForgotPassword', 'VerifyEmail'],
-    'Salon': ['SalonManagement', 'ServiceManagement', 'StaffManagement', 'ServiceCategories'],
-    'Bookings': ['BookingsManagement', 'BookingForm', 'BookingCalendar'],
-    'Clients': ['ClientsManagement', 'ClientForm', 'ClientList']
+    'Salon': [
+      'SalonManagement', 
+      'ServiceManagement', 
+      'StaffManagement', 
+      'ServiceCategories',
+      'Staff',
+      'StaffList',
+      'StaffForm',
+      'StaffAvailability',
+      'PublicSalonPage',
+      'StaffProfile'
+    ],
+    'Bookings': [
+      'BookingsManagement', 
+      'BookingForm', 
+      'BookingCalendar',
+      'BookingSuccess',
+      'RescheduleModal',
+      'CancelBookingModal',
+      'ReassignStaffModal',
+      'CreateBookingModal'
+    ],
+    'Modals': [
+      'UnauthorizedBookingModal',
+      'AddAvailabilityDialog',
+      'ConfirmationModal',
+      'DeleteConfirmationModal'
+    ],
+    'Reports': [
+      'FinancialReports',
+      'BookingReports',
+      'StaffPerformance',
+      'ServiceAnalytics'
+    ],
+    'Clients': [
+      'ClientsManagement', 
+      'ClientForm', 
+      'ClientList',
+      'ClientProfile'
+    ]
   };
 
-  const componentName = path.basename(componentPath, path.extname(componentPath))
+  // Check both the directory name and file name
+  const dirName = path.basename(path.dirname(componentPath));
+  const fileName = path.basename(componentPath, path.extname(componentPath))
     .replace('.test', '');
 
+  // First check if the file is in a specific component directory
+  const directoryMappings = {
+    'Salon': 'salon',
+    'Bookings': 'bookings',
+    'Modals': 'common',
+    'Reports': 'reports',
+    'Clients': 'clients'
+  };
+
+  if (directoryMappings[dirName]) {
+    return directoryMappings[dirName];
+  }
+
+  // Then check component mappings
   for (const [group, components] of Object.entries(groupMappings)) {
-    if (components.includes(componentName)) {
+    if (components.includes(fileName)) {
       return group.toLowerCase();
     }
   }
