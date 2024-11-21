@@ -43,5 +43,38 @@
   "status.rescheduled": "Rescheduled",
   "status.unassigned": "Unassigned",
   "tooltip.reassign_staff": "Click to reassign staff",
-  "tooltip.cannot_reassign": "Cannot reassign staff for cancelled or completed bookings"
+  "tooltip.cannot_reassign": "Cannot reassign staff for cancelled or completed bookings",
+  "unauthorized_booking": {
+    "title": "Book Appointment",
+    "selected_service": "Selected Service",
+    "duration": "Duration: {{minutes}} min",
+    "price": "Price: {{amount}}",
+    "form": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Enter your name"
+      },
+      "email": {
+        "label": "Email"
+      },
+      "phone": {
+        "label": "Phone Number"
+      },
+      "staff": {
+        "label": "Staff Member",
+        "placeholder": "Select a staff member"
+      },
+      "appointment": {
+        "label": "Appointment Date & Time",
+        "placeholder": "Select an available time",
+        "no_slots": "No available slots for this date. Please try another date."
+      },
+      "notes": {
+        "label": "Notes"
+      }
+    },
+    "required_field": "Required field",
+    "submit": "Submit",
+    "submitting": "Submitting..."
+  }
 }

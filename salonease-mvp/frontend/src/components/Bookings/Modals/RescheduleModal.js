@@ -4,15 +4,18 @@ import * as yup from 'yup';
 import { toast } from 'react-toastify';
 import "react-datepicker/dist/react-datepicker.css";
 import { publicApi } from '../../../utils/api';
-
-const schema = yup.object().shape({
-  appointmentDateTime: yup
-    .date()
-    .required('Appointment date and time are required')
-    .min(new Date(), 'Appointment date and time must be in the future'),
-});
+import { useTranslation } from 'react-i18next';
 
 const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
+  const { t } = useTranslation(['common', 'bookings', 'api']);
+  
+  const schema = yup.object().shape({
+    appointmentDateTime: yup
+      .date()
+      .required(t('common:appointment_date_and_time_are_required'))
+      .min(new Date(), t('api:errors.booking.pastDate')),
+  });
+
   const [newDateTime, setNewDateTime] = useState(
     new Date(booking?.appointmentDateTime || Date.now())
   );
@@ -84,14 +87,13 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
   const handleReschedule = () => {
     try {
       schema.validateSync({ appointmentDateTime: newDateTime });
-      // Check if selected time is in available slots
       const isTimeAvailable = availableSlots.some(slot => 
         slot.getHours() === newDateTime.getHours() && 
         slot.getMinutes() === newDateTime.getMinutes()
       );
 
       if (!isTimeAvailable) {
-        toast.error('Selected time slot is not available');
+        toast.error(t('common:selected_time_slot_is_not_available'));
         return;
       }
 
@@ -105,12 +107,12 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-4">Reschedule Booking</h2>
+        <h2 className="text-2xl font-bold mb-4">{t('common:reschedule_booking')}</h2>
         
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              New Appointment Date & Time
+              {t('common:new_appointment_date_time')}
             </label>
             
             <div className="sm:flex sm:space-x-4 space-y-4 sm:space-y-0">
@@ -142,7 +144,7 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
                   }`}
                   withPortal
                   includeTimes={availableSlots}
-                  placeholderText={loading ? "Loading..." : "Select time"}
+                  placeholderText={loading ? t('common:loading') : t('common:select_time')}
                   disabled={loading || availableSlots.length === 0}
                 />
               </div>
@@ -154,7 +156,7 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
             
             {availableSlots.length === 0 && !loading && (
               <p className="mt-1 text-sm text-amber-600">
-                No available time slots for this date
+                {t('common:no_available_time_slots_for_this_date')}
               </p>
             )}
           </div>
@@ -165,14 +167,14 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
             onClick={onClose}
             className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded transition duration-300"
           >
-            Close
+            {t('common:close')}
           </button>
           <button
             onClick={handleReschedule}
             className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded transition duration-300"
             disabled={!!error || loading || availableSlots.length === 0}
           >
-            Confirm Reschedule
+            {t('common:action.confirm_reschedule')}
           </button>
         </div>
       </div>

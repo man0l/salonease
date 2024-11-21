@@ -1,23 +1,29 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 import SalonManagement from '../Salon/SalonManagement';
 
 const SalonOwnerOnboarding = () => {
   const [step, setStep] = useState(1);
   const { user } = useAuth();
+  const { t } = useTranslation(['salon']);
 
   const renderStep = () => {
     switch (step) {
       case 1:
         return (
           <div className="text-center">
-            <h2 className="text-2xl font-semibold mb-4">Welcome to SalonEase!</h2>
-            <p className="mb-6 text-gray-600">Let's set up your first salon. Click next to begin.</p>
+            <h2 className="text-2xl font-semibold mb-4">
+              {t('salon:onboarding.welcome')}
+            </h2>
+            <p className="mb-6 text-gray-600">
+              {t('salon:onboarding.setup_message')}
+            </p>
             <button 
               onClick={() => setStep(2)}
               className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105"
             >
-              Next
+              {t('salon:onboarding.action.next')}
             </button>
           </div>
         );

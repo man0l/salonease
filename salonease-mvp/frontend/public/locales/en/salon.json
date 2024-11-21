@@ -61,9 +61,21 @@
   "action.save": "Save",
   "label.password": "Password",
   "action.confirm_password": "Confirm Password",
-  "accept_invitation": "Accept Invitation",
-  "accepting": "Accepting...",
-  "error.an_unexpected_error_occurred_while_accepting_the_invitation": "An unexpected error occurred while accepting the invitation",
+  "accept_invitation": {
+    "title": "Accept Invitation",
+    "form": {
+      "password": "Password",
+      "confirm_password": "Confirm Password"
+    },
+    "action": {
+      "accept": "Accept Invitation",
+      "accepting": "Accepting..."
+    },
+    "success": "Invitation accepted successfully",
+    "error": {
+      "unexpected": "An unexpected error occurred while accepting the invitation"
+    }
+  },
   "action.set_up_your_first_salon": "Set Up Your First Salon",
   "action.salon_management": "Salon Management",
   "action.hide_form": "Hide Form",
@@ -80,5 +92,63 @@
   "error.failed_to_add_salon": "Failed to add salon",
   "error.failed_to_save_salon": "Failed to save salon. Please try again.",
   "success.salon_deleted": "Salon deleted successfully",
-  "error.failed_to_delete_salon": "Failed to delete salon. Please try again."
+  "error.failed_to_delete_salon": "Failed to delete salon. Please try again.",
+  "onboarding": {
+    "welcome": "Welcome to SalonEase!",
+    "setup_message": "Let's set up your first salon. Click next to begin.",
+    "action": {
+      "next": "Next"
+    }
+  },
+  "availability": {
+    "title": "Add Availability",
+    "staff": {
+      "availability_for": "Availability for {{name}}",
+      "select_staff": "Select Staff Member"
+    },
+    "type": {
+      "availability": "Availability",
+      "time_off": "Time Off"
+    },
+    "time": {
+      "start": "Start Time",
+      "end": "End Time"
+    },
+    "action": {
+      "save": "Save",
+      "cancel": "Cancel"
+    }
+  },
+  "public_page": {
+    "hero": {
+      "tagline": "Experience Exceptional Beauty Services That Make You Shine"
+    },
+    "about": {
+      "title": "Discover Your New Favorite Salon",
+      "default_description": "At our salon, we believe in pampering you with top-notch services that enhance your natural beauty. Our talented team is dedicated to providing personalized experiences that leave you feeling refreshed and confident."
+    },
+    "services": {
+      "title": "What Would You Like Done Today?",
+      "subtitle": "Choose from our wide range of services designed to make you look and feel your best",
+      "loading": "Loading services...",
+      "no_services": "No services available at the moment. Please check back later!"
+    },
+    "team": {
+      "title": "Meet Our Expert Team",
+      "subtitle": "Our passionate professionals are here to provide exceptional service tailored to your needs"
+    },
+    "contact": {
+      "title": "Get in Touch & Business Hours",
+      "subtitle": "We're here to answer your questions and book your appointments. We look forward to seeing you soon!",
+      "business_hours": "Business Hours",
+      "contact_us": "Contact Us"
+    },
+    "error": {
+      "title": "Oops! Something Went Wrong.",
+      "not_found": {
+        "title": "We Can't Find That Salon",
+        "message": "The salon you're looking for doesn't seem to exist."
+      }
+    }
+  }
 }

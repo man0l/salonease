@@ -10,9 +10,9 @@ import DeleteConfirmationDialog from '../common/DeleteConfirmationDialog';
 import { useTranslation } from 'react-i18next';
 
 const schema = yup.object().shape({
-  name: yup.string().required(t('name_is_required')),
-  email: yup.string().email(t('error.invalid_email_format')),
-  phone: yup.string().required(t('phone_is_required')),
+  name: yup.string().required(t('clients:validation.name_required')),
+  email: yup.string().email(t('clients:validation.email_invalid')),
+  phone: yup.string().required(t('clients:validation.phone_required')),
   notes: yup.string(),
 });
 

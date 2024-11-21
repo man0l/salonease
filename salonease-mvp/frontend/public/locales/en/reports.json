@@ -1,5 +1,23 @@
 {
-  "title.staff_performance": "Staff Performance",
-  "financial_reports": "Financial Reports",
-  "error.error_toast_error": ", error);\n      toast.error("
+  "date_range": {
+    "title": "Select Date Range",
+    "ranges": {
+      "today": "Today",
+      "week": "This Week",
+      "month": "This Month",
+      "quarter": "This Quarter",
+      "year": "This Year"
+    },
+    "placeholder": {
+      "start_date": "Start Date",
+      "end_date": "End Date"
+    }
+  },
+  "staff_performance": {
+    "title": "Staff Performance",
+    "loading": "Loading staff data...",
+    "tooltip": {
+      "staff": "Staff: {{name}}"
+    }
+  }
 }

@@ -5,6 +5,7 @@ import * as yup from 'yup';
 import DatePicker from 'react-datepicker';
 import { toast } from 'react-toastify';
 import { FaTimes } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 import "react-datepicker/dist/react-datepicker.css";
 import { bookingApi, publicApi } from '../../utils/api';
 import 'react-phone-number-input/style.css';
@@ -31,6 +32,7 @@ const roundToNextFifteen = (date) => {
 };
 
 const UnauthorizedBookingModal = ({ isOpen, onClose, salonId, service, staff }) => {
+  const { t } = useTranslation(['bookings', 'common']);
   const [loading, setLoading] = useState(false);
   const [availableSlots, setAvailableSlots] = useState([]);
   const defaultDate = roundToNextFifteen(new Date());
@@ -133,34 +135,38 @@ const UnauthorizedBookingModal = ({ isOpen, onClose, salonId, service, staff }) 
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
-          aria-label="Close modal"
+          aria-label={t('common:close_modal')}
         >
           <FaTimes className="w-5 h-5" />
         </button>
 
-        <h2 className="text-2xl font-bold mb-4">Book Appointment</h2>
+        <h2 className="text-2xl font-bold mb-4">{t('bookings:unauthorized_booking.title')}</h2>
         
         {service && (
           <div className="mb-4 p-4 bg-gray-50 rounded-md">
-            <h3 className="font-medium text-gray-700">Selected Service</h3>
+            <h3 className="font-medium text-gray-700">{t('bookings:unauthorized_booking.selected_service')}</h3>
             <p className="text-gray-800">{service.name}</p>
-            <p className="text-gray-600 text-sm mt-1">Duration: {service.duration} min</p>
-            <p className="text-gray-600 text-sm">Price: {service.price}</p>
+            <p className="text-gray-600 text-sm mt-1">
+              {t('bookings:unauthorized_booking.duration', { minutes: service.duration })}
+            </p>
+            <p className="text-gray-600 text-sm">
+              {t('bookings:unauthorized_booking.price', { amount: service.price })}
+            </p>
           </div>
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" role="form">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Name <span className="text-red-500">*</span>
+              {t('common:label.name')} <span className="text-red-500">*</span>
             </label>
             <input
               {...register('clientName')}
               data-testid="clientName"
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              placeholder="Enter your name"
+              placeholder={t('common:label.enter_your_name')}
             />
-            <p className="mt-1 text-xs text-gray-500">Required field</p>
+            <p className="mt-1 text-xs text-gray-500">{t('common:form.required', { field: t('common:label.name') })}</p>
             {errors.clientName && (
               <p className="mt-1 text-sm text-red-600">{errors.clientName.message}</p>
             )}
@@ -168,7 +174,7 @@ const UnauthorizedBookingModal = ({ isOpen, onClose, salonId, service, staff }) 
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
+              {t('common:form.email')}
             </label>
             <input
               type="email"
@@ -183,7 +189,7 @@ const UnauthorizedBookingModal = ({ isOpen, onClose, salonId, service, staff }) 
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Phone Number <span className="text-red-500">*</span>
+              {t('common:form.contactNumber')} <span className="text-red-500">*</span>
             </label>
             <PhoneInput
               data-testid="clientPhone"
@@ -198,7 +204,7 @@ const UnauthorizedBookingModal = ({ isOpen, onClose, salonId, service, staff }) 
               format={appConfig.phoneNumber.defaultFormat}
               placeholder={appConfig.phoneNumber.defaultPlaceholder}
             />
-            <p className="mt-1 text-xs text-gray-500">Required field</p>
+            <p className="mt-1 text-xs text-gray-500">{t('common:form.required', { field: t('common:form.contactNumber') })}</p>
             {errors.clientPhone && (
               <p className="mt-1 text-sm text-red-600">
                 {errors.clientPhone.message}
@@ -208,21 +214,21 @@ const UnauthorizedBookingModal = ({ isOpen, onClose, salonId, service, staff }) 
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Staff Member <span className="text-red-500">*</span>
+              {t('common:staff_member')} <span className="text-red-500">*</span>
             </label>
             <select
               {...register('staffId')}
               data-testid="staffId"
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             >
-              <option value="">Select a staff member</option>
+              <option value="">{t('common:form.pleaseSelect', { field: t('common:staff_member') })}</option>
               {staff.map(member => (
                 <option key={member.id} value={member.id}>
                   {member.fullName}
                 </option>
               ))}
             </select>
-            <p className="mt-1 text-xs text-gray-500">Required field</p>
+            <p className="mt-1 text-xs text-gray-500">{t('common:form.required', { field: t('common:staff_member') })}</p>
             {errors.staffId && (
               <p className="mt-1 text-sm text-red-600">{errors.staffId.message}</p>
             )}
@@ -230,7 +236,7 @@ const UnauthorizedBookingModal = ({ isOpen, onClose, salonId, service, staff }) 
 
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
-              Appointment Date & Time <span className="text-red-500">*</span>
+              {t('common:appointment_date_time')} <span className="text-red-500">*</span>
             </label>
             
             <div className="sm:flex sm:space-x-4 space-y-4 sm:space-y-0">
@@ -244,14 +250,14 @@ const UnauthorizedBookingModal = ({ isOpen, onClose, salonId, service, staff }) 
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 minDate={new Date()}
                 includeTimes={availableSlots}
-                placeholderText="Select an available time"
+                placeholderText={t('bookings:unauthorized_booking.form.appointment.placeholder')}
                 disabled={!selectedStaffId || availableSlots.length === 0}
               />
             </div>
-            <p className="mt-1 text-xs text-gray-500">Required field</p>
+            <p className="mt-1 text-xs text-gray-500">{t('common:form.required', { field: t('common:appointment_date_time') })}</p>
             {availableSlots.length === 0 && selectedStaffId && (
               <p className="mt-1 text-sm text-gray-600">
-                No available slots for this date. Please try another date.
+                {t('bookings:unauthorized_booking.form.appointment.no_slots')}
               </p>
             )}
             {errors.appointmentDateTime && (
@@ -262,7 +268,7 @@ const UnauthorizedBookingModal = ({ isOpen, onClose, salonId, service, staff }) 
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('common:notes')}</label>
             <textarea
               {...register('notes')}
               data-testid="notes"

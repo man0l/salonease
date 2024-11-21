@@ -9,14 +9,16 @@ import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 
-const schema = yup.object().shape({
-  name: yup.string().required(t('salon_name_is_required')),
-  address: yup.string().required(t('action.address_is_required')),
-  contactNumber: yup.string().required(t('contact_number_is_required')),
-  description: yup.string(),
-});
-
 const SalonManagement = ({ isOnboarding = false }) => {
+  const { t } = useTranslation(['salon', 'common']);
+
+  const schema = yup.object().shape({
+    name: yup.string().required(t('salon:salon_name_is_required')),
+    address: yup.string().required(t('salon:action.address_is_required')),
+    contactNumber: yup.string().required(t('salon:contact_number_is_required')),
+    description: yup.string(),
+  });
+
   const { salons, loading, error, addSalon, updateSalon, deleteSalon, currentPage, totalPages, setCurrentPage, fetchSalons, selectedSalon } = useSalonContext();
   const { user, updateUser } = useAuth();
   const navigate = useNavigate();
@@ -28,8 +30,6 @@ const SalonManagement = ({ isOnboarding = false }) => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
   });
-
-  const { t } = useTranslation('salon');
 
   useEffect(() => {
     if (error) {

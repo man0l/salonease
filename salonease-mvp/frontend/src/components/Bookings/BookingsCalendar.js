@@ -13,6 +13,7 @@ import { BOOKING_STATUSES } from '../../utils/constants';
 import useBookings from '../../hooks/useBookings';
 import CancelBookingModal from './Modals/CancelBookingModal';
 import ReassignStaffModal from './Modals/ReassignStaffModal';
+import { useTranslation } from 'react-i18next';
 
 const localizer = momentLocalizer(moment);
 
@@ -26,6 +27,7 @@ const colorStyles = [
 ];
 
 const BookingsCalendar = () => {
+  const { t } = useTranslation(['common', 'bookings', 'staff']);
   const { salonId } = useParams();
   const [view, setView] = useState('week');
   const [selectedStaffIds, setSelectedStaffIds] = useState([]);
@@ -154,13 +156,13 @@ const BookingsCalendar = () => {
             className={`px-4 py-2 rounded-l-lg ${view === 'day' ? 'bg-primary-600 text-white' : 'bg-gray-200'}`}
             onClick={() => setView('day')}
           >
-            Day
+            {t('staff:availability.calendar.dayView')}
           </button>
           <button
             className={`px-4 py-2 rounded-r-lg ${view === 'week' ? 'bg-primary-600 text-white' : 'bg-gray-200'}`}
             onClick={() => setView('week')}
           >
-            Week
+            {t('staff:availability.calendar.weekView')}
           </button>
         </div>
       </div>
@@ -207,6 +209,12 @@ const BookingsCalendar = () => {
           resourceTitleAccessor="fullName"
           eventPropGetter={eventStyleGetter}
           className="h-full min-w-[800px]"
+          messages={{
+            next: t('bookings:action.next'),
+            previous: t('bookings:action.previous'),
+            today: t('common:today'),
+            noEventsInRange: t('common:status.noData')
+          }}
           formats={{
             dayFormat: 'ddd D/M',
             timeGutterFormat: 'HH:mm',
@@ -235,7 +243,9 @@ const BookingsCalendar = () => {
                         {staff.find(s => s.id === props.event.resourceId)?.fullName}
                       </div>
                     )}
-                    <div className="text-xs mt-0.5">{BOOKING_STATUSES[props.event.status]}</div>
+                  </div>
+                  <div className="text-xs opacity-75">
+                    {t('bookings:status.' + props.event.status.toLowerCase())}
                   </div>
                 </div>
               </div>

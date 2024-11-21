@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 import { FaCalendar } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
+import { useTranslation } from 'react-i18next';
 import "react-datepicker/dist/react-datepicker.css";
 
 const DateRangeSelector = ({ value, onChange }) => {
+  const { t } = useTranslation(['reports']);
   const [customStartDate, setCustomStartDate] = useState(null);
   const [customEndDate, setCustomEndDate] = useState(null);
   
   const ranges = [
-    { id: 'today', label: 'Today' },
-    { id: 'week', label: 'This Week' },
-    { id: 'month', label: 'This Month' },
-    { id: 'quarter', label: 'This Quarter' },
-    { id: 'year', label: 'This Year' },
+    { id: 'today', label: t('reports:date_range.ranges.today') },
+    { id: 'week', label: t('reports:date_range.ranges.week') },
+    { id: 'month', label: t('reports:date_range.ranges.month') },
+    { id: 'quarter', label: t('reports:date_range.ranges.quarter') },
+    { id: 'year', label: t('reports:date_range.ranges.year') },
   ];
 
   const handleDateRangeChange = (start, end) => {
@@ -41,7 +43,7 @@ const DateRangeSelector = ({ value, onChange }) => {
     <div className="bg-white p-4 rounded-lg shadow-card">
       <div className="flex items-center space-x-2 mb-4">
         <FaCalendar className="text-primary-500" />
-        <span className="font-medium">Select Date Range</span>
+        <span className="font-medium">{t('reports:date_range.title')}</span>
       </div>
       
       <div className="flex flex-wrap gap-2 mb-4">
@@ -73,7 +75,7 @@ const DateRangeSelector = ({ value, onChange }) => {
             startDate={customStartDate}
             endDate={customEndDate}
             className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-primary-500"
-            placeholderText="Start Date"
+            placeholderText={t('reports:date_range.placeholder.start_date')}
             dateFormat="MMM d, yyyy"
             isClearable
             maxDate={new Date()}
@@ -99,7 +101,7 @@ const DateRangeSelector = ({ value, onChange }) => {
             endDate={customEndDate}
             minDate={customStartDate}
             className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-primary-500"
-            placeholderText="End Date"
+            placeholderText={t('reports:date_range.placeholder.end_date')}
             dateFormat="MMM d, yyyy"
             isClearable
             maxDate={new Date()}

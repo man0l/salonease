@@ -177,7 +177,9 @@ const ServiceManagement = ({ salonId }) => {
               {errors.duration && <span className="text-red-500 text-sm">{errors.duration.message}</span>}
             </div>
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description:</label>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('label.description')}
+              </label>
               <textarea
                 id="description"
                 {...register('description')}

@@ -2,8 +2,10 @@ import React, { useState, useMemo } from 'react';
 import { FaChevronRight, FaClock } from 'react-icons/fa';
 import { formatCurrency } from '../../utils/currencyFormatter';
 import UnauthorizedBookingModal from '../Modals/UnauthorizedBookingModal';
+import { useTranslation } from 'react-i18next';
 
 const ServiceCategories = ({ services = [], categories = [], staff = [], salonId }) => {
+  const { t } = useTranslation(['service']);
   const [selectedService, setSelectedService] = useState(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
 
@@ -123,7 +125,7 @@ const ServiceCategories = ({ services = [], categories = [], staff = [], salonId
                   )}
                   <div className="text-sm text-gray-500 flex items-center gap-1 mt-1">
                     <FaClock className="h-4 w-4" />
-                    {service.duration} min.
+                    {t('service:duration.minutes', { duration: service.duration })}
                   </div>
                 </div>
                 <div className="flex items-center gap-4 ml-4">
@@ -134,7 +136,7 @@ const ServiceCategories = ({ services = [], categories = [], staff = [], salonId
                     onClick={() => handleServiceSelect(service)}
                     className="px-4 py-2 text-sm bg-primary-500 text-white rounded-md hover:bg-primary-600 transition-colors whitespace-nowrap"
                   >
-                    choose
+                    {t('service:action.choose')}
                   </button>
                 </div>
               </div>

@@ -5,11 +5,13 @@ import { toast } from 'react-toastify';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { staffApi } from '../../utils/api';
 import { acceptInvitationSchema } from '../../utils/validationSchemas';
+import { useTranslation } from 'react-i18next';
 
 const AcceptInvitation = () => {
   const [loading, setLoading] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation(['salon']);
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(acceptInvitationSchema),
@@ -21,16 +23,16 @@ const AcceptInvitation = () => {
 
     try {
       await staffApi.acceptInvitation({ token, password: data.password });
-      toast.success('Invitation accepted successfully');
+      toast.success(t('salon:accept_invitation.success'));
       navigate('/login');
     } catch (error) {
       console.error('Error accepting invitation:', error);
-      if (error.response && error.response.data && error.response.data.message) {
-        toast.error(`Error: ${error.response.data.message}`);
+      if (error.response?.data?.message) {
+        toast.error(`${t('common:status.error')}: ${error.response.data.message}`);
       } else if (error.message) {
-        toast.error(`Error: ${error.message}`);
+        toast.error(`${t('common:status.error')}: ${error.message}`);
       } else {
-        toast.error('An unexpected error occurred while accepting the invitation');
+        toast.error(t('salon:accept_invitation.error.unexpected'));
       }
     } finally {
       setLoading(false);
@@ -39,10 +41,14 @@ const AcceptInvitation = () => {
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-card">
-      <h2 className="text-2xl font-bold mb-6 text-primary-700">Accept Invitation</h2>
+      <h2 className="text-2xl font-bold mb-6 text-primary-700">
+        {t('salon:accept_invitation.title')}
+      </h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password:</label>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            {t('salon:accept_invitation.form.password')}:
+          </label>
           <input
             id="password"
             type="password"
@@ -52,7 +58,9 @@ const AcceptInvitation = () => {
           {errors.password && <span className="text-red-500 text-sm">{errors.password.message}</span>}
         </div>
         <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">Confirm Password:</label>
+          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+            {t('salon:accept_invitation.form.confirm_password')}:
+          </label>
           <input
             id="confirmPassword"
             type="password"
@@ -66,7 +74,7 @@ const AcceptInvitation = () => {
           className="w-full bg-primary-600 text-white py-2 px-4 rounded-md hover:bg-primary-700 transition duration-300"
           disabled={loading}
         >
-          {loading ? 'Accepting...' : 'Accept Invitation'}
+          {loading ? t('salon:accept_invitation.action.accepting') : t('salon:accept_invitation.action.accept')}
         </button>
       </form>
     </div>

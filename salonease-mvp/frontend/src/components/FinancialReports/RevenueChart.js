@@ -1,8 +1,11 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { formatCurrency } from '../../utils/currencyFormatter';
+import { useTranslation } from 'react-i18next';
 
 const RevenueChart = ({ data, loading }) => {
+  const { t } = useTranslation(['reports']);
+
   if (loading) {
     return (
       <div className="bg-white p-6 rounded-lg shadow-card h-80 flex items-center justify-center">
@@ -42,7 +45,7 @@ const RevenueChart = ({ data, loading }) => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-card">
-      <h2 className="text-xl font-semibold mb-4">Revenue Overview</h2>
+      <h2 className="text-xl font-semibold mb-4">{t('reports:revenue.title')}</h2>
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={formattedData}>

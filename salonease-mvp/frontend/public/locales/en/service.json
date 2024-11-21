@@ -24,5 +24,12 @@
   "validation.category_required": "Category is required",
   "validation.duration_required": "Duration is required",
   "validation.price_required": "Price is required",
-  "validation.price_positive": "Price must be a positive number"
+  "validation.price_positive": "Price must be a positive number",
+  "action": {
+    "choose": "Choose",
+    "book": "Book Now"
+  },
+  "duration": {
+    "minutes": "{{duration}} min."
+  }
 }

@@ -1,10 +1,13 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { formatCurrency } from '../../utils/currencyFormatter';
+import { useTranslation } from 'react-i18next';
 
 const COLORS = ['#0EA5E9', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
 
 const ServiceBreakdown = ({ data, loading }) => {
+  const { t } = useTranslation(['reports']);
+
   if (loading) {
     return (
       <div className="bg-white p-6 rounded-lg shadow-card h-80 flex items-center justify-center">
@@ -20,7 +23,7 @@ const ServiceBreakdown = ({ data, loading }) => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-card">
-      <h2 className="text-xl font-semibold mb-4">Service Revenue Breakdown</h2>
+      <h2 className="text-xl font-semibold mb-4">{t('reports:service_breakdown.title')}</h2>
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>

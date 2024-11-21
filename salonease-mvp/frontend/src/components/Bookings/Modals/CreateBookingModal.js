@@ -9,6 +9,7 @@ import useClients from '../../../hooks/useClients';
 import { FaTrash } from 'react-icons/fa';
 import { bookingApi } from '../../../utils/api';
 import { useDebounce } from '../../../hooks/useDebounce';
+import { useTranslation } from 'react-i18next';
 
 const roundToNextFifteen = (date) => {
   const minutes = date.getMinutes();
@@ -27,36 +28,8 @@ const roundToNextFifteen = (date) => {
   return roundedDate;
 };
 
-const schema = yup.object().shape({
-  clientMode: yup.string().oneOf(['existing', 'new']),
-  clientId: yup.string().when('clientMode', {
-    is: 'existing',
-    then: () => yup.string().required('Please select a client'),
-    otherwise: () => yup.string()
-  }),
-  clientName: yup.string().when('clientMode', {
-    is: 'new',
-    then: () => yup.string().required('Client name is required'),
-    otherwise: () => yup.string()
-  }),
-  clientEmail: yup.string().when('clientMode', {
-    is: 'new',
-    then: () => yup.string().email('Invalid email format'),
-    otherwise: () => yup.string()
-  }),
-  clientPhone: yup.string().when('clientMode', {
-    is: 'new',
-    then: () => yup.string().required('Client phone is required'),
-    otherwise: () => yup.string()
-  }),
-  serviceId: yup.string().required('Service is required'),
-  staffId: yup.string().required('Staff member is required'),
-  notes: yup.string(),
-  appointmentDateTime: yup.date().required('Appointment date and time are required')
-    .min(new Date(), 'Appointment date and time must be in the future'),
-});
-
 const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services, initialDate }) => {
+  const { t } = useTranslation(['common', 'bookings']);
   const { clients, fetchClients, addClient } = useClients();
   const [loading, setLoading] = useState(false);
   const [clientMode, setClientMode] = useState('existing');
@@ -224,7 +197,7 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-4">Create New Booking</h2>
+        <h2 className="text-2xl font-bold mb-4">{t('common:create_new_booking')}</h2>
         
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <input type="hidden" {...register('clientId')} />
@@ -241,7 +214,7 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
                   clientMode === 'existing' ? 'bg-primary-600 text-white' : 'bg-gray-200'
                 }`}
               >
-                Select Existing Client
+                {t('bookings:action.select_existing_client')}
               </button>
               <button
                 type="button"
@@ -253,14 +226,16 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
                   clientMode === 'new' ? 'bg-primary-600 text-white' : 'bg-gray-200'
                 }`}
               >
-                New Client
+                {t('bookings:action.new_client')}
               </button>
             </div>
 
             {clientMode === 'new' ? (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name:</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('common:label.name')}:
+                  </label>
                   <input
                     {...register('clientName')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
@@ -270,7 +245,9 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email:</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('common:label.email_address')}:
+                  </label>
                   <input
                     type="email"
                     {...register('clientEmail')}
@@ -281,7 +258,9 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone:</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('common:phone_number')}:
+                  </label>
                   <input
                     {...register('clientPhone')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
@@ -297,13 +276,13 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
                   <input
                     type="text"
                     value={clientSearch}
-                    placeholder="Search clients by name, email, or phone..."
+                    placeholder={t('common:placeholder.search_clients_by_name_email_or_phone')}
                     onChange={handleSearchChange}
                     className={inputClassName(errors.clientId)}
                   />
                   {clientSearch && clientSearch.length < 3 && (
                     <p className="mt-1 text-sm text-gray-600">
-                      Please enter at least 3 characters to search
+                      {t('common:message.please_enter_at_least_3_characters_to_search')}
                     </p>
                   )}
                   {errors.clientId && (
@@ -329,7 +308,9 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
                 {watch('clientName') && (
                   <div className="mt-4 p-4 bg-gray-50 rounded-md border border-gray-200">
                     <div className="flex justify-between items-start">
-                      <h3 className="font-medium text-gray-700 mb-2">Selected Client</h3>
+                      <h3 className="font-medium text-gray-700 mb-2">
+                        {t('common:selected_client')}
+                      </h3>
                       <button
                         type="button"
                         onClick={resetForm}
@@ -351,13 +332,13 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Service
+              {t('common:service')}
             </label>
             <select
               {...register('serviceId')}
               className={inputClassName(errors.serviceId)}
             >
-              <option value="">Select a service</option>
+              <option value="">{t('common:form.pleaseSelect', { field: t('common:service') })}</option>
               {services.map(service => (
                 <option key={service.id} value={service.id}>
                   {service.name}
@@ -371,13 +352,13 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Staff Member
+              {t('common:staff_member')}
             </label>
             <select
               {...register('staffId')}
               className={inputClassName(errors.staffId)}
             >
-              <option value="">Select a staff member</option>
+              <option value="">{t('common:form.pleaseSelect', { field: t('common:staff_member') })}</option>
               {staff.map(member => (
                 <option key={member.id} value={member.id}>
                   {member.fullName}
@@ -391,7 +372,7 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
 
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
-              Appointment Date & Time
+              {t('common:appointment_date_time')}
             </label>
             
             <div className="sm:flex sm:space-x-4 space-y-4 sm:space-y-0">
@@ -462,22 +443,20 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
             />
           </div>
 
-          <div className="flex justify-end gap-2 mt-6">
-            <button
-              type="button"
-              onClick={() => {
-                resetForm();
-                onClose();
-              }}
-              className="px-4 py-2 text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300"
-            >
-              Cancel
-            </button>
+          <div className="mt-6 flex justify-end space-x-2">
             <button
               type="submit"
-              className="px-4 py-2 text-white bg-primary-500 rounded-md hover:bg-primary-600"
+              disabled={loading}
+              className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded transition duration-300"
             >
-              Create Booking
+              {loading ? t('common:status.loading') : t('bookings:action.add_booking')}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded transition duration-300"
+            >
+              {t('common:action.cancel')}
             </button>
           </div>
         </form>

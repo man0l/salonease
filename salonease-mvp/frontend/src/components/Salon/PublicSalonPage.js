@@ -1,12 +1,14 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { FaPhone, FaMapMarkerAlt, FaClock, FaInstagram, FaFacebook } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 import ServiceCategories from './ServiceCategories.js';
 import usePublicSalon from '../../hooks/usePublicSalon';
 
 const PublicSalonPage = () => {
   const { salonId } = useParams();
   const { salon, services, categories, staff, loading, error } = usePublicSalon(salonId);
+  const { t } = useTranslation(['salon', 'common']);
 
   if (loading) {
     return (
@@ -20,7 +22,7 @@ const PublicSalonPage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-600 mb-4">Oops! Something Went Wrong.</h2>
+          <h2 className="text-2xl font-bold text-red-600 mb-4">{t('salon:public_page.error.title')}</h2>
           <p className="text-gray-600">{error}</p>
         </div>
       </div>
@@ -31,8 +33,8 @@ const PublicSalonPage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">We Can't Find That Salon</h2>
-          <p className="text-gray-600">The salon you're looking for doesn't seem to exist.</p>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('salon:public_page.error.not_found.title')}</h2>
+          <p className="text-gray-600">{t('salon:public_page.error.not_found.message')}</p>
         </div>
       </div>
     );
@@ -44,7 +46,7 @@ const PublicSalonPage = () => {
       <div className="bg-primary-900 text-white">
         <div className="container mx-auto px-4 py-16">
           <h1 className="text-5xl font-bold mb-4">{salon?.name}</h1>
-          <p className="text-xl mb-6">Experience Exceptional Beauty Services That Make You Shine.</p>
+          <p className="text-xl mb-6">{t('salon:public_page.hero.tagline')}</p>
           <div className="flex items-center space-x-6 text-lg">
             <div className="flex items-center">
               <FaMapMarkerAlt className="w-5 h-5 mr-2" />
@@ -62,24 +64,24 @@ const PublicSalonPage = () => {
       <div className="container mx-auto px-4 py-12">
         {/* About Section */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">Discover Your New Favorite Salon</h2>
+          <h2 className="text-3xl font-bold text-gray-800 mb-6">{t('salon:public_page.about.title')}</h2>
           <div className="bg-white rounded-lg shadow p-6">
             <p className="text-gray-600 leading-relaxed">
-              {salon?.description || 'At our salon, we believe in pampering you with top-notch services that enhance your natural beauty. Our talented team is dedicated to providing personalized experiences that leave you feeling refreshed and confident.'}
+              {salon?.description || t('salon:public_page.about.default_description')}
             </p>
           </div>
         </section>
 
         {/* Services Section */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">What Would You Like Done Today?</h2>
-          <p className="text-lg text-gray-700 mb-8">Choose from our wide range of services designed to make you look and feel your best.</p>
+          <h2 className="text-3xl font-bold text-gray-800 mb-6">{t('salon:public_page.services.title')}</h2>
+          <p className="text-lg text-gray-700 mb-8">{t('salon:public_page.services.subtitle')}</p>
           {loading ? (
-            <div className="text-center py-8">Loading services...</div>
+            <div className="text-center py-8">{t('salon:public_page.services.loading')}</div>
           ) : error ? (
             <div className="text-center py-8 text-red-500">{error}</div>
           ) : services.length === 0 ? (
-            <div className="text-center py-8">No services available at the moment. Please check back later!</div>
+            <div className="text-center py-8">{t('salon:public_page.services.no_services')}</div>
           ) : (
             <ServiceCategories 
               services={services} 
@@ -92,8 +94,8 @@ const PublicSalonPage = () => {
 
         {/* Staff Section */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">Meet Our Expert Team</h2>
-          <p className="text-lg text-gray-700 mb-8">Our passionate professionals are here to provide exceptional service tailored to your needs.</p>
+          <h2 className="text-3xl font-bold text-gray-800 mb-6">{t('salon:public_page.team.title')}</h2>
+          <p className="text-lg text-gray-700 mb-8">{t('salon:public_page.team.subtitle')}</p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {staff.map((member) => (
               <div key={member.id} className="bg-white rounded-lg shadow-card p-6 text-center">
@@ -117,11 +119,11 @@ const PublicSalonPage = () => {
 
         {/* Contact Section */}
         <section>
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">Get in Touch & Business Hours</h2>
-          <p className="text-lg text-gray-700 mb-8">We're here to answer your questions and book your appointments. We look forward to seeing you soon!</p>
+          <h2 className="text-3xl font-bold text-gray-800 mb-6">{t('salon:public_page.contact.title')}</h2>
+          <p className="text-lg text-gray-700 mb-8">{t('salon:public_page.contact.subtitle')}</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="bg-white rounded-lg shadow-card p-6">
-              <h3 className="text-2xl font-semibold text-gray-800 mb-4">Business Hours</h3>
+              <h3 className="text-2xl font-semibold text-gray-800 mb-4">{t('salon:public_page.contact.business_hours')}</h3>
               <div className="space-y-2">
                 {salon.businessHours?.map((hours, index) => (
                   <div key={index} className="flex justify-between text-gray-600">
@@ -132,7 +134,7 @@ const PublicSalonPage = () => {
               </div>
             </div>
             <div className="bg-white rounded-lg shadow-card p-6">
-              <h3 className="text-2xl font-semibold text-gray-800 mb-4">Contact Us</h3>
+              <h3 className="text-2xl font-semibold text-gray-800 mb-4">{t('salon:public_page.contact.contact_us')}</h3>
               <div className="space-y-4">
                 <p className="flex items-center text-gray-600">
                   <FaPhone className="mr-2" />
