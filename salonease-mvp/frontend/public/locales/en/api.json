@@ -1,0 +1,39 @@
+{
+    "errors": {
+      "auth": {
+        "invalidCredentials": "Invalid email or password",
+        "unauthorized": "Unauthorized access",
+        "tokenExpired": "Session expired, please login again"
+      },
+      "booking": {
+        "notFound": "Booking not found",
+        "invalidStatus": "Invalid booking status",
+        "pastDate": "Cannot book appointment in the past",
+        "unavailableSlot": "This time slot is not available",
+        "staffUnavailable": "Selected staff member is not available",
+        "alreadyCancelled": "Booking is already cancelled",
+        "alreadyCompleted": "Booking is already completed",
+        "cannotModify": "Cannot modify booking in current status"
+      },
+      "validation": {
+        "required": "{{field}} is required",
+        "invalid": "Invalid {{field}}",
+        "exists": "{{field}} already exists",
+        "notFound": "{{field}} not found",
+        "minLength": "{{field}} must be at least {{min}} characters",
+        "maxLength": "{{field}} cannot exceed {{max}} characters",
+        "email": "Invalid email format",
+        "phone": "Invalid phone number format",
+        "date": "Invalid date format",
+        "time": "Invalid time format"
+      }
+    },
+    "status": {
+      "PENDING": "Pending",
+      "CONFIRMED": "Confirmed",
+      "CANCELLED": "Cancelled",
+      "COMPLETED": "Completed",
+      "NO_SHOW": "No Show",
+      "RESCHEDULED": "Rescheduled"
+    }
+  }

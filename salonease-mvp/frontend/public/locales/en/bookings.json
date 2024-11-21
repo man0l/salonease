@@ -1,0 +1,41 @@
+{
+    "management": {
+      "title": "Bookings Management",
+      "filters": {
+        "staff": "Staff Member",
+        "service": "Service",
+        "allStaff": "All Staff",
+        "allServices": "All Services",
+        "dateRange": "Date Range"
+      },
+      "messages": {
+        "fetchError": "Failed to fetch bookings",
+        "reassignSuccess": "Staff reassigned successfully",
+        "reassignError": "Failed to reassign staff",
+        "cannotReassign": "Cannot reassign staff for cancelled or completed bookings",
+        "clickToReassign": "Click to reassign staff"
+      },
+      "staff": {
+        "unassigned": "Unassigned"
+      }
+    },
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled",
+      "completed": "Completed",
+      "noShow": "No Show",
+      "rescheduled": "Rescheduled"
+    },
+    "actions": {
+      "reschedule": {
+        "title": "Reschedule booking"
+      },
+      "complete": {
+        "title": "Complete booking"
+      },
+      "cancel": {
+        "title": "Cancel booking"
+      }
+    }
+  }

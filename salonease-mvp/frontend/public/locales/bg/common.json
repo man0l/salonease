@@ -1,0 +1,34 @@
+{
+    "actions": {
+      "edit": "Редактирай",
+      "delete": "Изтрий",
+      "add": "Добави",
+      "cancel": "Отказ",
+      "save": "Запази",
+      "reset": "Нулиране",
+      "choose": "Избери",
+      "reassign": "Преназначи"
+    },
+    "status": {
+      "loading": "Зареждане...",
+      "error": "Възникна грешка",
+      "noData": "Няма налични данни"
+    },
+    "form": {
+      "required": "{{field}} е задължително",
+      "invalid": "Невалиден {{field}}",
+      "email": "Имейл",
+      "fullName": "Пълно име",
+      "address": "Адрес",
+      "contactNumber": "Телефон за връзка",
+      "description": "Описание",
+      "category": "Категория",
+      "price": "Цена",
+      "duration": "Продължителност (минути)",
+      "notes": "Бележки",
+      "pleaseSelect": "Моля, изберете {{field}}"
+    },
+    "time": {
+      "minutes": "минути"
+    }
+  }
