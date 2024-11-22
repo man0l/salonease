@@ -30,7 +30,7 @@ const roundToNextFifteen = (date) => {
 
 const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services, initialDate }) => {
   const { t } = useTranslation(['common', 'bookings']);
-  const { clients, fetchClients, addClient } = useClients();
+  const { fetchClients, addClient } = useClients();
   const [loading, setLoading] = useState(false);
   const [clientMode, setClientMode] = useState('existing');
   const [clientSearch, setClientSearch] = useState('');
@@ -44,6 +44,35 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
     return roundToNextFifteen(new Date());
   }, [initialDate]);
 
+  const schema = yup.object().shape({
+    clientMode: yup.string().oneOf(['existing', 'new']),
+    clientId: yup.string().when('clientMode', {
+      is: 'existing',
+      then: () => yup.string().required(t('bookings:validation.client_mode')),
+      otherwise: () => yup.string()
+    }),
+    clientName: yup.string().when('clientMode', {
+      is: 'new',
+      then: () => yup.string().required(t('bookings:validation.client_name')),
+      otherwise: () => yup.string()
+    }),
+    clientEmail: yup.string().when('clientMode', {
+      is: 'new',
+      then: () => yup.string().email(t('bookings:validation.client_email')),
+      otherwise: () => yup.string()
+    }),
+    clientPhone: yup.string().when('clientMode', {
+      is: 'new',
+      then: () => yup.string().required(t('bookings:validation.client_phone')),
+      otherwise: () => yup.string()
+    }),
+    serviceId: yup.string().required(t('bookings:validation.service')),
+    staffId: yup.string().required(t('bookings:validation.staff')),
+    notes: yup.string(),
+    appointmentDateTime: yup.date().required(t('bookings:validation.appointment_date_and_time'))
+      .min(new Date(), t('bookings:validation.appointment_date_and_time_future')),
+  });
+  
   const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -453,8 +482,11 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
             </button>
             <button
               type="button"
-              onClick={onClose}
-              className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded transition duration-300"
+              onClick={() => {
+                resetForm();
+                onClose();
+              }}
+              className="px-4 py-2 text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300"
             >
               {t('common:action.cancel')}
             </button>

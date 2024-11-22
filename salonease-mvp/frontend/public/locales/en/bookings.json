@@ -76,5 +76,15 @@
     "required_field": "Required field",
     "submit": "Submit",
     "submitting": "Submitting..."
+  },
+  "validation": {
+    "client_mode": "Please select a client",
+    "client_name": "Client name is required",
+    "client_email": "Invalid email format",
+    "client_phone": "Client phone is required",
+    "service": "Service is required",
+    "staff": "Staff member is required",
+    "appointment_date_and_time": "Appointment date and time are required",
+    "appointment_date_and_time_future": "Appointment date and time must be in the future"
   }
 }

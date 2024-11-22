@@ -9,13 +9,6 @@ import useClients from '../../hooks/useClients';
 import DeleteConfirmationDialog from '../common/DeleteConfirmationDialog';
 import { useTranslation } from 'react-i18next';
 
-const schema = yup.object().shape({
-  name: yup.string().required(t('clients:validation.name_required')),
-  email: yup.string().email(t('clients:validation.email_invalid')),
-  phone: yup.string().required(t('clients:validation.phone_required')),
-  notes: yup.string(),
-});
-
 const ClientsManagement = () => {
   const { salonId } = useParams();
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,14 +17,10 @@ const ClientsManagement = () => {
   const [selectedClient, setSelectedClient] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [clientToDelete, setClientToDelete] = useState(null);
-  const { register, handleSubmit, reset, formState: { errors } } = useForm({
-    resolver: yupResolver(schema),
-  });
+
 
   const { 
     clients, 
-    loading, 
-    error, 
     fetchClients, 
     addClient, 
     updateClient, 
@@ -40,6 +29,17 @@ const ClientsManagement = () => {
   } = useClients();
 
   const { t } = useTranslation('clients');
+
+  const schema = yup.object().shape({
+    name: yup.string().required(t('clients:validation.name_required')),
+    email: yup.string().email(t('clients:validation.email_invalid')),
+    phone: yup.string().required(t('clients:validation.phone_required')),
+    notes: yup.string(),
+  });
+
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+    resolver: yupResolver(schema),
+  });
 
   useEffect(() => {
     if (salonId) {

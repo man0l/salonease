@@ -9,13 +9,6 @@ import { toast } from 'react-toastify';
 import CategorySelector from '../CategorySelector';
 import { useTranslation } from 'react-i18next';
 
-const schema = yup.object().shape({
-  name: yup.string().required(t('validation.name_required')),
-  category: yup.string().required(t('validation.category_required')),
-  duration: yup.number().required(t('validation.duration_required')),
-  price: yup.number().positive(t('validation.price_positive')).required(t('validation.price_required')),
-  description: yup.string(),
-});
 
 const ServiceManagement = ({ salonId }) => {
   const { t } = useTranslation('service');
@@ -33,6 +26,14 @@ const ServiceManagement = ({ salonId }) => {
     updateService,
     deleteService,
   } = useService(salonId);
+
+  const schema = yup.object().shape({
+    name: yup.string().required(t('validation.name_required')),
+    category: yup.string().required(t('validation.category_required')),
+    duration: yup.number().required(t('validation.duration_required')),
+    price: yup.number().positive(t('validation.price_positive')).required(t('validation.price_required')),
+    description: yup.string(),
+  });
 
   const { register, handleSubmit, reset, formState: { errors }, watch, setValue } = useForm({
     resolver: yupResolver(schema),
@@ -119,7 +120,11 @@ const ServiceManagement = ({ salonId }) => {
       </h1>
       
       <button
-        onClick={showForm ? () => setShowForm(false) : handleAddNewService}
+        onClick={() => {
+          setShowForm(!showForm);
+          setEditingService(null);
+          reset({ name: '', price: '', duration: '', description: '', promotionalOffer: '' });
+        }}
         className="mb-6 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-full transition duration-300 flex items-center"
       >
         {showForm ? <FaMinus className="mr-2" /> : <FaPlus className="mr-2" />}
