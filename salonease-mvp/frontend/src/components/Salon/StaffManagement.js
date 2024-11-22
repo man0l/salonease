@@ -168,4 +168,53 @@ const StaffManagement = () => {
         </div>
       )}
 
-      <div className="bg-background rounded-lg
+      <div className="bg-background rounded-lg shadow-card p-6">
+        <h3 className="text-xl font-semibold mb-4 text-primary-600">
+          {t('title.current_staff')}
+        </h3>
+        {loading ? (
+          <p className="text-gray-600">{t('message.loading')}</p>
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
+        ) : staff.length === 0 ? (
+          <p className="text-gray-600">{t('message.no_staff')}</p>
+        ) : (
+          <ul className="space-y-4">
+            {staff.map((member) => (
+              <li key={member.id} className="flex justify-between items-center p-4 border border-gray-200 rounded-lg hover:shadow-md transition duration-300">
+                <div>
+                  <span className="font-semibold text-primary-600">{member.fullName}</span>
+                  <span className="ml-2 text-sm text-gray-600">({member.email})</span>
+                </div>
+                <div className="space-x-2">
+                  <button
+                    onClick={() => handleEdit(member)}
+                    className="bg-secondary-500 hover:bg-secondary-600 text-white py-1 px-3 rounded-md text-sm transition duration-300"
+                    aria-label={t('action.edit')}
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(member.id)}
+                    className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md text-sm transition duration-300"
+                    aria-label={t('action.delete')}
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <DeleteConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={confirmDelete}
+      />
+    </div>
+  );
+};
+
+export default StaffManagement;
