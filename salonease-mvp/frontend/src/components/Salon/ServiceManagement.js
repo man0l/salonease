@@ -79,7 +79,7 @@ const ServiceManagement = ({ salonId }) => {
       setServiceToDelete(null);
     } catch (err) {
       // Error handling is managed by useService
-      toast.error('Failed to delete service');
+      toast.error(t('error.delete_failed'));
     }
   };
 
@@ -89,8 +89,8 @@ const ServiceManagement = ({ salonId }) => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
         <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h3 className="text-lg font-medium mb-4">Confirm Deletion</h3>
-          <p className="mb-4">Are you sure you want to delete this service? This action cannot be undone.</p>
+          <h3 className="text-lg font-medium mb-4">{t('modal.delete_title')}</h3>
+          <p className="mb-4">{t('modal.delete_message')}</p>
           <div className="flex justify-end">
             <button
               onClick={() => {
@@ -99,13 +99,13 @@ const ServiceManagement = ({ salonId }) => {
               }}
               className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mr-2 transition duration-300"
             >
-              Delete
+              {t('action.delete')}
             </button>
             <button
               onClick={onClose}
               className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded transition duration-300"
             >
-              Cancel
+              {t('action.cancel')}
             </button>
           </div>
         </div>
@@ -150,7 +150,9 @@ const ServiceManagement = ({ salonId }) => {
               {errors.name && <span className="text-red-500 text-sm">{errors.name.message}</span>}
             </div>
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">Category:</label>
+              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('label.category')}
+              </label>
               <CategorySelector
                 id="category"
                 categories={categories}
@@ -158,10 +160,12 @@ const ServiceManagement = ({ salonId }) => {
                 onChange={(value) => setValue('categoryId', value)}
               />
               {errors.categoryId && <span className="text-red-500 text-sm">{errors.categoryId.message}</span>}
-              {!watch('categoryId') && <span className="text-red-500 text-sm">Please select a category</span>}
+              {!watch('categoryId') && <span className="text-red-500 text-sm">{t('validation.select_category')}</span>}
             </div>
             <div>
-              <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">Price:</label>
+              <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('label.price')}
+              </label>
               <input
                 id="price"
                 type="number"
@@ -172,7 +176,9 @@ const ServiceManagement = ({ salonId }) => {
               {errors.price && <span className="text-red-500 text-sm">{errors.price.message}</span>}
             </div>
             <div>
-              <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-1">Duration (minutes):</label>
+              <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('label.duration')}
+              </label>
               <input
                 id="duration"
                 type="number"

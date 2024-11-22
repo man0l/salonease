@@ -76,7 +76,7 @@ const UnauthorizedBookingModal = ({ isOpen, onClose, salonId, service, staff }) 
         setAvailableSlots(availableTimes);
       } catch (error) {
         console.error('Failed to fetch available slots:', error);
-        toast.error('Failed to load available time slots');
+        toast.error(t('bookings:error.failed_to_load_slots'));
       }
     };
 

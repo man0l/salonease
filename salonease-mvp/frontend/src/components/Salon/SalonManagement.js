@@ -204,7 +204,7 @@ const SalonManagement = ({ isOnboarding = false }) => {
           <h2 className="text-2xl font-bold mt-8 mb-4 text-primary-700">
             {t('label.your_salons')}
           </h2>
-          <ul className="space-y-4" aria-label="List of salons">
+          <ul className="space-y-4" aria-label={t('salon:title.list_of_salons')}>
             {salons.map((salon) => (
               <li key={salon.id} className="border border-gray-200 p-4 rounded-lg shadow-sm hover:shadow-md transition duration-300">
                 <h3 className="text-xl font-semibold text-primary-600">{salon.name}</h3>

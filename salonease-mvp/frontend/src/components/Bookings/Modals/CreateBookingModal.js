@@ -124,7 +124,6 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
       let clientId = data.clientId;
 
       if (clientMode === 'new') {
-        // Create new client first
         const clientData = {
           name: data.clientName,
           email: data.clientEmail,
@@ -133,10 +132,9 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
         
         const newClient = await addClient(clientData);
         clientId = newClient.id;
-        await fetchClients(); // Refresh clients list
+        await fetchClients();
       }
       
-      // Remove clientMode and other unnecessary fields before sending
       const bookingData = {
         clientId,
         serviceId: data.serviceId,
@@ -147,19 +145,13 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
       
       const response = await bookingApi.createBooking(salonId, bookingData);
       if (response.data) {
-        toast.success('Booking created successfully');
+        toast.success(t('bookings:success.booking_created'));
         onSuccess();
         onClose();
         resetForm();
       }
     } catch (error) {
-      if (error.response?.data?.errors) {
-        error.response.data.errors.forEach(errorMessage => {
-          toast.error(errorMessage);
-        });
-      } else {
-        toast.error(error.response?.data?.message || 'Failed to create booking');
-      }
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
@@ -463,7 +455,7 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Notes
+              {t('label.notes')}
             </label>
             <textarea
               {...register('notes')}

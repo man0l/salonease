@@ -53,5 +53,28 @@
     "contact": "Contact",
     "login": "Login",
     "signup": "Sign Up"
+  },
+  "loading": {
+    "salon": "Loading salon...",
+    "time_slots": "Loading available time slots..."
+  },
+  "error": {
+    "no_salon": "No associated salon found",
+      "no_salons": "No salons available",
+    "load_time_slots": "Failed to load available time slots",
+    "no_associated_salon": "No associated salon found"
+  },
+  "emoji": {
+    "scissors": "✂️",
+      "phone": "📱",
+      "email": "✉️",
+      "user": "👤",
+      "clock": "⏱️",
+      "calendar": "📅",
+      "time": "🕒"
+    }
+  },
+  "label": {
+    "select_salon": "Select salon"
   }
 }

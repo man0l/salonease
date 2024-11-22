@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import AddAvailabilityDialog from './AddAvailabilityDialog';
 import { AVAILABILITY_TYPES } from '../../utils/constants';
 import useStaff from '../../hooks/useStaff';
+import { useTranslation } from 'react-i18next';
 
 const localizer = momentLocalizer(moment);
 
@@ -22,6 +23,7 @@ const colorStyles = [
   ];
 
 const StaffAvailability = () => {
+  const { t } = useTranslation(['staff', 'common']);
   const { salonId } = useParams();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -61,10 +63,9 @@ const StaffAvailability = () => {
       await createStaffAvailability(newEvent);
       await fetchStaffAndAvailability();
       setIsDialogOpen(false);
-      toast.success('Availability saved successfully.');
+      toast.success(t('staff:success.availability_saved'));
     } catch (error) {
-      console.error('Error saving availability:', error);
-      toast.error('Failed to save availability. Please try again.');
+      toast.error(t('staff:error.save_failed'));
     }
   };
 
@@ -79,10 +80,10 @@ const StaffAvailability = () => {
     try {
       await deleteStaffAvailability(availabilityId);
       await fetchStaffAndAvailability();
-      toast.success('Availability deleted successfully.');
+      toast.success(t('staff:success.availability_deleted'));
     } catch (error) {
       console.error('Error deleting availability:', error);
-      toast.error('Failed to delete availability. Please try again.');
+      toast.error(t('staff:error.delete_failed'));
     }
   };
 
@@ -131,20 +132,22 @@ const StaffAvailability = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <h1 className="text-2xl font-bold mb-4 text-primary-600">Staff Availability</h1>
+      <h1 className="text-2xl font-bold mb-4 text-primary-600">
+        {t('staff:title.availability')}
+      </h1>
       <div className="mb-4 flex justify-between items-center">
         <div>
           <button
             className={`px-4 py-2 rounded-l-lg ${view === 'day' ? 'bg-primary-600 text-white' : 'bg-gray-200'}`}
             onClick={() => setView('day')}
           >
-            Day
+            {t('staff:availability.calendar.dayView')}
           </button>
           <button
             className={`px-4 py-2 rounded-r-lg ${view === 'week' ? 'bg-primary-600 text-white' : 'bg-gray-200'}`}
             onClick={() => setView('week')}
           >
-            Week
+            {t('staff:availability.calendar.weekView')}
           </button>
         </div>
         <div className="text-sm text-gray-600">

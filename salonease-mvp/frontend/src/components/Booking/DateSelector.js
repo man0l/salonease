@@ -16,7 +16,6 @@ const DateSelector = ({ onSelect, salonId, staffId, shouldClear, actions }) => {
         const response = await publicApi.checkSalonAvailability(salonId, staffId, selectedDate);
         setAvailableSlots(response.data.availableSlots || []);
       } catch (error) {
-        console.error('Failed to fetch availability:', error);
         setAvailableSlots([]);
       } finally {
         setLoading(false);
@@ -56,7 +55,7 @@ const DateSelector = ({ onSelect, salonId, staffId, shouldClear, actions }) => {
       
       {loading && (
         <div className="mt-2 text-sm text-gray-600">
-          Loading available time slots...
+          {t('common:loading.available_time_slots')}
         </div>
       )}
       

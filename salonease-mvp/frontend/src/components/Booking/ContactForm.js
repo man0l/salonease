@@ -2,27 +2,29 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useTranslation } from 'react-i18next';
 
-const schema = yup.object().shape({
-  name: yup.string().required('Name is required'),
-  email: yup.string().email('Invalid email').required('Email is required'),
-  phone: yup.string().required('Phone number is required'),
-  notes: yup.string(),
-});
 
 const ContactForm = ({ onSubmit }) => {
+  const { t } = useTranslation(['common']); 
+  const schema = yup.object().shape({
+    name: yup.string().required(t('common:validation.name_required')),
+    email: yup.string().email(t('common:validation.invalid_email')).required(t('common:validation.email_required')),
+    phone: yup.string().required(t('common:validation.phone_required')),
+    notes: yup.string(),
+  });
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema)
   });
 
   return (
     <div className="p-4">
-      <h3 className="mb-4 text-lg font-medium">Enter your contact details:</h3>
+      <h3 className="mb-4 text-lg font-medium">{t('common:booking.contact_details')}</h3>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <input
             {...register('name')}
-            placeholder="Your name"
+            placeholder={t('common:booking.name')}
             className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
           {errors.name && (
@@ -34,7 +36,7 @@ const ContactForm = ({ onSubmit }) => {
           <input
             {...register('email')}
             type="email"
-            placeholder="Email address"
+            placeholder={t('common:booking.email')}
             className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
           {errors.email && (
@@ -45,7 +47,7 @@ const ContactForm = ({ onSubmit }) => {
         <div>
           <input
             {...register('phone')}
-            placeholder="Phone number"
+            placeholder={t('common:booking.phone')}
             className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
           {errors.phone && (
@@ -56,7 +58,7 @@ const ContactForm = ({ onSubmit }) => {
         <div>
           <textarea
             {...register('notes')}
-            placeholder="Additional notes (optional)"
+            placeholder={t('common:booking.notes')}
             className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             rows={3}
           />
@@ -66,7 +68,7 @@ const ContactForm = ({ onSubmit }) => {
           type="submit"
           className="w-full bg-primary-600 text-white py-2 px-4 rounded hover:bg-primary-700 transition-colors duration-200"
         >
-          Complete Booking
+          {t('common:booking.complete_booking')}
         </button>
       </form>
     </div>

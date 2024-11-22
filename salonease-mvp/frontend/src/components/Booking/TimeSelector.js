@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-
+import { useTranslation } from 'react-i18next';
 const TimeSelector = ({ date, duration, onSelect }) => {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +26,7 @@ const TimeSelector = ({ date, duration, onSelect }) => {
         
         setAvailableSlots(slots);
       } catch (error) {
-        setError('Failed to load available time slots');
+        setError(t('common:error.no_slots'));
       } finally {
         setLoading(false);
       }

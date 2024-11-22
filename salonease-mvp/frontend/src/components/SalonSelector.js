@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { useSalonContext } from '../contexts/SalonContext';
-import ROLES from '../utils/roles'; // Add this import
+import ROLES from '../utils/roles';
+import { useTranslation } from 'react-i18next';
 
 const SalonSelector = () => {
   const { salons, loading, error, selectedSalon, setSelectedSalon, userRole } = useSalonContext();
+  const { t } = useTranslation(['common']);
 
   useEffect(() => {
     if (userRole === ROLES.SALON_OWNER && salons.length > 0 && !selectedSalon) {
@@ -11,8 +13,17 @@ const SalonSelector = () => {
     }
   }, [salons, selectedSalon, setSelectedSalon, userRole]);
 
-  if (loading) return <div>Loading salon...</div>;
-  if (error) return <div>Error loading salon: {error}</div>;
+  if (loading) {
+    return <p>{t('loading.salon')}</p>;
+  }
+
+  if (error) {
+    return <p>{t('error.no_salon')}</p>;
+  }
+
+  if (!salons.length) {
+    return <p>{t('error.no_salons')}</p>;
+  }
 
   if (userRole === ROLES.STAFF) {
     return selectedSalon ? (
@@ -20,7 +31,7 @@ const SalonSelector = () => {
         {selectedSalon.name}
       </div>
     ) : (
-      <div>No associated salon found</div>
+      <div>{t('error.no_associated_salon')}</div>
     );
   }
 
@@ -40,13 +51,14 @@ const SalonSelector = () => {
         className="bg-white text-primary border border-primary rounded px-2 py-1"
         value={selectedSalon?.id || ''}
         onChange={handleSalonChange}
+        aria-label={t('label.select_salon')}
       >
         {salons.map(salon => (
           <option key={salon.id} value={salon.id}>{salon.name}</option>
         ))}
       </select>
     ) : (
-      <div>No salons available</div>
+      <div>{t('error.no_salons')}</div>
     )
   );
 };

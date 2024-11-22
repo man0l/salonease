@@ -1,9 +1,10 @@
 import React from 'react';
-
+import { useTranslation } from 'react-i18next';
 const StaffSelector = ({ staff, onSelect }) => {
+  const { t } = useTranslation(['common']);
   return (
     <div className="p-4">
-      <h3 className="mb-2 text-lg font-medium">Choose your stylist (optional):</h3>
+      <h3 className="mb-2 text-lg font-medium">{t('common:booking.choose_stylist')}</h3>
       <div className="space-y-2">
         {staff.map(member => (
           <button

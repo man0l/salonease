@@ -86,5 +86,14 @@
     "staff": "Staff member is required",
     "appointment_date_and_time": "Appointment date and time are required",
     "appointment_date_and_time_future": "Appointment date and time must be in the future"
+  },
+  "loading": {
+    "available_time_slots": "Loading available time slots..."
+  },
+  "error": {
+    "failed_to_load_slots": "Failed to load available time slots"
+  },
+  "success": {
+    "booking_created": "Booking created successfully"
   }
 }

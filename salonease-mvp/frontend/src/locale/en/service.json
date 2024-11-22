@@ -27,7 +27,8 @@
   "validation.price_positive": "Price must be a positive number",
   "action": {
     "choose": "Choose",
-    "book": "Book Now"
+    "book": "Book Now",
+    "cancel": "Cancel"
   },
   "duration": {
     "minutes": "{{duration}} min."
@@ -36,5 +37,21 @@
     "expand": "Expand category",
     "collapse": "Collapse category",
     "select": "Select category"
+  },
+  "label": {
+    "category": "Category",
+      "price": "Price",
+      "duration": "Duration (minutes)",
+    "notes": "Notes"
+  },
+  "modal": {
+    "delete_title": "Confirm Deletion",
+      "delete_message": "Are you sure you want to delete this service? This action cannot be undone."
+  },
+  "validation": {
+    "select_category": "Please select a category"
+  },
+  "error": {
+    "delete_failed": "Failed to delete service"
   }
 }
