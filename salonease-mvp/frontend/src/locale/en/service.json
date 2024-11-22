@@ -1,0 +1,40 @@
+{
+  "title.service_management": "Service Management",
+  "title.current_services": "Current Services",
+  "action.add_service": "Add Service",
+  "action.update_service": "Update Service",
+  "action.edit_service": "Edit Service",
+  "action.delete_service": "Delete Service",
+  "action.hide_form": "Hide Form",
+  "action.add_new_service": "Add New Service",
+  "label.name": "Name",
+  "label.category": "Category",
+  "label.duration": "Duration",
+  "label.price": "Price",
+  "label.description": "Description",
+  "loading.services": "Loading services...",
+  "error.no_services": "No services available.",
+  "success.service_updated": "Service updated successfully",
+  "success.service_added": "Service added successfully",
+  "success.service_deleted": "Service deleted successfully",
+  "error.failed_to_update": "Failed to update service",
+  "error.failed_to_add": "Failed to add service",
+  "error.failed_to_delete": "Failed to delete service",
+  "validation.name_required": "Service name is required",
+  "validation.category_required": "Category is required",
+  "validation.duration_required": "Duration is required",
+  "validation.price_required": "Price is required",
+  "validation.price_positive": "Price must be a positive number",
+  "action": {
+    "choose": "Choose",
+    "book": "Book Now"
+  },
+  "duration": {
+    "minutes": "{{duration}} min."
+  },
+  "category": {
+    "expand": "Expand category",
+    "collapse": "Collapse category",
+    "select": "Select category"
+  }
+}

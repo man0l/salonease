@@ -29,6 +29,7 @@ import BookingsManagement from './components/Bookings/BookingsManagement';
 import PublicSalonPage from './components/Salon/PublicSalonPage';
 import BookingsCalendar from './components/Bookings/BookingsCalendar';
 import FinancialReports from './components/FinancialReports/FinancialReports';
+import './i18n';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
