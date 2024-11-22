@@ -29,7 +29,7 @@ const ServiceManagement = ({ salonId }) => {
 
   const schema = yup.object().shape({
     name: yup.string().required(t('validation.name_required')),
-    category: yup.string().required(t('validation.category_required')),
+    categoryId: yup.number().required(t('validation.category_required')),
     duration: yup.number().required(t('validation.duration_required')),
     price: yup.number().positive(t('validation.price_positive')).required(t('validation.price_required')),
     description: yup.string(),
@@ -126,6 +126,7 @@ const ServiceManagement = ({ salonId }) => {
           reset({ name: '', price: '', duration: '', description: '', promotionalOffer: '' });
         }}
         className="mb-6 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-full transition duration-300 flex items-center"
+        data-testid="show-hide-form-button"
       >
         {showForm ? <FaMinus className="mr-2" /> : <FaPlus className="mr-2" />}
         {showForm ? t('action.hide_form') : t('action.add_new_service')}
@@ -133,7 +134,7 @@ const ServiceManagement = ({ salonId }) => {
 
       {showForm && (
         <div className="bg-background rounded-lg shadow-card p-6 mb-8 animate-slide-in">
-          <h3 className="text-xl font-semibold mb-4 text-primary-600">
+          <h3 className="text-xl font-semibold mb-4 text-primary-600" data-testid="add-service-title">
             {editingService ? t('action.edit_service') : t('action.add_service')}
           </h3>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -198,7 +199,7 @@ const ServiceManagement = ({ salonId }) => {
                 rows="3"
               />
             </div>           
-            <button type="submit" className="w-full bg-secondary-600 text-white py-2 px-4 rounded-md hover:bg-secondary-700 transition duration-300 flex items-center justify-center">
+            <button type="submit" data-testid="add-service-button" className="w-full bg-secondary-600 text-white py-2 px-4 rounded-md hover:bg-secondary-700 transition duration-300 flex items-center justify-center">
               <FaPlus className="mr-2" />
               {editingService ? t('action.update_service') : t('action.add_service')}
             </button>

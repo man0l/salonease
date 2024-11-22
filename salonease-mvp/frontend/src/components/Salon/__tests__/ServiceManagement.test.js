@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import ServiceManagement from '../ServiceManagement';
 import useService from '../../../hooks/useService';
@@ -20,8 +20,18 @@ const mockServices = [
 ];
 
 const mockCategories = [
-  { id: 1, name: 'Hair' },
-  { id: 2, name: 'Color' },
+  { 
+    id: 1, 
+    name: 'Hair',
+    children: [
+      { id: 3, name: 'Hair Services', parentId: 1 }
+    ]
+  },
+  { 
+    id: 2, 
+    name: 'Color',
+    children: []
+  },
 ];
 
 describe('ServiceManagement', () => {
@@ -50,8 +60,8 @@ describe('ServiceManagement', () => {
 
   it('opens the add service form when "Add New Service" is clicked', () => {
     render(<ServiceManagement salonId="123" />);
-    fireEvent.click(screen.getByText('Add New Service'));
-    expect(screen.getByText('Add New Service')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('show-hide-form-button'));
+    expect(screen.getByTestId('add-service-title')).toBeInTheDocument();
   });
 
   it('submits the form with valid data to add a new service', async () => {
@@ -61,11 +71,11 @@ describe('ServiceManagement', () => {
     render(<ServiceManagement />);
 
     // Click the button to show the form
-    fireEvent.click(screen.getByRole('button', { name: /Add New Service/i }));
+    fireEvent.click(screen.getByTestId('show-hide-form-button'));
 
     // Wait for the form to appear
     await waitFor(() => {
-      expect(screen.getByText('Add New Service')).toBeInTheDocument();
+      expect(screen.getByTestId('add-service-title')).toBeInTheDocument();
     });
 
     // Fill in the form fields
@@ -74,10 +84,17 @@ describe('ServiceManagement', () => {
     // Open the category dropdown
     fireEvent.click(screen.getByText('Select a category'));
     
-    // Wait for the dropdown to open and select a category
+    // First click the parent category to expand it
     await waitFor(() => {
-      const hairServicesButton = screen.getByRole('button', { name: /Hair/i });      
-      fireEvent.click(hairServicesButton);
+      const parentCategory = screen.getByTestId('category-item-1');
+      const expandButton = parentCategory.querySelector('button[aria-label="Expand category"]');
+      fireEvent.click(expandButton);
+    });
+
+    // Then select the child category
+    await waitFor(() => {
+      const childCategory = screen.getByText('Hair Services');
+      fireEvent.click(childCategory);
     });
 
     fireEvent.change(screen.getByLabelText('Price:'), { target: { value: '40' } });
@@ -91,13 +108,13 @@ describe('ServiceManagement', () => {
     }
 
     // Submit the form
-    fireEvent.click(screen.getByRole('button', { name: /Add Service/i }));
+    fireEvent.click(screen.getByTestId('add-service-button'));
 
     // Check if the addService function was called with the correct data
     await waitFor(() => {
       expect(addService).toHaveBeenCalledWith(expect.objectContaining({
         name: 'New Service',
-        categoryId: 1,
+        categoryId: 3,
         price: 40,
         duration: 45,
         description: 'Test description',
@@ -117,15 +134,33 @@ describe('ServiceManagement', () => {
     const { updateService } = useService();
     render(<ServiceManagement salonId="123" />);
 
+    // Click edit button for the first service
     const editButtons = screen.getAllByLabelText('Edit');
     fireEvent.click(editButtons[0]);
 
-    fireEvent.change(screen.getByLabelText('Service Name:'), { target: { value: 'Updated Haircut' } });
-    fireEvent.click(screen.getByText('Update Service'));
+    // Wait for the edit form to appear
+    await waitFor(() => {
+      expect(screen.getByText('Edit Service')).toBeInTheDocument();
+    });
 
+    // Fill in the form fields
+    const nameInput = screen.getByLabelText('Service Name:');
+    await act(async () => {
+      fireEvent.change(nameInput, { 
+        target: { value: 'Updated Haircut' } 
+      });
+    });
+
+    // Submit the form
+    const updateButton = screen.getByTestId('add-service-button');
+    await act(async () => {
+      fireEvent.click(updateButton);
+    });
+
+    // Verify the update service was called with correct parameters
     await waitFor(() => {
       expect(updateService).toHaveBeenCalledWith('1', expect.objectContaining({
-        name: 'Updated Haircut',
+        name: 'Updated Haircut'
       }));
     });
   });

@@ -1,17 +1,21 @@
 {
   "title.service_management": "Service Management",
   "title.current_services": "Current Services",
-  "action.add_service": "Add Service",
+  "action.add_service": "Add New Service",
   "action.update_service": "Update Service",
   "action.edit_service": "Edit Service",
-  "action.delete_service": "Delete Service",
+  "action.edit": "Edit",
+  "action.delete": "Delete",
+  "action.delete_service": "Delete",
   "action.hide_form": "Hide Form",
   "action.add_new_service": "Add New Service",
-  "label.name": "Name",
-  "label.category": "Category",
-  "label.duration": "Duration",
-  "label.price": "Price",
-  "label.description": "Description",
+  "label.name": "Service Name:",
+  "label.category": "Category:",
+  "label.duration": "Duration (minutes):",
+  "label.price": "Price:",
+  "label.description": "Description:",
+  "label.minutes": "minutes",
+  "label.notes": "Notes",
   "loading.services": "Loading services...",
   "error.no_services": "No services available.",
   "success.service_updated": "Service updated successfully",
@@ -28,7 +32,8 @@
   "action": {
     "choose": "Choose",
     "book": "Book Now",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "search_categories": "Search categories"
   },
   "duration": {
     "minutes": "{{duration}} min."
@@ -37,12 +42,6 @@
     "expand": "Expand category",
     "collapse": "Collapse category",
     "select": "Select category"
-  },
-  "label": {
-    "category": "Category",
-      "price": "Price",
-      "duration": "Duration (minutes)",
-    "notes": "Notes"
   },
   "modal": {
     "delete_title": "Confirm Deletion",

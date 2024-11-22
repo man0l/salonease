@@ -56,7 +56,7 @@ describe('ResetPassword Component', () => {
     const confirmPasswordInput = screen.getByLabelText(/^confirm new password$/i);
     const submitButton = screen.getByRole('button', { name: /reset password/i });
 
-    authApi.resetPassword.mockResolvedValueOnce({ data: { message: 'Password reset successful' } });
+    authApi.resetPassword.mockResolvedValueOnce({ data: { message: 'Password has been reset successfully' } });
 
     fireEvent.change(newPasswordInput, { target: { value: 'NewPassword123!' } });
     fireEvent.change(confirmPasswordInput, { target: { value: 'NewPassword123!' } });
@@ -64,7 +64,7 @@ describe('ResetPassword Component', () => {
 
     await waitFor(() => {
       expect(authApi.resetPassword).toHaveBeenCalledWith('testtoken123', 'NewPassword123!');
-      expect(toast.success).toHaveBeenCalledWith('Password reset successful');
+      expect(toast.success).toHaveBeenCalledWith('Password has been reset successfully');
     });
   });
 

@@ -27,5 +27,10 @@
   "success.client_deleted": "Client deleted successfully",
   "error.deleting_client": "Error deleting client",
   "phone_number_is_required": "Phone number is required",
-  "error.invalid_email": "Invalid email format"
+  "error.invalid_email": "Invalid email format",
+  "validation": {
+    "name_required": "Name is required",
+    "email_invalid": "Invalid email format",
+    "phone_required": "Phone is required"
+  }
 }
