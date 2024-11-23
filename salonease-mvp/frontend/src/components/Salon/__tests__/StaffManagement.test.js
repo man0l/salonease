@@ -78,7 +78,7 @@ describe('StaffManagement', () => {
     fireEvent.change(screen.getByLabelText('Email:'), { target: { value: 'newstaff@example.com' } });
     fireEvent.change(screen.getByLabelText('Full Name:'), { target: { value: 'New Staff' } });
 
-    fireEvent.click(screen.getByText('Invite Staff'));
+    fireEvent.click(screen.getByTestId('submit-button-invite-staff'));
 
     await waitFor(() => {
       expect(inviteStaff).toHaveBeenCalledWith({

@@ -160,9 +160,9 @@ const StaffManagement = () => {
               />
               {errors.fullName && <span className="text-red-500 text-sm">{errors.fullName.message}</span>}
             </div>
-            <button type="submit" className="w-full bg-secondary-600 text-white py-2 px-4 rounded-md hover:bg-secondary-700 transition duration-300 flex items-center justify-center">
+            <button data-testid="submit-button-invite-staff" type="submit" className="w-full bg-secondary-600 text-white py-2 px-4 rounded-md hover:bg-secondary-700 transition duration-300 flex items-center justify-center">
               <FaUserPlus className="mr-2" />
-              {editingStaff ? t('staff:action.update_staff') : t('staff:action.add_staff')}
+              {editingStaff ? t('staff:action.update_staff') : t('staff:action.invite_staff')}
             </button>
           </form>
         </div>
