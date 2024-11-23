@@ -10,12 +10,15 @@
     "previous": "Previous",
     "next": "Next",
     "page": "Page",
-    "of": "of"
+    "of": "of",
+    "select_existing_client": "Select Existing Client",
+    "new_client": "New Client",
+    "add_booking": "Add Booking"
   },
   "status": {
-    "loading": "Loading...",
     "error": "An error occurred",
-    "noData": "No data available"
+    "noData": "No data available",
+    "loading": "Loading..."
   },
   "form": {
     "required": "{{field}} is required",
@@ -77,6 +80,20 @@
       "time": "🕒"
   },
   "label": {
-    "select_salon": "Select salon"
+    "select_salon": "Select salon",
+    "name": "Name",
+    "email_address": "Email Address"
+  },
+  "phone_number": "Phone Number",
+  "service": "Service",
+  "staff_member": "Staff Member",
+  "appointment_date_time": "Appointment Date & Time",
+  "notes": "Notes",
+  "selected_client": "Selected Client",
+  "placeholder": {
+    "search_clients_by_name_email_or_phone": "Search clients by name, email, or phone"
+  },
+  "message": {
+    "please_enter_at_least_3_characters_to_search": "Please enter at least 3 characters to search"
   }
 }

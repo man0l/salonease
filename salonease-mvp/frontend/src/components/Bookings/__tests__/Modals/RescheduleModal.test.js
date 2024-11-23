@@ -75,7 +75,7 @@ describe('RescheduleModal', () => {
       />
     );
 
-    const datePicker = screen.getByPlaceholderText('Select date');
+    const datePicker = screen.getByDisplayValue('March 20, 2024');
     
     await act(async () => {
       fireEvent.change(datePicker, {
@@ -94,44 +94,7 @@ describe('RescheduleModal', () => {
     expect(toast.error).toHaveBeenCalledWith('Appointment date and time must be in the future');
   });
 
-  it('calls onReschedule with correct parameters when form is valid', async () => {
-    const mockOnReschedule = jest.fn();
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + 1);
-
-    render(
-      <RescheduleModal
-        show={true}
-        onClose={() => {}}
-        booking={mockBooking}
-        onReschedule={mockOnReschedule}
-        salonId="salon1"
-      />
-    );
-
-    const datePicker = screen.getByPlaceholderText('Select date');
-    
-    await act(async () => {
-      fireEvent.change(datePicker, {
-        target: { value: futureDate.toLocaleString() },
-      });
-    });
-
-    const confirmButton = screen.getByText('Confirm Reschedule');
-    fireEvent.click(confirmButton);
-
-    expect(mockOnReschedule).toHaveBeenCalledWith(
-      mockBooking.id,
-      expect.any(String)
-    );
-  });
-
   it('displays validation error when date is invalid', async () => {
-    // Mock the API response
-    publicApi.checkSalonAvailability.mockResolvedValue({
-      data: { availableSlots: [] }
-    });
-
     render(
       <RescheduleModal
         show={true}
@@ -142,20 +105,20 @@ describe('RescheduleModal', () => {
       />
     );
 
-    const datePicker = screen.getByPlaceholderText('Select date');
+    const datePicker = screen.getByDisplayValue('March 20, 2024');
     
     await act(async () => {
+      fireEvent.click(datePicker);
       fireEvent.change(datePicker, {
-        target: { value: 'invalid date' },
+        target: { value: 'not a date' }
       });
-      // Wait for state updates
+      // Simulate blur to trigger validation
+      fireEvent.blur(datePicker);
       await new Promise(resolve => setTimeout(resolve, 0));
     });
 
-    const confirmButton = screen.getByText('Confirm Reschedule');
     await act(async () => {
-      fireEvent.click(confirmButton);
-      // Wait for any state updates
+      fireEvent.click(screen.getByText('Confirm Reschedule'));
       await new Promise(resolve => setTimeout(resolve, 0));
     });
 
@@ -182,5 +145,68 @@ describe('RescheduleModal', () => {
     });
 
     expect(mockOnClose).toHaveBeenCalled();
+  });
+
+  it('calls onReschedule with correct parameters when form is valid', async () => {
+    // Mock the API response for available slots
+    const availableSlots = [
+      new Date('2024-03-20T10:00:00Z'),
+      new Date('2024-03-20T11:00:00Z')
+    ];
+    
+    publicApi.checkSalonAvailability.mockResolvedValue({
+      data: { availableSlots: availableSlots.map(slot => slot.toISOString()) }
+    });
+
+    const mockOnReschedule = jest.fn();
+    const mockBooking = {
+      id: '1',
+      staffId: 'staff1',
+      appointmentDateTime: '2024-03-20T10:00:00Z',
+    };
+
+    render(
+      <RescheduleModal
+        show={true}
+        onClose={() => {}}
+        booking={mockBooking}
+        onReschedule={mockOnReschedule}
+        salonId="salon1"
+      />
+    );
+
+    // Wait for available slots to be loaded
+    await waitFor(() => {
+      expect(publicApi.checkSalonAvailability).toHaveBeenCalled();
+    });
+
+    const newDateTime = new Date('2024-03-20T11:00:00Z');
+    
+    // Find the date picker and simulate date selection
+    await act(async () => {
+      const datePicker = screen.getByDisplayValue('March 20, 2024');
+      fireEvent.change(datePicker, {
+        target: { value: newDateTime }
+      });
+    });
+
+    // Find the time picker and simulate time selection
+    await act(async () => {
+      const timePicker = screen.getByDisplayValue('10:00 AM');
+      fireEvent.change(timePicker, {
+        target: { value: newDateTime }
+      });
+    });
+
+    // Click the confirm button
+    await act(async () => {
+      fireEvent.click(screen.getByText('Confirm Reschedule'));
+    });
+
+    // Verify onReschedule was called with correct parameters
+    expect(mockOnReschedule).toHaveBeenCalledWith(
+      mockBooking.id,
+      newDateTime.toISOString()
+    );
   });
 });

@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import "react-datepicker/dist/react-datepicker.css";
 import { publicApi } from '../../../utils/api';
 import { useTranslation } from 'react-i18next';
+import { useAvailability } from '../../../hooks/useAvailability';
 
 const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
   const { t } = useTranslation(['common', 'bookings', 'api']);
@@ -20,40 +21,13 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
     new Date(booking?.appointmentDateTime || Date.now())
   );
   const [error, setError] = useState(null);
-  const [availableSlots, setAvailableSlots] = useState([]);
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchAvailability = async () => {
-      if (!booking?.staffId || !newDateTime) return;
-      
-      try {
-        setLoading(true);
-        const date = new Date(newDateTime);
-        const formattedDate = date.toISOString().split('T')[0];
-        
-        const response = await publicApi.checkSalonAvailability(
-          salonId, 
-          booking.staffId,
-          formattedDate
-        );
-        
-        const slots = (response.data.availableSlots || []).map(slot => new Date(slot));
-        setAvailableSlots(slots);
-      } catch (error) {
-        console.error('Failed to fetch availability:', error);
-        setAvailableSlots([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (show) {
-      fetchAvailability();
-    }
-  }, [show, booking?.staffId, newDateTime, salonId]);
-
-  if (!show) return null;
+  const { availableSlots, loading } = useAvailability(
+    salonId,
+    booking?.staffId,
+    newDateTime,
+    show
+  );
 
   const handleDateChange = (date) => {
     setError(null);
@@ -102,6 +76,8 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
       toast.error(err.message);
     }
   };
+
+  if (!show) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">

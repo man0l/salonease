@@ -10,6 +10,7 @@ import { FaTrash } from 'react-icons/fa';
 import { bookingApi } from '../../../utils/api';
 import { useDebounce } from '../../../hooks/useDebounce';
 import { useTranslation } from 'react-i18next';
+import { useAvailability } from '../../../hooks/useAvailability';
 
 const roundToNextFifteen = (date) => {
   const minutes = date.getMinutes();
@@ -87,6 +88,16 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
       notes: '',
     }
   });
+
+  const staffId = watch('staffId');
+  const appointmentDateTime = watch('appointmentDateTime');
+
+  const { availableSlots, loading: loadingSlots } = useAvailability(
+    salonId,
+    staffId,
+    appointmentDateTime,
+    show
+  );
 
   useEffect(() => {
     if (show) {
@@ -211,14 +222,12 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
     ${error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary-500'}
   `;
 
-  const appointmentDateTime = watch('appointmentDateTime', defaultDate);
-
   if (!show) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-4">{t('common:create_new_booking')}</h2>
+        <h2 className="text-2xl font-bold mb-4">{t('bookings:title.create_new_booking')}</h2>
         
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <input type="hidden" {...register('clientId')} />
@@ -440,8 +449,9 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
                     errors.appointmentDateTime ? 'border-red-500' : 'border-gray-300'
                   }`}
                   withPortal
-                  minTime={new Date().setHours(8, 0)}
-                  maxTime={new Date().setHours(20, 0)}
+                  includeTimes={availableSlots}
+                  placeholderText={loadingSlots ? t('common:status.loading') : t('bookings:modal.select_time')}
+                  disabled={loadingSlots || availableSlots.length === 0 || !watch('staffId')}
                 />
               </div>
             </div>
@@ -455,7 +465,7 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('label.notes')}
+              {t('bookings:label.notes')}
             </label>
             <textarea
               {...register('notes')}

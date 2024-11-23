@@ -83,16 +83,11 @@
     "client_mode": "Please select a client",
     "client_name": "Client name is required",
     "client_email": "Invalid email format",
-    "client_phone": "Client phone is required",
+    "client_phone": "Phone number is required",
     "service": "Service is required",
     "staff": "Staff member is required",
-    "appointment_date_and_time": "Appointment date and time are required",
-    "appointment_date_and_time_future": "Appointment date and time must be in the future",
-    "appointment_date_time": {
-      "required": "Appointment date and time are required",
-      "future": "Appointment date and time must be in the future",
-      "not_available": "Selected time slot is not available"
-    }
+    "appointment_date_and_time": "Appointment date and time is required",
+    "appointment_date_and_time_future": "Appointment must be in the future"
   },
   "loading": {
     "available_time_slots": "Loading available time slots..."
@@ -106,11 +101,19 @@
   "modal": {
     "reschedule": {
       "title": "Reschedule Booking",
-      "new_date_time": "New Appointment Date & Time",
+    "new_date_time": "New Appointment Date & Time",
       "no_slots": "No available time slots for this date",
       "loading_slots": "Loading...",
       "select_time": "Select time",
       "select_date": "Select date"
     }
+  },
+  "action": {
+    "select_existing_client": "Select Existing Client",
+    "new_client": "New Client",
+    "add_booking": "Add Booking"
+  },
+  "title": {
+    "create_new_booking": "Create New Booking"
   }
 }
