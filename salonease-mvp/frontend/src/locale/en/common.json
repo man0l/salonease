@@ -1,35 +1,38 @@
 {
-  "actions": {
-    "edit": "Редактирай",
-    "delete": "Изтрий",
-    "add": "Добави",
-    "cancel": "Отказ",
-    "save": "Запази",
-    "reset": "Нулиране",
-    "choose": "Избери",
-    "reassign": "Преназначи"
+  "action": {
+    "search_categories": "Search categories...",
+    "done": "Done",
+    "cancel": "Cancel",
+    "confirm_reschedule": "Confirm Reschedule",
+    "confirm_cancel": "Confirm Cancellation",
+    "close": "Close",
+    "confirm": "Confirm",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of"
   },
   "status": {
-    "loading": "Зареждане...",
-    "error": "Възникна грешка",
-    "noData": "Няма налични данни"
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "noData": "No data available"
   },
   "form": {
-    "required": "{{field}} е задължително",
-    "invalid": "Невалиден {{field}}",
-    "email": "Имейл",
-    "fullName": "Пълно име",
-    "address": "Адрес",
-    "contactNumber": "Телефон за връзка",
-    "description": "Описание",
-    "category": "Категория",
-    "price": "Цена",
-    "duration": "Продължителност (минути)",
-    "notes": "Бележки",
-    "pleaseSelect": "Моля, изберете {{field}}"
+    "required": "{{field}} is required",
+    "invalid": "Invalid {{field}}",
+    "email": "Email",
+    "fullName": "Full Name",
+    "address": "Address",
+    "contactNumber": "Contact Number",
+    "description": "Description",
+    "category": "Category",
+    "price": "Price",
+    "duration": "Duration (minutes)",
+    "notes": "Notes",
+    "pleaseSelect": "Please select {{field}}"
   },
   "time": {
-    "minutes": "минути"
+    "minutes": "minutes"
   },
   "footer": {
     "copyright": "© 2024 SalonEase. All rights reserved.",

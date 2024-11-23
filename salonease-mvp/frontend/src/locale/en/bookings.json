@@ -20,12 +20,14 @@
   "label.duration_minutes": "{{duration}} minutes",
   "label.page": "Page {{current}} of {{total}}",
   "label.showing_entries": "Showing {{start}} to {{end}} of {{total}} bookings",
+  "label.booking_note_optional": "Add additional note for the reason of the cancelation",
   "action.previous": "Previous",
   "action.prev": "Prev",
   "action.next": "Next",
   "action.reschedule": "Reschedule booking",
   "action.complete": "Complete booking",
   "action.cancel": "Cancel booking",
+  "action.confirm_cancel": "Confirm Cancellation",
   "error.failed_to_fetch_bookings": "Failed to fetch bookings",
   "success.booking_rescheduled": "Booking rescheduled successfully",
   "error.failed_to_reschedule_booking": "Failed to reschedule booking",
@@ -85,7 +87,12 @@
     "service": "Service is required",
     "staff": "Staff member is required",
     "appointment_date_and_time": "Appointment date and time are required",
-    "appointment_date_and_time_future": "Appointment date and time must be in the future"
+    "appointment_date_and_time_future": "Appointment date and time must be in the future",
+    "appointment_date_time": {
+      "required": "Appointment date and time are required",
+      "future": "Appointment date and time must be in the future",
+      "not_available": "Selected time slot is not available"
+    }
   },
   "loading": {
     "available_time_slots": "Loading available time slots..."
@@ -95,5 +102,15 @@
   },
   "success": {
     "booking_created": "Booking created successfully"
+  },
+  "modal": {
+    "reschedule": {
+      "title": "Reschedule Booking",
+      "new_date_time": "New Appointment Date & Time",
+      "no_slots": "No available time slots for this date",
+      "loading_slots": "Loading...",
+      "select_time": "Select time",
+      "select_date": "Select date"
+    }
   }
 }

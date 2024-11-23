@@ -3,12 +3,35 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect';
 import RescheduleModal from '../../Modals/RescheduleModal';
 import { toast } from 'react-toastify';
+import { publicApi } from '../../../../utils/api';
+
+// Add mocks
+jest.mock('../../../../utils/api', () => ({
+  publicApi: {
+    checkSalonAvailability: jest.fn()
+  }
+}));
 
 jest.mock('react-toastify', () => ({
   toast: {
     error: jest.fn(),
     success: jest.fn(),
   },
+}));
+
+// Add mock for i18next
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key) => {
+      const translations = {
+        'common:action.close': 'Close',
+        'common:action.confirm_reschedule': 'Confirm Reschedule',
+        'bookings:validation.appointment_date_time.future': 'Appointment date and time must be in the future',
+        'bookings:modal.reschedule.title': 'Reschedule Booking'
+      };
+      return translations[key] || key;
+    }
+  })
 }));
 
 const mockBooking = {
@@ -20,6 +43,10 @@ const mockBooking = {
 describe('RescheduleModal', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Mock successful API response
+    publicApi.checkSalonAvailability.mockResolvedValue({
+      data: { availableSlots: ['10:00', '11:00', '12:00'] }
+    });
   });
 
   it('renders nothing when show is false', () => {
@@ -48,16 +75,21 @@ describe('RescheduleModal', () => {
       />
     );
 
-    const datePicker = screen.getByRole('textbox');
+    const datePicker = screen.getByPlaceholderText('Select date');
     
     await act(async () => {
       fireEvent.change(datePicker, {
         target: { value: pastDate.toLocaleString() },
       });
+      // Wait for state updates
+      await new Promise(resolve => setTimeout(resolve, 0));
     });
 
-    const confirmButton = screen.getByText('Confirm Reschedule');
-    fireEvent.click(confirmButton);
+    await act(async () => {
+      fireEvent.click(screen.getByText('Confirm Reschedule'));
+      // Wait for state updates
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
 
     expect(toast.error).toHaveBeenCalledWith('Appointment date and time must be in the future');
   });
@@ -77,7 +109,7 @@ describe('RescheduleModal', () => {
       />
     );
 
-    const datePicker = screen.getByRole('textbox');
+    const datePicker = screen.getByPlaceholderText('Select date');
     
     await act(async () => {
       fireEvent.change(datePicker, {
@@ -95,6 +127,11 @@ describe('RescheduleModal', () => {
   });
 
   it('displays validation error when date is invalid', async () => {
+    // Mock the API response
+    publicApi.checkSalonAvailability.mockResolvedValue({
+      data: { availableSlots: [] }
+    });
+
     render(
       <RescheduleModal
         show={true}
@@ -105,21 +142,27 @@ describe('RescheduleModal', () => {
       />
     );
 
-    const datePicker = screen.getByRole('textbox');
+    const datePicker = screen.getByPlaceholderText('Select date');
     
     await act(async () => {
       fireEvent.change(datePicker, {
         target: { value: 'invalid date' },
       });
+      // Wait for state updates
+      await new Promise(resolve => setTimeout(resolve, 0));
     });
 
     const confirmButton = screen.getByText('Confirm Reschedule');
-    fireEvent.click(confirmButton);
+    await act(async () => {
+      fireEvent.click(confirmButton);
+      // Wait for any state updates
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
 
     expect(toast.error).toHaveBeenCalledWith('Appointment date and time must be in the future');
   });
 
-  it('calls onClose when close button is clicked', () => {
+  it('calls onClose when close button is clicked', async () => {
     const mockOnClose = jest.fn();
     
     render(
@@ -132,8 +175,11 @@ describe('RescheduleModal', () => {
       />
     );
 
-    const closeButton = screen.getByText('Close');
-    fireEvent.click(closeButton);
+    await act(async () => {
+      fireEvent.click(screen.getByText('Close'));
+      // Wait for any state updates
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
 
     expect(mockOnClose).toHaveBeenCalled();
   });

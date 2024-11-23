@@ -12,8 +12,8 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
   const schema = yup.object().shape({
     appointmentDateTime: yup
       .date()
-      .required(t('common:appointment_date_and_time_are_required'))
-      .min(new Date(), t('api:errors.booking.pastDate')),
+      .required(t('bookings:validation.appointment_date_time.required'))
+      .min(new Date(), t('bookings:validation.appointment_date_time.future')),
   });
 
   const [newDateTime, setNewDateTime] = useState(
@@ -38,7 +38,6 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
           formattedDate
         );
         
-        // Convert available slots strings to Date objects
         const slots = (response.data.availableSlots || []).map(slot => new Date(slot));
         setAvailableSlots(slots);
       } catch (error) {
@@ -93,7 +92,7 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
       );
 
       if (!isTimeAvailable) {
-        toast.error(t('common:selected_time_slot_is_not_available'));
+        toast.error(t('bookings:validation.appointment_date_time.not_available'));
         return;
       }
 
@@ -107,12 +106,12 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-4">{t('common:reschedule_booking')}</h2>
+        <h2 className="text-2xl font-bold mb-4">{t('bookings:modal.reschedule.title')}</h2>
         
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('common:new_appointment_date_time')}
+              {t('bookings:modal.reschedule.new_date_time')}
             </label>
             
             <div className="sm:flex sm:space-x-4 space-y-4 sm:space-y-0">
@@ -122,6 +121,7 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
                   onChange={handleDateChange}
                   dateFormat="MMMM d, yyyy"
                   minDate={new Date()}
+                  placeholderText={t('bookings:modal.reschedule.select_date')}
                   className={`w-full px-3 py-2 border rounded-md ${
                     error ? 'border-red-500' : 'border-gray-300'
                   }`}
@@ -132,6 +132,7 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
 
               <div className="flex-1">
                 <DatePicker
+                  data-testid="time-picker"
                   selected={newDateTime}
                   onChange={handleTimeChange}
                   showTimeSelect
@@ -144,7 +145,7 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
                   }`}
                   withPortal
                   includeTimes={availableSlots}
-                  placeholderText={loading ? t('common:loading') : t('common:select_time')}
+                  placeholderText={loading ? t('common.status.loading') : t('bookings:modal.reschedule.select_time')}
                   disabled={loading || availableSlots.length === 0}
                 />
               </div>
@@ -156,7 +157,7 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
             
             {availableSlots.length === 0 && !loading && (
               <p className="mt-1 text-sm text-amber-600">
-                {t('common:no_available_time_slots_for_this_date')}
+                {t('bookings:modal.reschedule.no_slots')}
               </p>
             )}
           </div>
@@ -167,7 +168,7 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
             onClick={onClose}
             className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded transition duration-300"
           >
-            {t('common:close')}
+            {t('common:action.close')}
           </button>
           <button
             onClick={handleReschedule}

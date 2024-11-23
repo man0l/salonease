@@ -20,12 +20,13 @@ const CancelBookingModal = ({ show, onClose, booking, onCancel }) => {
           <div>
             <label 
               htmlFor="booking-note"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-700 mb-1"              
             >
-              {t('common:booking_note_optional')}
+              {t('bookings:booking_note_optional')}
             </label>
             <textarea
               id="booking-note"
+              data-testid="booking-note-input"
               value={bookingNote}
               onChange={(e) => setBookingNote(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
@@ -40,7 +41,7 @@ const CancelBookingModal = ({ show, onClose, booking, onCancel }) => {
             onClick={() => onCancel(booking.id, bookingNote)}
             className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition duration-300"
           >
-            {t('bookings:action.cancel')}
+            {t('bookings:action.confirm_cancel')}
           </button>
           <button
             onClick={onClose}

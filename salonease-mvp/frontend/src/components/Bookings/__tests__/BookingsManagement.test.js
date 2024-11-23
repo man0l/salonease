@@ -125,18 +125,20 @@ describe('BookingsManagement', () => {
     // Mock the bookings data with the correct structure
     const mockBookings = [{
       id: '1',
-      client: { name: 'John Doe' },  // client is an object with name property
-      serviceName: 'Haircut',
+      client: { name: 'John Doe' },
+      service: { 
+        name: 'Haircut',
+        duration: 30 
+      },
+      staff: { fullName: 'Staff Member' },
       appointmentDateTime: '2024-03-20T10:00:00Z',
-      status: 'CONFIRMED',
-      service: { duration: 30 },
-      staff: { fullName: 'Staff Member' }
+      status: 'CONFIRMED'
     }];
 
     // Mock the API response with the correct structure
     bookingApi.getBookings.mockResolvedValue({ 
       data: { 
-        bookings: mockBookings,  // bookings array inside data object
+        bookings: mockBookings,
         totalPages: 1,
         totalItems: 1
       } 
@@ -186,7 +188,7 @@ describe('BookingsManagement', () => {
     });
 
     // Enter cancellation message
-    const messageInput = screen.getByLabelText(/booking note/i);
+    const messageInput = screen.getByTestId('booking-note-input');
     const message = 'Cancellation message';
     await act(async () => {
       fireEvent.change(messageInput, {
