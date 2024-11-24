@@ -97,10 +97,8 @@ const ClientsManagement = () => {
       const success = await deleteClient(salonId, clientToDelete.id);
       if (success) {
         await fetchClients();
-        toast.success(t('success.client_deleted'));
       }
     } catch (error) {
-      toast.error(t('error.deleting_client'));
     } finally {
       setIsDeleteDialogOpen(false);
       setClientToDelete(null);
