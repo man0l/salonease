@@ -95,5 +95,7 @@
   },
   "message": {
     "please_enter_at_least_3_characters_to_search": "Please enter at least 3 characters to search"
-  }
+  },
+  "date_to_be_confirmed": "Date to be confirmed",
+  "time_to_be_confirmed": "Time to be confirmed"
 }

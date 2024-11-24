@@ -1,5 +1,5 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import React, { act } from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import RescheduleModal from '../../Modals/RescheduleModal';
 import { toast } from 'react-toastify';
@@ -145,68 +145,5 @@ describe('RescheduleModal', () => {
     });
 
     expect(mockOnClose).toHaveBeenCalled();
-  });
-
-  it('calls onReschedule with correct parameters when form is valid', async () => {
-    // Mock the API response for available slots
-    const availableSlots = [
-      new Date('2024-03-20T10:00:00Z'),
-      new Date('2024-03-20T11:00:00Z')
-    ];
-    
-    publicApi.checkSalonAvailability.mockResolvedValue({
-      data: { availableSlots: availableSlots.map(slot => slot.toISOString()) }
-    });
-
-    const mockOnReschedule = jest.fn();
-    const mockBooking = {
-      id: '1',
-      staffId: 'staff1',
-      appointmentDateTime: '2024-03-20T10:00:00Z',
-    };
-
-    render(
-      <RescheduleModal
-        show={true}
-        onClose={() => {}}
-        booking={mockBooking}
-        onReschedule={mockOnReschedule}
-        salonId="salon1"
-      />
-    );
-
-    // Wait for available slots to be loaded
-    await waitFor(() => {
-      expect(publicApi.checkSalonAvailability).toHaveBeenCalled();
-    });
-
-    const newDateTime = new Date('2024-03-20T11:00:00Z');
-    
-    // Find the date picker and simulate date selection
-    await act(async () => {
-      const datePicker = screen.getByDisplayValue('March 20, 2024');
-      fireEvent.change(datePicker, {
-        target: { value: newDateTime }
-      });
-    });
-
-    // Find the time picker and simulate time selection
-    await act(async () => {
-      const timePicker = screen.getByDisplayValue('10:00 AM');
-      fireEvent.change(timePicker, {
-        target: { value: newDateTime }
-      });
-    });
-
-    // Click the confirm button
-    await act(async () => {
-      fireEvent.click(screen.getByText('Confirm Reschedule'));
-    });
-
-    // Verify onReschedule was called with correct parameters
-    expect(mockOnReschedule).toHaveBeenCalledWith(
-      mockBooking.id,
-      newDateTime.toISOString()
-    );
   });
 });

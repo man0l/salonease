@@ -33,8 +33,8 @@ const BookingSuccess = ({ booking, onClose }) => {
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
         <div className="text-center">
           <FaCheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('bookings:success.booking_confirmed')}</h2>
-          <p className="text-gray-600 mb-6">{t('bookings:success.appointment_scheduled')}</p>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2" data-testid="booking-confirmed-title">{t('bookings:success.booking_confirmed')}</h2>
+          <p className="text-gray-600 mb-6" data-testid="appointment-scheduled-message">{t('bookings:success.appointment_scheduled')}</p>
         </div>
 
         <div className="space-y-4 mb-6">
@@ -60,7 +60,7 @@ const BookingSuccess = ({ booking, onClose }) => {
               <div>
                 <p className="font-medium">{t('common:service')}</p>
                 <div className="text-gray-600">
-                  <p>{serviceName}</p>
+                  <p data-testid="service-name">{serviceName}</p>
                   {servicePrice && (
                     <p className="text-sm">{formatCurrency(servicePrice)}</p>
                   )}
@@ -74,7 +74,7 @@ const BookingSuccess = ({ booking, onClose }) => {
               <FaUser className="w-5 h-5 text-primary-600" />
               <div>
                 <p className="font-medium">{t('common:staff_member')}</p>
-                <p className="text-gray-600">{staffMember}</p>
+                <p className="text-gray-600" data-testid="staff-member-name">{staffMember}</p>
               </div>
             </div>
           )}

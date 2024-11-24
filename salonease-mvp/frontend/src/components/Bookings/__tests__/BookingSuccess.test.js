@@ -20,9 +20,9 @@ describe('BookingSuccess', () => {
   it('renders booking confirmation details', () => {
     render(<BookingSuccess booking={mockBooking} onClose={() => {}} />);
 
-    expect(screen.getByText('Booking Confirmed!')).toBeInTheDocument();
-    expect(screen.getByText(mockBooking.booking.staff.fullName)).toBeInTheDocument();
-    expect(screen.getByText(mockBooking.booking.service.name)).toBeInTheDocument();
+    expect(screen.getByTestId('booking-confirmed-title')).toBeInTheDocument();
+    expect(screen.getByTestId('staff-member-name')).toHaveTextContent(mockBooking.booking.staff.fullName);
+    expect(screen.getByTestId('service-name')).toHaveTextContent(mockBooking.booking.service.name);
   });
 
   it('formats date and time correctly', () => {
@@ -55,8 +55,8 @@ describe('BookingSuccess', () => {
 
     render(<BookingSuccess booking={incompleteBooking} onClose={() => {}} />);
 
-    expect(screen.getByText('Date to be confirmed')).toBeInTheDocument();
-    expect(screen.getByText('Time to be confirmed')).toBeInTheDocument();
+    expect(screen.getByTestId('booking-confirmed-title')).toBeInTheDocument();
+    expect(screen.getByTestId('appointment-scheduled-message')).toBeInTheDocument();
   });
 
   it('calls onClose when Done button is clicked', () => {

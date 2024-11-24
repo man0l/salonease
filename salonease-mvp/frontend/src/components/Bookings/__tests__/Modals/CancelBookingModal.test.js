@@ -33,7 +33,7 @@ describe('CancelBookingModal', () => {
         onCancel={() => {}}
       />
     );
-    expect(screen.queryByText('Cancel Booking')).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('renders cancel confirmation when show is true', () => {
@@ -45,8 +45,11 @@ describe('CancelBookingModal', () => {
         onCancel={() => {}}
       />
     );
-    expect(screen.getByText('Cancel Booking')).toBeInTheDocument();
-    expect(screen.getByText(/are you sure you want to cancel this booking/i)).toBeInTheDocument();
+    
+    const modal = screen.getByRole('dialog');
+    expect(modal).toBeInTheDocument();
+    
+    expect(screen.getByTestId('cancel-confirmation-message')).toBeInTheDocument();
   });
 
   it('calls onCancel with notification message when confirmed', async () => {
@@ -61,11 +64,14 @@ describe('CancelBookingModal', () => {
     );
 
     const message = 'Cancellation due to emergency';
-    fireEvent.change(screen.getByLabelText(/booking note/i), {
+    const noteInput = screen.getByTestId('booking-note-input');
+    fireEvent.change(noteInput, {
       target: { value: message },
     });
 
-    fireEvent.click(screen.getByText('Confirm Cancellation'));
+    const confirmButton = screen.getByTestId('confirm-cancel-button');
+    fireEvent.click(confirmButton);
+    
     await waitFor(() => {
       expect(onCancel).toHaveBeenCalledWith(mockBooking.id, message);
     });
@@ -82,7 +88,8 @@ describe('CancelBookingModal', () => {
       />
     );
 
-    fireEvent.click(screen.getByText('Cancel'));
+    const cancelButton = screen.getByTestId('cancel-button');
+    fireEvent.click(cancelButton);
     expect(onClose).toHaveBeenCalled();
   });
 }); 

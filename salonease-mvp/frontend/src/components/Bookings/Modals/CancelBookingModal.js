@@ -8,12 +8,24 @@ const CancelBookingModal = ({ show, onClose, booking, onCancel }) => {
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div 
+      role="dialog" 
+      aria-labelledby="cancel-booking-title"
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+    >
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-4">{t('bookings:action.cancel')}</h2>
+        <h2 
+          id="cancel-booking-title" 
+          className="text-2xl font-bold mb-4"
+        >
+          {t('bookings:action.cancel')}
+        </h2>
         
         <div className="space-y-4">
-          <p className="text-gray-600">
+          <p 
+            className="text-gray-600"
+            data-testid="cancel-confirmation-message"
+          >
             {t('common:message.are_you_sure_you_want_to_cancel_this_booking_this_action_cannot_be_undone')}
           </p>
           
@@ -35,15 +47,16 @@ const CancelBookingModal = ({ show, onClose, booking, onCancel }) => {
             />
           </div>
         </div>
-
         <div className="mt-6 flex justify-end space-x-2">
           <button
+            data-testid="confirm-cancel-button"
             onClick={() => onCancel(booking.id, bookingNote)}
             className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition duration-300"
           >
             {t('bookings:action.confirm_cancel')}
           </button>
           <button
+            data-testid="cancel-button"
             onClick={onClose}
             className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded transition duration-300"
           >
