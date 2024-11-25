@@ -30,6 +30,7 @@ import PublicSalonPage from './components/Salon/PublicSalonPage';
 import BookingsCalendar from './components/Bookings/BookingsCalendar';
 import FinancialReports from './components/FinancialReports/FinancialReports';
 import './i18n';
+import { LanguageProvider } from './contexts/LanguageContext';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -175,13 +176,15 @@ function AppContent() {
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <SalonProvider>
-          <AppContent />
-        </SalonProvider>
-      </AuthProvider>
-    </Router>
+    <LanguageProvider>
+      <Router>
+        <AuthProvider>
+          <SalonProvider>
+            <AppContent />
+          </SalonProvider>
+        </AuthProvider>
+      </Router>
+    </LanguageProvider>
   );
 }
 
