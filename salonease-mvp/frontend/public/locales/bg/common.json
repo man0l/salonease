@@ -32,26 +32,26 @@
       "minutes": "минути"
     },
     "footer": {
-      "copyright": "© 2024 SalonEase. All rights reserved.",
+      "copyright": "© 2024 SalonEase. Всички права запазени.",
       "links": {
-        "terms": "Terms",
-        "privacy": "Privacy Policy"
+        "terms": "Общи условия",
+        "privacy": "Политика за поверителност"
       }
     },
     "header": {
       "brand": "SalonEase",
-      "notifications": "Notifications",
-      "profile": "Profile",
-      "logout": "Logout",
-      "login": "Login",
-      "signup": "Sign Up"
+      "notifications": "Известия",
+      "profile": "Профил",
+      "logout": "Изход",
+      "login": "Вход",
+      "signup": "Регистрация"
     },
     "nav": {
       "brand": "SalonEase",
-      "features": "Features",
-      "pricing": "Pricing",
-      "contact": "Contact",
-      "login": "Login",
-      "signup": "Sign Up"
+      "features": "Функции",
+      "pricing": "Цени",
+      "contact": "Контакт",
+      "login": "Вход",
+      "signup": "Регистрация"
     }
   }

@@ -1,0 +1,56 @@
+{
+  "title.service_management": "Управление на услугите",
+  "title.current_services": "Текущи услуги",
+  "action.add_service": "Добави нова услуга",
+  "action.update_service": "Обнови услуга",
+  "action.edit_service": "Редактирай услуга",
+  "action.edit": "Редактирай",
+  "action.delete": "Изтрий",
+  "action.delete_service": "Изтрий",
+  "action.hide_form": "Скрий формата",
+  "action.add_new_service": "Добави нова услуга",
+  "label.name": "Име на услугата:",
+  "label.category": "Категория:",
+  "label.duration": "Продължителност (минути):",
+  "label.price": "Цена:",
+  "label.description": "Описание:",
+  "label.minutes": "минути",
+  "label.notes": "Бележки",
+  "loading.services": "Зареждане на услуги...",
+  "error.no_services": "Няма налични услуги.",
+  "success.service_updated": "Услугата е обновена успешно",
+  "success.service_added": "Услугата е добавена успешно",
+  "success.service_deleted": "Услугата е изтрита успешно",
+  "error.failed_to_update": "Неуспешно обновяване на услугата",
+  "error.failed_to_add": "Неуспешно добавяне на услуга",
+  "error.failed_to_delete": "Неуспешно изтриване на услуга",
+  "validation.name_required": "Името на услугата е задължително",
+  "validation.category_required": "Категорията е задължителна",
+  "validation.duration_required": "Продължителността е задължителна",
+  "validation.price_required": "Цената е задължителна",
+  "validation.price_positive": "Цената трябва да бъде положително число",
+  "action": {
+    "choose": "Избери",
+    "book": "Запази час",
+    "cancel": "Отказ",
+    "search_categories": "Търсене на категории"
+  },
+  "duration": {
+    "minutes": "{{duration}} мин."
+  },
+  "category": {
+    "expand": "Разгъни категория",
+    "collapse": "Свий категория",
+    "select": "Избери категория"
+  },
+  "modal": {
+    "delete_title": "Потвърждаване на изтриването",
+    "delete_message": "Сигурни ли сте, че искате да изтриете тази услуга? Това действие не може да бъде отменено."
+  },
+  "validation": {
+    "select_category": "Моля, изберете категория"
+  },
+  "error": {
+    "delete_failed": "Неуспешно изтриване на услуга"
+  }
+}

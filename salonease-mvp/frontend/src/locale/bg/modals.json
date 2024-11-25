@@ -1,0 +1,5 @@
+{
+  "action.cancel": "Отказ",
+  "action.confirm_deletion": "Потвърди изтриването",
+  "message.are_you_sure_you_want_to_delete_this_client_this_action_cannot_be_undone": "Сигурни ли сте, че искате да изтриете този клиент? Това действие не може да бъде отменено."
+}

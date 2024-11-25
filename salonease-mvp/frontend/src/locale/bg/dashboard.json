@@ -1,0 +1,30 @@
+{
+  "title": {
+    "super_admin": "Административно табло",
+    "staff_dashboard": "Табло на персонала",
+    "dashboard": "Табло за управление",
+    "staff_management": "Управление на персонала"
+  },
+  "error": {
+    "invalid_user_role": "Невалидна потребителска роля"
+  },
+  "action": {
+    "setup_first_salon": "Настройте първия си салон",
+    "view_public_page": "Преглед на публичната страница"
+  },
+  "today_s_appointments": "Днешни часове",
+  "revenue_this_week": "Приходи тази седмица",
+  "next_appointment": "Следващ час",
+  "no_upcoming_appointments": "Няма предстоящи часове",
+  "services": "Услуги",
+  "calendar": "Календар",
+  "clients": "Клиенти",
+  "recent_activity": "Последна активност",
+  "manage_your_team": "Управление на екипа",
+  "manage_offerings": "Управление на услугите",
+  "view_schedule": "Преглед на графика",
+  "manage_clients": "Управление на клиентите",
+  "loading": {
+    "activity": "Зареждане на активност..."
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "title.staff_management": "Управление на персонала",
+  "title.add_staff": "Добавяне на служител",
+  "title.edit_staff": "Редактиране на служител",
+  "title.current_staff": "Текущи служители",
+  "action.add_staff": "Добави служител",
+  "action.invite_staff": "Покани служител",
+  "action.update_staff": "Обнови служител",
+  "action.edit": "Редактирай",
+  "action.delete": "Изтрий",
+  "action.cancel": "Отказ",
+  "action.hide_form": "Скрий формата",
+  "action.add_new_staff": "Добави нов служител",
+  "action.confirm_deletion": "Потвърди изтриването",
+  "label.full_name": "Пълно име:",
+  "label.email": "Имейл:",
+  "label.phone": "Телефон:",
+  "label.role": "Роля:",
+  "label.specialization": "Специализация:",
+  "label.services": "Услуги:",
+  "label.availability": "Наличност:",
+  "label.working_hours": "Работно време:",
+  "label.start_time": "Начален час:",
+  "label.end_time": "Краен час:",
+  "validation.name_required": "Пълното име е задължително",
+  "validation.email_required": "Имейлът е задължителен",
+  "validation.email_invalid": "Невалиден имейл адрес",
+  "validation.phone_required": "Телефонният номер е задължителен",
+  "validation.role_required": "Ролята е задължителна",
+  "success.staff_added": "Служителят е добавен успешно",
+  "success.staff_updated": "Служителят е обновен успешно",
+  "success.staff_deleted": "Служителят е изтрит успешно",
+  "error.failed_to_add": "Неуспешно добавяне на служител",
+  "error.failed_to_update": "Неуспешно обновяване на служител",
+  "error.failed_to_delete": "Неуспешно изтриване на служител",
+  "error.no_staff": "Няма намерени служители",
+  "loading.staff": "Зареждане на служители...",
+  "message": {
+    "confirm_delete": "Искате ли да изтриете този служител?"
+  },
+  "title": {
+    "availability": "Наличност на персонала"
+  },
+  "success": {
+    "availability_saved": "Наличността е запазена успешно.",
+    "availability_deleted": "Наличността е изтрита успешно."
+  },
+  "error": {
+    "save_failed": "Неуспешно запазване на наличността. Моля, опитайте отново.",
+    "delete_failed": "Неуспешно изтриване на наличността. Моля, опитайте отново."
+  },
+  "availability": {
+    "calendar": {
+      "dayView": "Ден",
+      "weekView": "Седмица"
+    },
+    "scroll": {
+      "vertical": "Превъртете вертикално, за да видите всички часове",
+      "horizontal": "Превъртете хоризонтално, за да видите всички дни"
+    },
+    "confirm_delete": "Искате ли да изтриете тази наличност?"
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "title.bookings_management": "Управление на резервации",
+  "title.filters": "Филтри",
+  "action.reset": "Нулиране",
+  "action.show_filters": "Покажи филтрите",
+  "label.start_date": "Начална дата",
+  "label.end_date": "Крайна дата",
+  "label.staff_member": "Служител",
+  "label.service": "Услуга",
+  "label.all_staff": "Всички служители",
+  "label.all_services": "Всички услуги",
+  "action.add_booking": "Добави резервация",
+  "action.add": "Добави",
+  "placeholder.select_start_date": "Изберете начална дата",
+  "placeholder.select_end_date": "Изберете крайна дата",
+  "label.notes": "Бележки",
+  "label.phone": "Телефон",
+  "label.email": "Имейл",
+  "label.duration": "Продължителност",
+  "label.duration_minutes": "{{duration}} минути",
+  "label.page": "Страница {{current}} от {{total}}",
+  "label.showing_entries": "Показване на {{start}} до {{end}} от {{total}} резервации",
+  "label.booking_note_optional": "Добавете допълнителна бележка за причината за отмяната",
+  "action.previous": "Предишна",
+  "action.prev": "Назад",
+  "action.next": "Напред",
+  "action.reschedule": "Пренасрочи резервация",
+  "action.complete": "Завърши резервация",
+  "action.cancel": "Отмени резервация",
+  "action.confirm_cancel": "Потвърди отмяната",
+  "error.failed_to_fetch_bookings": "Грешка при зареждане на резервации",
+  "success.booking_rescheduled": "Резервацията е успешно пренасрочена",
+  "error.failed_to_reschedule_booking": "Грешка при пренасрочване на резервация",
+  "success.booking_cancelled": "Резервацията е успешно отменена",
+  "error.failed_to_cancel_booking": "Грешка при отмяна на резервация",
+  "success.staff_reassigned": "Служителят е успешно преназначен",
+  "error.failed_to_reassign_staff": "Грешка при преназначаване на служител",
+  "success.booking_completed": "Резервацията е успешно завършена",
+  "error.failed_to_complete_booking": "Грешка при завършване на резервация",
+  "status.confirmed": "Потвърдена",
+  "status.pending": "Чакаща",
+  "status.cancelled": "Отменена",
+  "status.completed": "Завършена",
+  "status.no_show": "Неявяване",
+  "status.rescheduled": "Пренасрочена",
+  "status.unassigned": "Неназначена",
+  "tooltip.reassign_staff": "Кликнете за преназначаване на служител",
+  "tooltip.cannot_reassign": "Не може да се преназначи служител за отменени или завършени резервации",
+  "unauthorized_booking": {
+    "title": "Запазване на час",
+    "selected_service": "Избрана услуга",
+    "duration": "Продължителност: {{minutes}} мин",
+    "price": "Цена: {{amount}}",
+    "form": {
+      "name": {
+        "label": "Име",
+        "placeholder": "Въведете вашето име"
+      },
+      "email": {
+        "label": "Имейл"
+      },
+      "phone": {
+        "label": "Телефонен номер"
+      },
+      "staff": {
+        "label": "Служител",
+        "placeholder": "Изберете служител"
+      },
+      "appointment": {
+        "label": "Дата и час на посещението",
+        "placeholder": "Изберете свободен час",
+        "no_slots": "Няма свободни часове за тази дата. Моля, изберете друга дата."
+      },
+      "notes": {
+        "label": "Бележки"
+      }
+    },
+    "required_field": "Задължително поле",
+    "submit": "Изпрати",
+    "submitting": "Изпращане..."
+  },
+  "validation": {
+    "client_mode": "Моля, изберете клиент",
+    "client_name": "Името на клиента е задължително",
+    "client_email": "Невалиден формат на имейл",
+    "client_phone": "Телефонният номер е задължителен",
+    "service": "Услугата е задължителна",
+    "staff": "Служителят е задължителен",
+    "appointment_date_and_time": "Датата и часът са задължителни",
+    "appointment_date_and_time_future": "Часът трябва да бъде в бъдещето"
+  },
+  "loading": {
+    "available_time_slots": "Зареждане на свободни часове..."
+  },
+  "error": {
+    "failed_to_load_slots": "Грешка при зареждане на свободните часове"
+  },
+  "success": {
+    "booking_created": "Резервацията е създадена успешно"
+  },
+  "modal": {
+    "reschedule": {
+      "title": "Пренасрочване на резервация",
+      "new_date_time": "Нова дата и час на посещението",
+      "no_slots": "Няма свободни часове за тази дата",
+      "loading_slots": "Зареждане...",
+      "select_time": "Изберете час",
+      "select_date": "Изберете дата"
+    }
+  },
+  "action": {
+    "select_existing_client": "Изберете съществуващ клиент",
+    "new_client": "Нов клиент",
+    "add_booking": "Добави резервация"
+  },
+  "title": {
+    "create_new_booking": "Създаване на нова резервация"
+  }
+}

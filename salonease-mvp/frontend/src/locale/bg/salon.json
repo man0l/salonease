@@ -1,0 +1,154 @@
+{
+  "label.email": "Имейл",
+  "label.full_name": "Пълно име",
+  "action.cancel": "Отказ",
+  "action.confirm_deletion": "Потвърди изтриването",
+  "title.staff_management": "Управление на персонала",
+  "current_staff": "Текущ персонал",
+  "message.are_you_sure_you_want_to_delete_this_staff_member_this_action_cannot_be_undone": "Сигурни ли сте, че искате да изтриете този служител? Това действие не може да бъде отменено.",
+  "loading_staff": "Зареждане на персонал...",
+  "no_staff_members_yet": "Все още няма персонал.",
+  "action.edit": "Редактирай",
+  "action.delete": "Изтрий",
+  "email_is_required": "Имейлът е задължителен",
+  "full_name_is_required": "Пълното име е задължително",
+  "error.invalid_email": "Невалиден имейл",
+  "staff_availability": "Наличност на персонала",
+  "error.failed_to_save_availability_please_try_again": "Неуспешно запазване на наличността. Моля, опитайте отново.",
+  "error.failed_to_delete_availability_please_try_again": "Неуспешно изтриване на наличността. Моля, опитайте отново.",
+  "do_you_want_to_delete_this_availability": "Искате ли да изтриете тази наличност?",
+  "label.service_name": "Име на услугата",
+  "category": "Категория",
+  "price": "Цена",
+  "duration_minutes": "Продължителност (минути)",
+  "label.description": "Описание",
+  "title.service_management": "Управление на услугите",
+  "current_services": "Текущи услуги",
+  "message.are_you_sure_you_want_to_delete_this_service_this_action_cannot_be_undone": "Сигурни ли сте, че искате да изтриете тази услуга? Това действие не може да бъде отменено.",
+  "loading_services": "Зареждане на услуги...",
+  "no_services_available": "Няма налични услуги.",
+  "error.failed_to_delete_service": "Неуспешно изтриване на услугата",
+  "service_name_is_required": "Името на услугата е задължително",
+  "category_is_required": "Категорията е задължителна",
+  "price_is_required": "Цената е задължителна",
+  "duration_is_required": "Продължителността е задължителна",
+  "price_must_be_positive": "Цената трябва да бъде положително число",
+  "duration_must_be_positive": "Продължителността трябва да бъде положително число",
+  "label.salon_name": "Име на салона",
+  "action.address": "Адрес",
+  "contact_number": "Телефон за връзка",
+  "your_salons": "Вашите салони",
+  "message.are_you_sure_you_want_to_delete_this_salon_this_action_cannot_be_undone": "Сигурни ли сте, че искате да изтриете този салон? Това действие не може да бъде отменено.",
+  "title.list_of_salons": "Списък със салони",
+  "salon_name_is_required": "Името на салона е задължително",
+  "action.address_is_required": "Адресът е задължителен",
+  "contact_number_is_required": "Телефонът за връзка е задължителен",
+  "oops_something_went_wrong": "Упс! Нещо се обърка.",
+  "we_can_t_find_that_salon": "Не можем да намерим този салон",
+  "discover_your_new_favorite_salon": "Открийте своя нов любим салон",
+  "message.what_would_you_like_done_today": "Какво бихте искали да направим днес?",
+  "meet_our_expert_team": "Запознайте се с нашия експертен екип",
+  "get_in_touch_business_hours": "Свържете се с нас и работно време",
+  "business_hours": "Работно време",
+  "contact_us": "Свържете се с нас",
+  "the_salon_you_re_looking_for_doesn_t_seem_to_exist": "Изглежда, че търсеният от вас салон не съществува.",
+  "experience_exceptional_beauty_services_that_make_you_shine": "Изпитайте изключителни козметични услуги, които ви карат да блестите.",
+  "choose_from_our_wide_range_of_services_designed_to_make_you_look_and_feel_your_best": "Изберете от нашата широка гама от услуги, създадени да ви накарат да изглеждате и да се чувствате най-добре.",
+  "our_passionate_professionals_are_here_to_provide_exceptional_service_tailored_to_your_needs": "Нашите отдадени професионалисти са тук, за да предоставят изключително обслужване, съобразено с вашите нужди.",
+  "we_re_here_to_answer_your_questions_and_book_your_appointments_we_look_forward_to_seeing_you_soon": "Тук сме, за да отговорим на въпросите ви и да запишем вашите часове. Очакваме с нетърпение да ви видим скоро!",
+  "start_time": "Начален час",
+  "end_time": "Краен час",
+  "action.save": "Запази",
+  "label.password": "Парола",
+  "action.confirm_password": "Потвърди паролата",
+  "accept_invitation": {
+    "title": "Приемане на покана",
+    "form": {
+      "password": "Парола",
+      "confirm_password": "Потвърди паролата"
+    },
+    "action": {
+      "accept": "Приеми поканата",
+      "accepting": "Приемане..."
+    },
+    "success": "Поканата е приета успешно",
+    "error": {
+      "unexpected": "Възникна неочаквана грешка при приемане на поканата"
+    }
+  },
+  "action.set_up_your_first_salon": "Настройте първия си салон",
+  "action.salon_management": "Управление на салона",
+  "action.hide_form": "Скрий формата",
+  "action.add_new_salon": "Добави нов салон",
+  "action.edit_salon": "Редактирай салон",
+  "action.update_salon": "Обнови салон",
+  "action.add_salon": "Добави салон",
+  "action.are_you_sure_you_want_to_delete_this_salon": "Сигурни ли сте, че искате да изтриете този салон?",
+  "label.your_salons": "Вашите салони",
+  "success.salon_updated": "Салонът е обновен успешно",
+  "error.failed_to_update_salon": "Неуспешно обновяване на салона",
+  "success.salon_added": "Салонът е добавен успешно",
+  "success.onboarding_completed": "Въвеждането е завършено успешно!",
+  "error.failed_to_add_salon": "Неуспешно добавяне на салон",
+  "error.failed_to_save_salon": "Неуспешно запазване на салона. Моля, опитайте отново.",
+  "success.salon_deleted": "Салонът е изтрит успешно",
+  "error.failed_to_delete_salon": "Неуспешно изтриване на салона. Моля, опитайте отново.",
+  "onboarding": {
+    "welcome": "Добре дошли в SalonEase!",
+    "setup_message": "Нека настроим първия ви салон. Кликнете напред, за да започнете.",
+    "action": {
+      "next": "Напред"
+    }
+  },
+  "availability": {
+    "title": "Добави наличност",
+    "staff": {
+      "availability_for": "Наличност за {{name}}",
+      "select_staff": "Избери служител"
+    },
+    "type": {
+      "availability": "Наличност",
+      "time_off": "Почивка"
+    },
+    "time": {
+      "start": "Начален час",
+      "end": "Краен час"
+    },
+    "action": {
+      "save": "Запази",
+      "cancel": "Отказ"
+    }
+  },
+  "public_page": {
+    "hero": {
+      "tagline": "Изпитайте изключителни козметични услуги, които ви карат да блестите"
+    },
+    "about": {
+      "title": "Открийте своя нов любим салон",
+      "default_description": "В нашия салон вярваме в глезенето ви с първокласни услуги, които подчертават естествената ви красота. Нашият талантлив екип е отдаден на предоставянето на персонализирано изживяване, което ви кара да се чувствате освежени и уверени."
+    },
+    "services": {
+      "title": "Какво бихте искали да направим днес?",
+      "subtitle": "Изберете от нашата широка гама от услуги, създадени да ви накарат да изглеждате и да се чувствате най-добре",
+      "loading": "Зареждане на услуги...",
+      "no_services": "В момента няма налични услуги. Моля, проверете по-късно!"
+    },
+    "team": {
+      "title": "Запознайте се с нашия експертен екип",
+      "subtitle": "Нашите отдадени професионалисти са тук, за да предоставят изключително обслужване, съобразено с вашите нужди"
+    },
+    "contact": {
+      "title": "Свържете се с нас и работно време",
+      "subtitle": "Тук сме, за да отговорим на въпросите ви и да запишем вашите часове. Очакваме с нетърпение да ви видим скоро!",
+      "business_hours": "Работно време",
+      "contact_us": "Свържете се с нас"
+    },
+    "error": {
+      "title": "Упс! Нещо се обърка.",
+      "not_found": {
+        "title": "Не можем да намерим този салон",
+        "message": "Изглежда, че търсеният от вас салон не съществува."
+      }
+    }
+  }
+}

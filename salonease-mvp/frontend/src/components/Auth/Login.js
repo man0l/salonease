@@ -77,12 +77,6 @@ function Login() {
             </div>
           </div>
 
-          <div className="text-sm mt-4">
-            <Link to="/forgot-password" className="font-medium text-indigo-600 hover:text-indigo-500">
-              {t('label.forgot_password')}
-            </Link>
-          </div>
-
           <div className="mt-6">
             <button
               type="submit"

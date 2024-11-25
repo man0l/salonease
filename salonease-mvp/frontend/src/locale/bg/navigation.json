@@ -1,0 +1,17 @@
+{
+  "menu": "Меню",
+  "sidebar": {
+    "dashboard": "Табло за управление",
+    "salon_management": "Управление на салон",
+    "calendar": "Календар",
+    "bookings": "Резервации",
+    "clients": "Клиенти",
+    "staff": "Персонал",
+    "staff_availability": "Наличност на персонала",
+    "services": "Услуги",
+    "billing": "Фактуриране",
+    "financial_reports": "Финансови отчети",
+    "settings": "Настройки",
+    "admin_dashboard": "Административно табло"
+  }
+}
