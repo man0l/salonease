@@ -211,8 +211,8 @@ const BookingsCalendar = () => {
           className="h-full min-w-[800px]"
           messages={{
             next: t('bookings:action.next'),
-            previous: t('bookings:action.previous'),
-            today: t('common:today'),
+            previous: t('bookings:action.prev'),
+            today: t('bookings:action.today'),
             noEventsInRange: t('common:status.noData')
           }}
           formats={{

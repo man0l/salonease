@@ -220,6 +220,11 @@ const StaffAvailability = () => {
               </div>
             )
           }}
+          messages={{
+            next: t('staff:action.next'),
+            previous: t('staff:action.prev'),
+            today: t('staff:action.today'),
+          }}
         />
       </div>
       <AddAvailabilityDialog

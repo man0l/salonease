@@ -111,7 +111,8 @@
   "action": {
     "select_existing_client": "Изберете съществуващ клиент",
     "new_client": "Нов клиент",
-    "add_booking": "Добави резервация"
+    "add_booking": "Добави резервация",
+    "today": "Днес"
   },
   "title": {
     "create_new_booking": "Създаване на нова резервация"

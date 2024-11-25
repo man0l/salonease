@@ -111,7 +111,8 @@
   "action": {
     "select_existing_client": "Select Existing Client",
     "new_client": "New Client",
-    "add_booking": "Add Booking"
+    "add_booking": "Add Booking",
+    "today": "Today"
   },
   "title": {
     "create_new_booking": "Create New Booking"
