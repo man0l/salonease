@@ -50,7 +50,6 @@ const FinancialReports = () => {
       
       toast.success(t('reports:export.success', { format: format.toUpperCase() }));
     } catch (error) {
-      console.error('Export error:', error);
       toast.error(t('reports:export.error', { message: error.message || t('common:error.unknown') }));
     }
   };
@@ -71,7 +70,7 @@ const FinancialReports = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">{t('reports:title')}</h1>
+        <h1 className="text-2xl font-bold text-gray-900"> {t('reports:title')} </h1>
         <div className="flex space-x-4">
           <button
             onClick={() => handleExport('csv')}

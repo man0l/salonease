@@ -2,7 +2,9 @@
   "action": {
     "search_categories": "Search categories...",
     "done": "Done",
+    "edit": "Edit",
     "cancel": "Cancel",
+    "delete": "Delete",
     "confirm_reschedule": "Confirm Reschedule",
     "confirm_cancel": "Confirm Cancellation",
     "close": "Close",

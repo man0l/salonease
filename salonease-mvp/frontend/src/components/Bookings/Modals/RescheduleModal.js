@@ -13,8 +13,8 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
   const schema = yup.object().shape({
     appointmentDateTime: yup
       .date()
-      .required(t('bookings:validation.appointment_date_time.required'))
-      .min(new Date(), t('bookings:validation.appointment_date_time.future')),
+      .required(t('bookings:validation.appointment_date_and_time'))
+      .min(new Date(), t('bookings:validation.appointment_date_and_time_future')),
   });
 
   const [newDateTime, setNewDateTime] = useState(

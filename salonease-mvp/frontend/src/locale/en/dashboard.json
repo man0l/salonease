@@ -1,4 +1,30 @@
 {
-  "title": "Dashboard",
-  "welcome": "Welcome to your dashboard. Here you can manage your salon operations."
+  "title": {
+    "super_admin": "Super Admin Dashboard",
+    "staff_dashboard": "Staff Dashboard",
+    "dashboard": "Dashboard",
+    "staff_management": "Staff Management"
+  },
+  "error": {
+    "invalid_user_role": "Invalid user role"
+  },
+  "action": {
+    "setup_first_salon": "Setup Your First Salon",
+    "view_public_page": "View Public Page"
+  },
+  "today_s_appointments": "Today's Appointments",
+  "revenue_this_week": "Revenue This Week",
+  "next_appointment": "Next Appointment",
+  "no_upcoming_appointments": "No upcoming appointments",
+  "services": "Services",
+  "calendar": "Calendar",
+  "clients": "Clients",
+  "recent_activity": "Recent Activity",
+  "manage_your_team": "Manage your team members",
+  "manage_offerings": "Manage service offerings",
+  "view_schedule": "View appointment schedule",
+  "manage_clients": "Manage client database",
+  "loading": {
+    "activity": "Loading activity..."
+  }
 }

@@ -212,11 +212,11 @@ const SalonManagement = ({ isOnboarding = false }) => {
                 <p className="text-gray-600">{salon.contactNumber}</p>
                 <p className="text-gray-600 mt-2">{salon.description}</p>
                 <div className="mt-4 flex space-x-2">
-                  <button onClick={() => handleEdit(salon)} className="bg-secondary-500 hover:bg-secondary-600 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" aria-label={`${t('action.edit')} ${salon.name}`}>
-                    <FaEdit className="mr-1" /> {t('action.edit')}
+                  <button onClick={() => handleEdit(salon)} className="bg-secondary-500 hover:bg-secondary-600 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" aria-label={`${t('common:action.edit')} ${salon.name}`}>
+                    <FaEdit className="mr-1" /> {t('common:action.edit')}
                   </button>
-                  <button onClick={() => handleDelete(salon.id)} className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" aria-label={`${t('action.delete')} ${salon.name}`}>
-                    <FaTrash className="mr-1" /> {t('action.delete')}
+                  <button onClick={() => handleDelete(salon.id)} className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" aria-label={`${t('common:action.delete')} ${salon.name}`}>
+                    <FaTrash className="mr-1" /> {t('common:action.delete')}
                   </button>
                 </div>
               </li>
@@ -229,15 +229,15 @@ const SalonManagement = ({ isOnboarding = false }) => {
               disabled={currentPage === 1}
               className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-md transition duration-300 disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
-              {t('action.previous')}
+              {t('common:action.previous')}
             </button>
-            <span className="text-gray-600">{t('action.page')} {currentPage} {t('action.of')} {totalPages}</span>
+            <span className="text-gray-600">{t('common:action.page')} {currentPage} {t('common:action.of')} {totalPages}</span>
             <button 
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
               disabled={currentPage === totalPages}
               className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-md transition duration-300 disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
-              {t('action.next')}
+              {t('common:action.next')}
             </button>
           </div>
 

@@ -225,7 +225,7 @@ const ServiceManagement = ({ salonId }) => {
                   <span className="font-semibold text-primary-600">{service.name}</span>
                   <span className="ml-2 text-sm text-gray-600">{service?.category?.name}</span>
                   <p className="text-sm text-gray-600">
-                    {t('label.price')}: {formatCurrency(service.price)} | {t('label.duration')}: {service.duration} {t('label.minutes')}
+                    {t('label.price')} {formatCurrency(service.price)} | {t('label.duration')} {service.duration} {t('label.minutes')}
                   </p>
                   {service.promotionalOffer && <p className="text-sm text-green-600">{t('label.offer')}: {service.promotionalOffer}</p>}
                 </div>

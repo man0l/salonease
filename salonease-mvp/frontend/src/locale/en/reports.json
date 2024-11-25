@@ -19,5 +19,20 @@
     "tooltip": {
       "staff": "Staff: {{name}}"
     }
-  }
+  },
+  "revenue": {
+    "title": "Revenue"
+  },
+  "service_breakdown": {
+    "title": "Service Breakdown"
+  },
+  "export": {
+    "csv": "Export CSV",
+    "success": "Report exported successfully to {{format}}",
+    "error": "Failed to export report: {{message}}"
+  },
+  "error": {
+    "loading": "Error loading reports: {{message}}"
+  },
+  "title": "Financial Reports"
 }

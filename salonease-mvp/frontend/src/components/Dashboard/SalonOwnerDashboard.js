@@ -33,7 +33,7 @@ const SalonOwnerDashboard = () => {
       <div className="flex-1 p-10">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-semibold text-gray-900">
-            {selectedSalon.name} {t('common:title.dashboard')}
+            {selectedSalon.name} {t('dashboard:title.dashboard')}
           </h1>
           <Link 
             to={`/salon/${selectedSalon.id}`} 
