@@ -37,6 +37,7 @@
   "error.failed_to_reassign_staff": "Failed to reassign staff",
   "success.booking_completed": "Booking completed successfully",
   "error.failed_to_complete_booking": "Failed to complete booking",
+  "error.no_bookings": "No bookings",
   "status.confirmed": "Confirmed",
   "status.pending": "Pending",
   "status.cancelled": "Cancelled",

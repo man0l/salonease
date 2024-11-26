@@ -37,6 +37,7 @@
   "error.failed_to_reassign_staff": "Грешка при преназначаване на служител",
   "success.booking_completed": "Резервацията е успешно завършена",
   "error.failed_to_complete_booking": "Грешка при завършване на резервация",
+  "error.no_bookings": "Няма резервации",
   "status.confirmed": "Потвърдена",
   "status.pending": "Чакаща",
   "status.cancelled": "Отменена",
