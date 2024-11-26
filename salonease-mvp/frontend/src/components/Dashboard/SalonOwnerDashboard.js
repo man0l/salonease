@@ -109,7 +109,7 @@ const SalonOwnerDashboard = () => {
               {recentActivity.map((activity) => (
                 <li key={activity.id} className="flex items-center space-x-3 text-sm">
                   <FaClock className="text-gray-400" />
-                  <span>{activity.description}</span>
+                  <span>{activity.client.name} {t('dashboard:booked')} {activity.service.name} {t('dashboard:with')} {activity.staff.fullName}</span>
                   <span className="text-gray-400">{activity.timeAgo}</span>
                 </li>
               ))}

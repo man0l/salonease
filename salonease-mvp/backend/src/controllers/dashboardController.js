@@ -150,7 +150,7 @@ exports.getDashboardActivity = async (req, res) => {
       createdAt: activity.createdAt
     }));
 
-    res.json(formattedActivities);
+    res.json(activities);
 
   } catch (error) {
     console.error('Error fetching dashboard activity:', error);
