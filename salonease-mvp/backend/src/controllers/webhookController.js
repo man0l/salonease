@@ -2,17 +2,26 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { User } = require('../config/db');
 const emailHelper = require('../utils/helpers/emailHelper');
 
+let stripeInstance = stripe;
+
 const handleSubscriptionTrialEnding = async (subscription, user) => {
   const daysRemaining = Math.ceil((subscription.trial_end - Date.now() / 1000) / 86400);
   await emailHelper.sendTrialEndingEmail(user.email, daysRemaining);
 };
 
-const handleInvoicePaymentFailed = async (subscription, user) => {
-  const errorMessage = subscription.last_payment_error?.message || 'Payment method declined';
+const handleInvoicePaymentFailed = async (invoice, user) => {
+  const errorMessage = invoice.last_payment_error?.message || 'Payment method declined';
   await emailHelper.sendSubscriptionFailedEmail(user.email, errorMessage);
 };
 
-const handleSubscriptionDeleted = async (user) => {
+const handleSubscriptionDeleted = async (subscription, user) => {
+  await User.update({
+    subscriptionStatus: 'canceled',
+    subscriptionId: null
+  }, {
+    where: { id: user.id }
+  });
+
   await emailHelper.sendSubscriptionCanceledEmail(user.email);
 };
 
@@ -36,7 +45,7 @@ exports.handleStripeWebhook = async (req, res) => {
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(
+    event = stripeInstance.webhooks.constructEvent(
       req.rawBody,
       req.headers['stripe-signature'],
       process.env.STRIPE_WEBHOOK_SECRET
@@ -45,17 +54,30 @@ exports.handleStripeWebhook = async (req, res) => {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  const subscription = event.data.object;
-  const user = await User.findOne({ where: { subscriptionId: subscription.id } });
+  const eventObject = event.data.object;
+  const user = await User.findOne({ 
+    where: { 
+      subscriptionId: eventObject.subscription || eventObject.id 
+    } 
+  });
 
   if (!user) {
-    return res.status(200).json({ received: true });
+    return res.json({ received: true });
   }
 
   const handler = eventHandlers[event.type];
   if (handler) {
-    await handler(subscription, user);
+    try {
+      await handler(eventObject, user);
+    } catch (error) {
+      console.error('Webhook handler error:', error);
+      return res.status(500).json({ error: error.message });
+    }
   }
 
-  res.json({ received: true });
+  return res.json({ received: true });
+};
+
+exports.setStripeInstance = (instance) => {
+  stripeInstance = instance;
 };
