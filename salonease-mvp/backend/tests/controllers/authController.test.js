@@ -1,9 +1,13 @@
-const { register, verifyEmail, login, refreshToken: refreshTokenAction, logout, forgotPassword } = require('../../src/controllers/authController');
+const { register, verifyEmail, login, refreshToken: refreshTokenAction, logout, forgotPassword, completeOnboarding } = require('../../src/controllers/authController');
 const { User, RefreshToken: RefreshTokenModel, sequelize } = require('../setupTests');
 const httpMocks = require('node-mocks-http');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
+const subscriptionService = require('../../src/services/subscriptionService');
+
+// Mock the services
+jest.mock('../../src/services/subscriptionService');
 
 // mock the emailHelper
 jest.mock('../../src/utils/helpers/emailHelper', () => ({
@@ -206,5 +210,53 @@ describe('Auth Controller', () => {
     });
 
     // ... (other forgotPassword tests)
+  });
+
+  describe('completeOnboarding', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+      User.update = jest.fn().mockResolvedValue([1]);
+    });
+
+    it('should complete onboarding successfully', async () => {
+      // create user
+      const user = await User.create({
+        fullName: 'Forgot Password User',
+        email: 'forgotpassword@example.com',
+        password: await bcrypt.hash('OldPassword123!', 10),
+        isEmailVerified: true,
+      });
+
+      const req = { user: { userId: user.id } };
+      const res = {
+        json: jest.fn(),
+        status: jest.fn().mockReturnThis()
+      };
+
+      await completeOnboarding(req, res);
+      expect(subscriptionService.startTrialSubscription).toHaveBeenCalledWith(user.id);
+
+    });
+
+    it('should handle onboarding error and rollback transaction', async () => {
+      const req = { user: { userId: 1 } };
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn()
+      };
+
+      const mockTransaction = {
+        commit: jest.fn(),
+        rollback: jest.fn()
+      };
+
+      sequelize.transaction = jest.fn().mockResolvedValue(mockTransaction);
+      subscriptionService.startTrialSubscription = jest.fn().mockRejectedValue(new Error('Subscription error'));
+
+      await completeOnboarding(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Subscription error' });
+    });
   });
 });
