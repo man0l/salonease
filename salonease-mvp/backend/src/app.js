@@ -24,6 +24,9 @@ const reportRoutes = require('./routes/reportRoutes');
 
 // Use routes
 app.use('/api/auth', authRoutes);
+app.use('/api/public', publicRoutes);
+
+
 app.use('/api/salons', salonRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/staff-availability', staffAvailabilityRoutes);
@@ -31,7 +34,6 @@ app.use('/api/services', serviceRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/bookings', bookingRoutes);
-app.use('/api/public', publicRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/reports', reportRoutes);
 

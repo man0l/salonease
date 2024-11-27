@@ -129,3 +129,127 @@ The SalonEase Team`;
 
   await sendEmail(email, subject, htmlContent, textContent);
 };
+
+exports.sendTrialEndingEmail = async (email, daysRemaining) => {
+  const subject = 'Your SalonEase Trial is Ending Soon';
+  
+  const htmlContent = `
+    <html>
+      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <h2>Your Trial is Ending Soon</h2>
+        <p>Your SalonEase trial period will end in ${daysRemaining} days.</p>
+        <p>To continue using all features of SalonEase, please update your subscription:</p>
+        <p>
+          <a href="${process.env.FRONTEND_URL}/settings/subscription" 
+             style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">
+            Update Subscription
+          </a>
+        </p>
+        <p>If you have any questions about our subscription plans, please don't hesitate to contact our support team.</p>
+        <p>Best regards,<br>The SalonEase Team</p>
+      </body>
+    </html>
+  `;
+
+  const textContent = `Your Trial is Ending Soon
+
+Your SalonEase trial period will end in ${daysRemaining} days.
+
+To continue using all features of SalonEase, please update your subscription:
+${process.env.FRONTEND_URL}/settings/subscription
+
+If you have any questions about our subscription plans, please don't hesitate to contact our support team.
+
+Best regards,
+The SalonEase Team`;
+
+  await sendEmail(email, subject, htmlContent, textContent);
+};
+
+exports.sendSubscriptionFailedEmail = async (email, reason) => {
+  const subject = 'Subscription Payment Failed';
+  
+  const htmlContent = `
+    <html>
+      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <h2>Subscription Payment Failed</h2>
+        <p>We were unable to process your subscription payment for SalonEase.</p>
+        <p>Reason: ${reason}</p>
+        <p>To avoid any interruption in service, please update your payment method:</p>
+        <p>
+          <a href="${process.env.FRONTEND_URL}/settings/billing" 
+             style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">
+            Update Payment Method
+          </a>
+        </p>
+        <p>If you need assistance, please contact our support team.</p>
+        <p>Best regards,<br>The SalonEase Team</p>
+      </body>
+    </html>
+  `;
+
+  const textContent = `Subscription Payment Failed
+
+We were unable to process your subscription payment for SalonEase.
+
+Reason: ${reason}
+
+To avoid any interruption in service, please update your payment method:
+${process.env.FRONTEND_URL}/settings/billing
+
+If you need assistance, please contact our support team.
+
+Best regards,
+The SalonEase Team`;
+
+  await sendEmail(email, subject, htmlContent, textContent);
+};
+
+exports.sendSubscriptionCanceledEmail = async (email) => {
+  const subject = 'Subscription Canceled';
+  
+  const htmlContent = `
+    <html>
+      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <h2>Subscription Canceled</h2>
+        <p>Your SalonEase subscription has been canceled.</p>
+        <p>You will continue to have access to your account until the end of your current billing period.</p>
+        <p>If you'd like to reactivate your subscription:</p>
+        <p>
+          <a href="${process.env.FRONTEND_URL}/settings/subscription" 
+             style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">
+            Reactivate Subscription
+          </a>
+        </p>
+        <p>We're sorry to see you go. If you have any feedback about how we can improve our service, please let us know.</p>
+        <p>Best regards,<br>The SalonEase Team</p>
+      </body>
+    </html>
+  `;
+
+  const textContent = `Subscription Canceled
+
+Your SalonEase subscription has been canceled.
+
+You will continue to have access to your account until the end of your current billing period.
+
+If you'd like to reactivate your subscription:
+${process.env.FRONTEND_URL}/settings/subscription
+
+We're sorry to see you go. If you have any feedback about how we can improve our service, please let us know.
+
+Best regards,
+The SalonEase Team`;
+
+  await sendEmail(email, subject, htmlContent, textContent);
+};
+
+module.exports = {
+  sendEmail,
+  sendVerificationEmail: exports.sendVerificationEmail,
+  sendInvitationEmail: exports.sendInvitationEmail,
+  sendWelcomeEmail: exports.sendWelcomeEmail,
+  sendTrialEndingEmail: exports.sendTrialEndingEmail,
+  sendSubscriptionFailedEmail: exports.sendSubscriptionFailedEmail,
+  sendSubscriptionCanceledEmail: exports.sendSubscriptionCanceledEmail
+};

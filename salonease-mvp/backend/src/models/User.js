@@ -48,6 +48,22 @@ module.exports = (sequelize) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    stripeCustomerId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    subscriptionId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    subscriptionStatus: {
+      type: DataTypes.ENUM('trialing', 'active', 'past_due', 'canceled', 'incomplete'),
+      allowNull: true,
+    },
+    trialEndsAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    }
   }, {
     sequelize,
     modelName: 'User',
