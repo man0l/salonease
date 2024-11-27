@@ -1,6 +1,7 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { User } = require('../config/db');
 const emailHelper = require('../utils/helpers/emailHelper');
+const subscriptionService = require('../services/subscriptionService');
 
 let stripeInstance = stripe;
 
@@ -15,23 +16,16 @@ const handleInvoicePaymentFailed = async (invoice, user) => {
 };
 
 const handleSubscriptionDeleted = async (subscription, user) => {
-  await User.update({
-    subscriptionStatus: 'canceled',
-    subscriptionId: null
-  }, {
-    where: { id: user.id }
-  });
-
+  await subscriptionService.cancelSubscription(user.id);
   await emailHelper.sendSubscriptionCanceledEmail(user.email);
 };
 
 const handleSubscriptionUpdated = async (subscription, user) => {
-  await User.update({
-    subscriptionStatus: subscription.status,
-    trialEndsAt: subscription.trial_end ? new Date(subscription.trial_end * 1000) : null
-  }, {
-    where: { id: user.id }
-  });
+  await subscriptionService.updateSubscriptionStatus(
+    user.id,
+    subscription.status,
+    subscription.trial_end
+  );
 };
 
 const eventHandlers = {

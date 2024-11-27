@@ -2,9 +2,13 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { User } = require('../config/db');
 
 class SubscriptionService {
+  constructor() {
+    this.stripe = stripe;
+  }
+
   async createCustomer(user) {
     try {
-      const customer = await stripe.customers.create({
+      const customer = await this.stripe.customers.create({
         email: user.email,
         name: user.fullName,
         metadata: {
@@ -34,7 +38,7 @@ class SubscriptionService {
         customer = await this.createCustomer(user);
       }
 
-      const subscription = await stripe.subscriptions.create({
+      const subscription = await this.stripe.subscriptions.create({
         customer: user.stripeCustomerId || customer.id,
         trial_period_days: 14,
         items: [
@@ -66,13 +70,41 @@ class SubscriptionService {
       const user = await User.findByPk(userId);
       if (!user?.subscriptionId) return null;
 
-      const subscription = await stripe.subscriptions.retrieve(user.subscriptionId);
+      const subscription = await this.stripe.subscriptions.retrieve(user.subscriptionId);
       return subscription;
     } catch (error) {
       console.error('Error retrieving subscription status:', error);
       return null;
     }
   }
+
+  async updateSubscriptionStatus(userId, status, trialEnd = null) {
+    try {
+      await User.update({
+        subscriptionStatus: status,
+        trialEndsAt: trialEnd ? new Date(trialEnd * 1000) : null
+      }, {
+        where: { id: userId }
+      });
+    } catch (error) {
+      console.error('Error updating subscription status:', error);
+      throw new Error('Failed to update subscription status');
+    }
+  }
+
+  async cancelSubscription(userId) {
+    try {
+      await User.update({
+        subscriptionStatus: 'canceled',
+        subscriptionId: null
+      }, {
+        where: { id: userId }
+      });
+    } catch (error) {
+      console.error('Error canceling subscription:', error);
+      throw new Error('Failed to cancel subscription');
+    }
+  }
 }
 
-module.exports = new SubscriptionService();
+module.exports = SubscriptionService;

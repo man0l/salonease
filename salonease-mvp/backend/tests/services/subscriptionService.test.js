@@ -2,12 +2,33 @@ const stripe = require('stripe');
 const { User } = require('../setupTests');
 const SubscriptionService = require('../../src/services/subscriptionService');
 
-jest.mock('stripe');
-jest.mock('../../src/config/db');
+// Mock stripe
+jest.mock('stripe', () => {
+  return jest.fn(() => ({
+    customers: {
+      create: jest.fn(),
+      retrieve: jest.fn()
+    },
+    subscriptions: {
+      create: jest.fn(),
+      retrieve: jest.fn()
+    }
+  }));
+});
 
 describe('Subscription Service', () => {
+  let stripeInstance;
+  let mockStripe;
+  
   beforeEach(() => {
     jest.clearAllMocks();
+    mockStripe = stripe();
+    stripeInstance = new SubscriptionService();
+    stripeInstance.stripe = mockStripe;
+
+    // Mock User methods
+    User.update = jest.fn().mockResolvedValue([1]);
+    User.findByPk = jest.fn();
   });
 
   describe('createCustomer', () => {
@@ -19,11 +40,11 @@ describe('Subscription Service', () => {
       };
 
       const mockStripeCustomer = { id: 'cus_123' };
-      stripe.customers.create.mockResolvedValue(mockStripeCustomer);
+      mockStripe.customers.create.mockResolvedValue(mockStripeCustomer);
 
-      await SubscriptionService.createCustomer(mockUser);
+      await stripeInstance.createCustomer(mockUser);
 
-      expect(stripe.customers.create).toHaveBeenCalledWith({
+      expect(mockStripe.customers.create).toHaveBeenCalledWith({
         email: mockUser.email,
         name: mockUser.fullName,
         metadata: { userId: mockUser.id }
@@ -36,9 +57,9 @@ describe('Subscription Service', () => {
     });
 
     it('should handle stripe customer creation error', async () => {
-      stripe.customers.create.mockRejectedValue(new Error('Stripe error'));
+      mockStripe.customers.create.mockRejectedValue(new Error('Stripe error'));
 
-      await expect(SubscriptionService.createCustomer({ id: 1 }))
+      await expect(stripeInstance.createCustomer({ id: 1 }))
         .rejects
         .toThrow('Failed to create Stripe customer');
     });
@@ -59,11 +80,11 @@ describe('Subscription Service', () => {
         trial_end: Math.floor(Date.now() / 1000) + 86400 * 14
       };
 
-      stripe.subscriptions.create.mockResolvedValue(mockSubscription);
+      mockStripe.subscriptions.create.mockResolvedValue(mockSubscription);
 
-      await SubscriptionService.startTrialSubscription(mockUser.id);
+      await stripeInstance.startTrialSubscription(mockUser.id);
 
-      expect(stripe.subscriptions.create).toHaveBeenCalledWith({
+      expect(mockStripe.subscriptions.create).toHaveBeenCalledWith({
         customer: mockUser.stripeCustomerId,
         trial_period_days: 14,
         items: [
@@ -93,7 +114,7 @@ describe('Subscription Service', () => {
       User.findByPk.mockResolvedValue(mockUser);
 
       const mockCustomer = { id: 'cus_123' };
-      stripe.customers.create.mockResolvedValue(mockCustomer);
+      mockStripe.customers.create.mockResolvedValue(mockCustomer);
 
       const mockSubscription = {
         id: 'sub_123',
@@ -101,12 +122,12 @@ describe('Subscription Service', () => {
         trial_end: Math.floor(Date.now() / 1000) + 86400 * 14
       };
 
-      stripe.subscriptions.create.mockResolvedValue(mockSubscription);
+      mockStripe.subscriptions.create.mockResolvedValue(mockSubscription);
 
-      await SubscriptionService.startTrialSubscription(mockUser.id);
+      await stripeInstance.startTrialSubscription(mockUser.id);
 
-      expect(stripe.customers.create).toHaveBeenCalled();
-      expect(stripe.subscriptions.create).toHaveBeenCalled();
+      expect(mockStripe.customers.create).toHaveBeenCalled();
+      expect(mockStripe.subscriptions.create).toHaveBeenCalled();
     });
   });
 });
