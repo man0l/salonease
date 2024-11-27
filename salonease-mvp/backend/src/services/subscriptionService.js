@@ -23,7 +23,6 @@ class SubscriptionService {
 
       return customer;
     } catch (error) {
-      console.error('Error creating Stripe customer:', error);
       throw new Error('Failed to create Stripe customer');
     }
   }
@@ -60,7 +59,6 @@ class SubscriptionService {
 
       return subscription;
     } catch (error) {
-      console.error('Error starting trial subscription:', error);
       throw new Error('Failed to start trial subscription');
     }
   }
@@ -73,7 +71,6 @@ class SubscriptionService {
       const subscription = await this.stripe.subscriptions.retrieve(user.subscriptionId);
       return subscription;
     } catch (error) {
-      console.error('Error retrieving subscription status:', error);
       return null;
     }
   }
@@ -87,7 +84,6 @@ class SubscriptionService {
         where: { id: userId }
       });
     } catch (error) {
-      console.error('Error updating subscription status:', error);
       throw new Error('Failed to update subscription status');
     }
   }
@@ -101,7 +97,6 @@ class SubscriptionService {
         where: { id: userId }
       });
     } catch (error) {
-      console.error('Error canceling subscription:', error);
       throw new Error('Failed to cancel subscription');
     }
   }

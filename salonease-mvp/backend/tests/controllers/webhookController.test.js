@@ -2,11 +2,17 @@ const { handleStripeWebhook, setStripeInstance } = require('../../src/controller
 const { User } = require('../setupTests');
 const httpMocks = require('node-mocks-http');
 const emailHelper = require('../../src/utils/helpers/emailHelper');
+const subscriptionService = require('../../src/services/subscriptionService');
 
 jest.mock('../../src/utils/helpers/emailHelper', () => ({
   sendTrialEndingEmail: jest.fn().mockResolvedValue(),
   sendSubscriptionFailedEmail: jest.fn().mockResolvedValue(),
   sendSubscriptionCanceledEmail: jest.fn().mockResolvedValue()
+}));
+
+jest.mock('../../src/services/subscriptionService', () => ({
+  updateSubscriptionStatus: jest.fn().mockResolvedValue(),
+  cancelSubscription: jest.fn().mockResolvedValue()
 }));
 
 describe('Webhook Controller', () => {
@@ -20,6 +26,25 @@ describe('Webhook Controller', () => {
       password: 'password123',
       subscriptionId: 'sub_123',
       role: 'SalonOwner'
+    });
+
+    // Mock the subscription service to actually update the user
+    subscriptionService.updateSubscriptionStatus.mockImplementation(async (userId, status, trialEnd) => {
+      await User.update({
+        subscriptionStatus: status,
+        trialEndsAt: trialEnd ? new Date(trialEnd * 1000) : null
+      }, {
+        where: { id: userId }
+      });
+    });
+
+    subscriptionService.cancelSubscription.mockImplementation(async (userId) => {
+      await User.update({
+        subscriptionStatus: 'canceled',
+        subscriptionId: null
+      }, {
+        where: { id: userId }
+      });
     });
 
     // Mock Stripe instance
@@ -125,8 +150,7 @@ describe('Webhook Controller', () => {
       await handleStripeWebhook(req, res);
 
       // Verify the user's subscription status is updated
-      const updatedUser = await User.findByPk(testUser.id);
-      console.log(updatedUser);
+      const updatedUser = await User.findByPk(testUser.id);      
       expect(updatedUser.subscriptionStatus).toBe('canceled');
       expect(updatedUser.subscriptionId).toBeNull();
 
@@ -194,7 +218,9 @@ describe('Webhook Controller', () => {
       };
 
       mockStripe.webhooks.constructEvent.mockReturnValue(event);
-      jest.spyOn(User, 'update').mockRejectedValue(new Error('Database error'));
+      
+      // Mock the subscription service to throw the specific error
+      subscriptionService.updateSubscriptionStatus.mockRejectedValue(new Error('Database error'));
 
       await handleStripeWebhook(req, res);
 

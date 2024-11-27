@@ -63,8 +63,7 @@ exports.handleStripeWebhook = async (req, res) => {
   if (handler) {
     try {
       await handler(eventObject, user);
-    } catch (error) {
-      console.error('Webhook handler error:', error);
+    } catch (error) {      
       return res.status(500).json({ error: error.message });
     }
   }

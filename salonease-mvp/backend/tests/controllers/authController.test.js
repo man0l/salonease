@@ -216,6 +216,7 @@ describe('Auth Controller', () => {
     beforeEach(() => {
       jest.clearAllMocks();
       User.update = jest.fn().mockResolvedValue([1]);
+      subscriptionService.startTrialSubscription = jest.fn().mockResolvedValue();
     });
 
     it('should complete onboarding successfully', async () => {
@@ -234,8 +235,22 @@ describe('Auth Controller', () => {
       };
 
       await completeOnboarding(req, res);
+      
+      // Verify subscription service was called
       expect(subscriptionService.startTrialSubscription).toHaveBeenCalledWith(user.id);
-
+      
+      // Verify user update was called
+      expect(User.update).toHaveBeenCalledWith(
+        { onboardingCompleted: true },
+        expect.objectContaining({
+          where: { id: user.id }
+        })
+      );
+      
+      // Verify response
+      expect(res.json).toHaveBeenCalledWith({ 
+        message: 'Onboarding completed successfully' 
+      });
     });
 
     it('should handle onboarding error and rollback transaction', async () => {
