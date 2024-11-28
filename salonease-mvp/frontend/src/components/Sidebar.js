@@ -30,6 +30,16 @@ const Sidebar = () => {
     user && (item.roles.includes(user.role) || (user.role === 'SuperAdmin' && item.roles.includes('SalonOwner')))
   );
 
+  const shouldDisableNavigation = () => {
+    if (user.role === 'SalonOwner') {
+      return !user.onboardingCompleted;
+    }
+    if (user.role === 'Staff') {
+      return !selectedSalon;
+    }
+    return false;
+  };
+
   const getRoute = (route) => {
     if (selectedSalon && route.includes(':salonId')) {
       return route.replace(':salonId', selectedSalon.id);
@@ -63,7 +73,7 @@ const Sidebar = () => {
                     ? 'bg-primary-50 text-primary-700 border-l-4 border-primary-500'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-primary-600'
                 } ${
-                  (!user.onboardingCompleted && !item.alwaysEnabled && user.role !== 'Staff')
+                  shouldDisableNavigation()
                     ? 'opacity-50 pointer-events-none'
                     : ''
                 }`
