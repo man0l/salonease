@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
+import { subscriptionApi } from '../../utils/api';
 
 const SalonManagement = ({ isOnboarding = false }) => {
   const { t } = useTranslation(['salon', 'common']);
@@ -37,34 +38,49 @@ const SalonManagement = ({ isOnboarding = false }) => {
     }
   }, [error]);
 
+  const handleSalonUpdate = async (salonId, data) => {
+    const updatedSalon = await updateSalon(salonId, data);
+    if (!updatedSalon) {
+      throw new Error(t('error.failed_to_update_salon'));
+    }
+    
+    toast.success(t('success.salon_updated'));
+    reset(updatedSalon);
+    setEditingSalon(null);
+    await fetchSalons();
+    setShowForm(false);
+  };
+
+  const handleSalonCreate = async (data) => {
+    const newSalon = await addSalon(data);
+    if (!newSalon) {
+      throw new Error(t('error.failed_to_add_salon'));
+    }
+
+    toast.success(t('success.salon_added'));
+    reset();
+    await fetchSalons();
+    setShowForm(false);
+
+    if (isOnboarding) {
+      await updateUser({ ...user, onboardingCompleted: true });
+      toast.success(t('success.onboarding_completed'));
+      navigate('/dashboard');
+    }
+
+    try {
+      await subscriptionApi.incrementBasePrice();
+    } catch (error) {
+      toast.error(t('error.failed_to_update_subscription'));
+    }
+  };
+
   const onSubmit = async (data) => {
     try {
       if (editingSalon) {
-        const updatedSalon = await updateSalon(editingSalon.id, data);
-        if (updatedSalon) {
-          toast.success(t('success.salon_updated'));
-          reset(updatedSalon);
-          setEditingSalon(null);
-          await fetchSalons();
-          setShowForm(false);
-        } else {
-          throw new Error(t('error.failed_to_update_salon'));
-        }
+        await handleSalonUpdate(editingSalon.id, data);
       } else {
-        const newSalon = await addSalon(data);
-        if (newSalon) {
-          toast.success(t('success.salon_added'));
-          reset();
-          await fetchSalons();
-          setShowForm(false);
-          if (isOnboarding) {
-            await updateUser({ ...user, onboardingCompleted: true });
-            toast.success(t('success.onboarding_completed'));
-            navigate('/dashboard');
-          }
-        } else {
-          throw new Error(t('error.failed_to_add_salon'));
-        }
+        await handleSalonCreate(data);
       }
     } catch (err) {
       toast.error(t('error.failed_to_save_salon'));

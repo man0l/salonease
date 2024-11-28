@@ -177,6 +177,12 @@ const reportsApi = {
     })
 };
 
+const subscriptionApi = {
+  incrementBasePrice: () => api.post('/subscription/increment-base-price'),
+  addBookingCharge: () => api.post('/subscription/add-booking-charge'),
+};
+
+
 export { 
   api, 
   authApi, 
@@ -186,5 +192,6 @@ export {
   bookingApi, 
   publicApi,
   dashboardApi,
-  reportsApi 
+  reportsApi,
+  subscriptionApi
 };

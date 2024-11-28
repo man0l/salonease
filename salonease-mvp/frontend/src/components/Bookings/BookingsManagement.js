@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { bookingApi } from '../../utils/api';
+import { bookingApi, subscriptionApi } from '../../utils/api';
 import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
@@ -115,9 +115,22 @@ const BookingsManagement = () => {
     }
   };
 
-  const handleAddNewBooking = () => {
-    setSelectedBooking(null);
-    setShowCreateModal(true);
+  const handleAddNewBooking = async (bookingData) => {
+    try {
+      const result = await bookingApi.createBooking(salonId, bookingData);
+      if (result) {
+        try {
+          await subscriptionApi.addBookingCharge();
+        } catch (error) {
+          toast.error(t('error.failed_to_update_subscription'));
+        }
+        toast.success(t('success.booking_created'));
+        fetchBookingsData();
+        setShowCreateModal(false);
+      }
+    } catch (error) {
+      toast.error(t('error.failed_to_create_booking'));
+    }
   };
 
   const getStatusColor = (status) => {

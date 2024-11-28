@@ -91,6 +91,7 @@
   "success.onboarding_completed": "Въвеждането е завършено успешно!",
   "error.failed_to_add_salon": "Неуспешно добавяне на салон",
   "error.failed_to_save_salon": "Неуспешно запазване на салона. Моля, опитайте отново.",
+  "error.failed_to_update_subscription": "Неуспешно обновяване на вашата подписка",
   "success.salon_deleted": "Салонът е изтрит успешно",
   "error.failed_to_delete_salon": "Неуспешно изтриване на салона. Моля, опитайте отново.",
   "onboarding": {

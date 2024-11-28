@@ -100,6 +100,57 @@ class SubscriptionService {
       throw new Error('Failed to cancel subscription');
     }
   }
+
+  async incrementBasePrice(userId) {
+    try {
+      const user = await User.findByPk(userId);
+      if (!user?.subscriptionId) return null;
+
+      const subscription = await this.stripe.subscriptions.retrieve(user.subscriptionId);
+      const baseItem = subscription.items.data.find(
+        item => item.price.id === process.env.STRIPE_BASE_PRICE_ID
+      );
+
+      if (baseItem) {
+        await this.stripe.subscriptionItems.update(baseItem.id, {
+          quantity: baseItem.quantity + 1
+        });
+      }
+
+      return subscription;
+    } catch (error) {
+      console.error('Failed to increment base price:', error);
+      throw new Error('Failed to update subscription base price');
+    }
+  }
+
+  async addBookingCharge(userId) {
+    let user;
+    try {
+      user = await User.findByPk(userId);
+
+      if (user.role === ROLES.STAFF) {
+        user = await Salon.findByPk(user.salonId);
+      }
+
+      if (!user?.subscriptionId) return null;
+
+      const subscription = await this.stripe.subscriptions.retrieve(user.subscriptionId);
+      const bookingItem = subscription.items.data.find(
+        item => item.price.id === process.env.STRIPE_BOOKING_PRICE_ID
+      );
+
+      if (bookingItem) {
+        await this.stripe.subscriptionItems.update(bookingItem.id, {
+          quantity: bookingItem.quantity + 1
+        });
+      }
+
+      return subscription;
+    } catch (error) {      
+      throw new Error('Failed to update subscription booking charge: ' + error.message);
+    }
+  }
 }
 
 module.exports = SubscriptionService;

@@ -91,6 +91,7 @@
   "success.onboarding_completed": "Onboarding completed successfully!",
   "error.failed_to_add_salon": "Failed to add salon",
   "error.failed_to_save_salon": "Failed to save salon. Please try again.",
+  "error.failed_to_update_subscription": "Failed to update your subscription",
   "success.salon_deleted": "Salon deleted successfully",
   "error.failed_to_delete_salon": "Failed to delete salon. Please try again.",
   "onboarding": {

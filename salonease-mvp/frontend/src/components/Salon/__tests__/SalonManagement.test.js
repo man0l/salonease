@@ -6,10 +6,16 @@ import { SalonProvider } from '../../../contexts/SalonContext';
 import { useSalon } from '../../../hooks/useSalon';
 import { useAuth } from '../../../hooks/useAuth';
 import { toast } from 'react-toastify';
+import { subscriptionApi } from '../../../utils/api';
 
 jest.mock('../../../hooks/useSalon');
 jest.mock('../../../hooks/useAuth');
 jest.mock('react-toastify');
+jest.mock('../../../utils/api', () => ({
+  subscriptionApi: {
+    incrementBasePrice: jest.fn(),
+  },
+}));
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => jest.fn(),
@@ -26,23 +32,29 @@ const renderWithContext = (component) => {
 };
 
 describe('SalonManagement', () => {
+  const mockFetchSalons = jest.fn();
+  const mockAddSalon = jest.fn();
+  const mockUpdateSalon = jest.fn();
+  const mockDeleteSalon = jest.fn();
+  const mockUpdateUser = jest.fn();
+
   beforeEach(() => {
     useSalon.mockReturnValue({
       salons: [],
       loading: false,
       error: null,
-      addSalon: jest.fn(),
-      updateSalon: jest.fn(),
-      deleteSalon: jest.fn(),
+      addSalon: mockAddSalon,
+      updateSalon: mockUpdateSalon,
+      deleteSalon: mockDeleteSalon,
       currentPage: 1,
       totalPages: 1,
       setCurrentPage: jest.fn(),
-      fetchSalons: jest.fn(),
+      fetchSalons: mockFetchSalons,
     });
 
     useAuth.mockReturnValue({
       user: { id: '1', name: 'Test User' },
-      updateUser: jest.fn(),
+      updateUser: mockUpdateUser,
     });
 
     toast.success = jest.fn();
@@ -60,12 +72,9 @@ describe('SalonManagement', () => {
     expect(screen.getByText(/add new salon/i)).toBeInTheDocument();
   });
 
-  it('submits the form with valid data', async () => {
-    const mockAddSalon = jest.fn().mockResolvedValue({ id: '123e4567-e89b-12d3-a456-426614174000', name: 'Test Salon' });
-    useSalon.mockReturnValue({
-      ...useSalon(),
-      addSalon: mockAddSalon,
-    });
+  it('handles salon creation successfully', async () => {
+    mockAddSalon.mockResolvedValueOnce({ id: '123', name: 'Test Salon' });
+    subscriptionApi.incrementBasePrice.mockResolvedValueOnce({});
 
     renderWithContext(<SalonManagement />);
     fireEvent.click(screen.getByText(/add new salon/i));
