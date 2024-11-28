@@ -148,6 +148,10 @@ const BookingsCalendar = () => {
     booking: booking,
   }));
 
+  const handleViewChange = (newView) => {
+    setView(newView);
+  };
+
   return (
     <div className="h-full flex flex-col">
       <div className="mb-4 flex justify-between items-center">
@@ -195,6 +199,7 @@ const BookingsCalendar = () => {
           endAccessor="end"
           defaultView={Views.WEEK}
           view={view}
+          onView={handleViewChange}
           views={[Views.DAY, Views.WEEK]}
           step={15}
           timeslots={1}
