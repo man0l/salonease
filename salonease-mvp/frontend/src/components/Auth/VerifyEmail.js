@@ -19,7 +19,7 @@ const VerifyEmail = () => {
       if (token) {
         try {
           const response = await authApi.verifyEmail(token);
-          setMessage(response.data.message);
+          setMessage(t('success.verification_successful'));
           setStatus('success');
           setTimeout(() => {
             navigate('/login');
