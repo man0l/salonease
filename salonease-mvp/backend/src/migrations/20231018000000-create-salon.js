@@ -25,6 +25,10 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: true
       },
+      deletedAt: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
       ownerId: {
         type: Sequelize.UUID,
         allowNull: false,

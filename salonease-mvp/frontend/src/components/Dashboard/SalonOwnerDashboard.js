@@ -106,13 +106,19 @@ const SalonOwnerDashboard = () => {
             <div className="text-red-500 text-center py-4">{error}</div>
           ) : (
             <ul className="space-y-4">
-              {recentActivity.map((activity) => (
-                <li key={activity.id} className="flex items-center space-x-3 text-sm">
-                  <FaClock className="text-gray-400" />
-                  <span>{activity.client.name} {t('dashboard:booked')} {activity.service.name} {t('dashboard:with')} {activity.staff.fullName}</span>
-                  <span className="text-gray-400">{activity.timeAgo}</span>
+              {recentActivity.length === 0 ? (
+                <li className="text-gray-500 text-center py-4">
+                  {t('dashboard:no_recent_activity')}
                 </li>
-              ))}
+              ) : (
+                recentActivity.map((activity) => (
+                  <li key={activity.id} className="flex items-center space-x-3 text-sm">
+                    <FaClock className="text-gray-400" />
+                    <span>{activity.client.name} {t('dashboard:booked')} {activity.service.name} {t('dashboard:with')} {activity.staff.fullName}</span>
+                    <span className="text-gray-400">{activity.timeAgo}</span>
+                  </li>
+                ))
+              )}
             </ul>
           )}
         </div>

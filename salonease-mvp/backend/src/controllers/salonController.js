@@ -67,15 +67,43 @@ exports.updateSalon = async (req, res) => {
 exports.deleteSalon = async (req, res) => {
   try {
     const { id } = req.params;
-    const salon = await Salon.findOne({ where: { id, ownerId: req.user.id } });
+    const { force } = req.query;
+    
+    const salon = await Salon.findOne({ 
+      where: { id, ownerId: req.user.id },
+      paranoid: false // Allow finding soft-deleted salons for force delete
+    });
     
     if (!salon) {
       return res.status(404).json({ message: 'Salon not found' });
     }
 
-    await salon.destroy();
+    await salon.destroy({ force: force === 'true' });
     res.status(204).send();
   } catch (error) {
+    console.error('Error deleting salon:', error);
     res.status(500).json({ message: 'Error deleting salon', error: error.message });
+  }
+};
+
+// Add restore endpoint
+exports.restoreSalon = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const salon = await Salon.findOne({ 
+      where: { id, ownerId: req.user.id },
+      paranoid: false // Required to find soft-deleted salons
+    });
+    
+    if (!salon) {
+      return res.status(404).json({ message: 'Salon not found' });
+    }
+
+    await salon.restore();
+    res.status(200).json(salon);
+  } catch (error) {
+    console.error('Error restoring salon:', error);
+    res.status(500).json({ message: 'Error restoring salon', error: error.message });
   }
 };

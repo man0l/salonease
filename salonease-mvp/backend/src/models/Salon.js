@@ -54,6 +54,8 @@ module.exports = (sequelize) => {
   }, {
     sequelize,
     modelName: 'Salon',
+    paranoid: true,
+    timestamps: true
   });
 
   return Salon;

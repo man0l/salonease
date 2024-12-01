@@ -2,11 +2,31 @@ import React, { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import SalonManagement from '../Salon/SalonManagement';
+import { subscriptionApi } from '../../utils/api';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import SubscriptionPricing from './SubscriptionPricing';
 
 const SalonOwnerOnboarding = () => {
   const [step, setStep] = useState(1);
-  const { user } = useAuth();
+  const [salonData, setSalonData] = useState(null);
+  const { user, updateUser } = useAuth();
   const { t } = useTranslation(['salon']);
+  const navigate = useNavigate();
+
+  const handleSalonComplete = (salon) => {
+    setSalonData(salon);
+    setStep(step + 1);
+  };
+
+  const handleOnboardingComplete = async () => {
+
+    await subscriptionApi.incrementBasePrice();
+
+    updateUser({ ...user, onboardingCompleted: true });
+    toast.success(t('success.onboarding_completed'));
+    navigate('/dashboard');
+  };
 
   const renderStep = () => {
     switch (step) {
@@ -19,24 +39,56 @@ const SalonOwnerOnboarding = () => {
             <p className="mb-6 text-gray-600">
               {t('salon:onboarding.setup_message')}
             </p>
-            <button 
-              onClick={() => setStep(2)}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105"
-            >
-              {t('salon:onboarding.action.next')}
-            </button>
           </div>
         );
       case 2:
-        return <SalonManagement isOnboarding={true} />;
+        return <SalonManagement isOnboarding={true} onComplete={handleSalonComplete} />;
+      case 3:
+        return <SubscriptionPricing salonData={salonData} onComplete={() => setStep(step + 1)} />;
+      case 4:
+        return <div className="text-center">
+          <h2 className="text-2xl font-semibold mb-4">
+            {t('salon:onboarding.complete')}
+          </h2>
+          <p className="mb-6 text-gray-600">
+            {t('salon:onboarding.complete_message')}
+          </p>
+          <button onClick={handleOnboardingComplete} className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105">
+            {t('common:action.complete')}
+          </button>
+        </div>;
       default:
         return null;
     }
   };
 
+  const TOTAL_STEPS = 4;
+
   return (
     <div className="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
       {renderStep()}
+      
+      <div className="flex justify-between mt-8">
+        <button
+          onClick={() => setStep(step - 1)}
+          disabled={step === 1}
+          className={`px-4 py-2 rounded transition duration-300 ease-in-out transform hover:scale-105
+            ${step === 1 
+              ? 'bg-gray-300 cursor-not-allowed' 
+              : 'bg-gray-500 hover:bg-gray-600 text-white font-bold'}`}
+        >
+          {t('common:action.previous')}
+        </button>
+        
+        {step < TOTAL_STEPS && (
+          <button
+            onClick={() => setStep(step + 1)}
+            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            {t('common:action.next')}
+          </button>
+        )}
+      </div>
     </div>
   );
 };
