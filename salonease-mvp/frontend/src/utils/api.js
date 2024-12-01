@@ -51,6 +51,16 @@ const refreshAccessToken = async (refreshToken) => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    // Handle network errors first
+    if (!error.response) {
+      // Network error or server not responding
+      return Promise.reject({
+        message: 'Unable to connect to server. Please check your internet connection.',
+        isNetworkError: true,
+        originalError: error
+      });
+    }
+
     const originalRequest = error.config;
 
     if (error.response.status === 401 && !originalRequest._retry) {
@@ -68,7 +78,10 @@ api.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        // Use the separate refresh function instead
+        if (!refreshToken) {
+          throw new Error('No refresh token available');
+        }
+        
         const { token, refreshToken: newRefreshToken } = await refreshAccessToken(refreshToken);
         
         localStorage.setItem('token', token);
@@ -82,14 +95,25 @@ api.interceptors.response.use(
       } catch (refreshError) {
         console.error('Error refreshing token:', refreshError);
         localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');        
-        return Promise.reject(refreshError);
+        localStorage.removeItem('refreshToken');
+        
+        // Return a more specific error for authentication failures
+        return Promise.reject({
+          message: 'Your session has expired. Please log in again.',
+          isAuthError: true,
+          originalError: refreshError
+        });
       } finally {
         isRefreshing = false;
       }
     }
 
-    return Promise.reject(error);
+    // For all other errors, return a structured error object
+    return Promise.reject({
+      message: error.response?.data?.message || 'An unexpected error occurred',
+      status: error.response?.status,
+      originalError: error
+    });
   }
 );
 
@@ -102,6 +126,7 @@ const authApi = {
   resetPassword: (token, newPassword) => api.post('/auth/reset-password', { token, newPassword }),
   logout: (refreshToken) => api.post('/auth/logout', { refreshToken }),
   me: () => api.get('/auth/me'),
+  completeOnboarding: () => api.post('/auth/complete-onboarding'),
 };
 
 const staffApi = {

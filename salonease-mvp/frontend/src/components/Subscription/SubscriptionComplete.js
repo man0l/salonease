@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { useAuth } from '../../hooks/useAuth';
+import { authApi } from '../../utils/api';
 
 const SubscriptionComplete = () => {
   const stripe = useStripe();
@@ -12,7 +13,7 @@ const SubscriptionComplete = () => {
   const location = useLocation();
   const { t } = useTranslation(['common']);
   const [status, setStatus] = useState('processing');
-  const { user, loading } = useAuth();
+  const { user, loading, fetchUser } = useAuth();
 
   useEffect(() => {
     const handleSetupIntent = async () => {
@@ -36,11 +37,20 @@ const SubscriptionComplete = () => {
         
         switch (setupIntent.status) {
           case 'succeeded':
-            setStatus('success');
-            toast.success(t('common:subscription.complete.success'));
-            setTimeout(() => {
-              navigate('/dashboard');
-            }, 2000);
+            // Start trial subscription after successful payment setup
+            try {
+              await authApi.completeOnboarding();
+              await fetchUser();
+              setStatus('success');
+              toast.success(t('common:subscription.complete.success'));
+              setTimeout(() => {
+                navigate('/dashboard');
+              }, 2000);
+            } catch (subscriptionError) {
+              console.error('Subscription creation failed:', subscriptionError);
+              setStatus('error');
+              toast.error(t('common:subscription.complete.subscription_failed'));
+            }
             break;
           case 'processing':
             setStatus('processing');

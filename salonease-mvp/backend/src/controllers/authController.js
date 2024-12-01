@@ -7,7 +7,8 @@ const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
 const { validateRegister, validateLogin } = require('../validators/authValidator');
 const ROLES = require('../config/roles');
-const subscriptionService = require('../services/subscriptionService');
+const SubscriptionService = require('../services/subscriptionService');
+const subscriptionServiceInstance = new SubscriptionService();
 
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET is not set in the environment variables');
@@ -289,17 +290,16 @@ exports.updateUser = async (req, res) => {
 exports.completeOnboarding = async (req, res) => {
   const transaction = await sequelize.transaction();
   
-  try {
-    const { userId } = req.user;
-
+  try {   
+    
     // Start trial subscription
-    await subscriptionService.startTrialSubscription(userId);
+    await subscriptionServiceInstance.startTrialSubscription(req.user.id);
 
     // Mark onboarding as completed
     await User.update({
       onboardingCompleted: true
     }, { 
-      where: { id: userId },
+      where: { id: req.user.id },
       transaction 
     });
 

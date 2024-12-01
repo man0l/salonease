@@ -59,7 +59,7 @@ class SubscriptionService {
 
       return subscription;
     } catch (error) {
-      throw new Error('Failed to start trial subscription');
+      throw new Error('Failed to start trial subscription: ' + error.message);
     }
   }
 

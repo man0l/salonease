@@ -3,6 +3,8 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const staffController = require('../controllers/staffController');
 const authMiddleware = require('../middleware/authMiddleware');
+const roleMiddleware = require('../middleware/roleMiddleware');
+const ROLES = require('../config/roles');
 
 // Registration route
 router.post('/register', authController.register);
@@ -28,5 +30,12 @@ router.post('/accept-invitation', staffController.acceptInvitation);
 
 // Add this new route
 router.put('/update', authMiddleware, authController.updateUser);
+
+// Add this new route
+router.post('/complete-onboarding', 
+  authMiddleware, 
+  roleMiddleware([ROLES.SUPER_ADMIN, ROLES.SALON_OWNER]), 
+  authController.completeOnboarding
+);
 
 module.exports = router;

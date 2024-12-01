@@ -49,14 +49,16 @@ describe('ClientsManagement', () => {
   let mockFetchClients;
 
   beforeEach(() => {
-    // Reset all mocks before each test
     jest.clearAllMocks();
     
+    // Mock toast functions
+    toast.success = jest.fn();
+    toast.error = jest.fn();
+    
     // Create mock functions
-    mockDeleteClient = jest.fn().mockResolvedValue(true);
+    mockDeleteClient = jest.fn().mockResolvedValue({ data: { success: true } });
     mockFetchClients = jest.fn();
     
-    // Mock the useClients hook implementation
     useClients.mockImplementation(() => ({
       clients: mockClients,
       loading: false,
@@ -187,24 +189,22 @@ describe('ClientsManagement', () => {
 
     // Click delete button for the first client (John Doe)
     const deleteButton = screen.getByLabelText('Delete John Doe');
-    await act(async () => {
-      fireEvent.click(deleteButton);
-    });
+    fireEvent.click(deleteButton);
 
     // Wait for the delete confirmation modal to appear
     await waitFor(() => {
       expect(screen.getByTestId('delete-modal')).toBeInTheDocument();
     });
 
-    // Click the confirm delete button
+    // Click the confirm delete button and wait for deletion to complete
     const confirmButton = screen.getByText('Delete');
     await act(async () => {
       fireEvent.click(confirmButton);
-      // Wait for the promise from mockDeleteClient to resolve
+      // Wait for the mockDeleteClient promise to resolve
       await mockDeleteClient();
     });
 
-    // Wait for and verify the deletion process
+    // Verify the deletion process and success message
     await waitFor(() => {
       expect(mockDeleteClient).toHaveBeenCalledWith('mockSalonId', '1');
       expect(mockFetchClients).toHaveBeenCalled();
