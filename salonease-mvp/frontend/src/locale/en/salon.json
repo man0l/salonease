@@ -43,6 +43,7 @@
   "salon_name_is_required": "Salon name is required",
   "action.address_is_required": "Address is required",
   "contact_number_is_required": "Contact number is required",
+  "invalid_phone_number": "Invalid phone number",
   "oops_something_went_wrong": "Oops! Something Went Wrong.",
   "we_can_t_find_that_salon": "We Can't Find That Salon",
   "discover_your_new_favorite_salon": "Discover Your New Favorite Salon",
@@ -151,5 +152,15 @@
         "message": "The salon you're looking for doesn't seem to exist."
       }
     }
+  },
+  "status": {
+    "deleted": "Deleted"
+  },
+  "deleted_at": "Deleted on {{date}}",
+  "success": {
+    "salon_restored": "Salon restored successfully"
+  },
+  "error": {
+    "failed_to_restore_salon": "Failed to restore salon"
   }
 }

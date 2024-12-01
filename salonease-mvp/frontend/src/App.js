@@ -31,6 +31,8 @@ import BookingsCalendar from './components/Bookings/BookingsCalendar';
 import FinancialReports from './components/FinancialReports/FinancialReports';
 import './i18n';
 import { LanguageProvider } from './contexts/LanguageContext';
+import SubscriptionComplete from './components/Subscription/SubscriptionComplete';
+import StripeWrapper from './components/Subscription/StripeWrapper';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -163,6 +165,14 @@ function AppContent() {
                   <PrivateRoute allowedRoles={[ROLES.SALON_OWNER]}>
                     <FinancialReports />
                   </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/subscription/complete" 
+                element={
+                  <StripeWrapper>
+                    <SubscriptionComplete />
+                  </StripeWrapper>
                 } 
               />
             </Routes>

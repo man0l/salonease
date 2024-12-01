@@ -91,6 +91,17 @@ export const useSalon = () => {
     }
   };
 
+  const restoreSalon = async (salonId) => {
+    try {
+      const response = await api.post(`/salons/${salonId}/restore`);
+      await fetchSalons();
+      return response.data;
+    } catch (err) {
+      handleError(err);
+      return null;
+    }
+  };
+
   const setCurrentPage = (page) => {
     currentPageRef.current = page;
     fetchSalons();
@@ -103,6 +114,7 @@ export const useSalon = () => {
     addSalon, 
     updateSalon, 
     deleteSalon, 
+    restoreSalon, 
     fetchSalons,
     currentPage: currentPageRef.current,
     totalPages,

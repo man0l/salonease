@@ -43,6 +43,7 @@
   "salon_name_is_required": "Името на салона е задължително",
   "action.address_is_required": "Адресът е задължителен",
   "contact_number_is_required": "Телефонът за връзка е задължителен",
+  "invalid_phone_number": "Невалиден телефонен номер",
   "oops_something_went_wrong": "Упс! Нещо се обърка.",
   "we_can_t_find_that_salon": "Не можем да намерим този салон",
   "discover_your_new_favorite_salon": "Открийте своя нов любим салон",
@@ -94,6 +95,8 @@
   "error.failed_to_update_subscription": "Неуспешно обновяване на вашата подписка",
   "success.salon_deleted": "Салонът е изтрит успешно",
   "error.failed_to_delete_salon": "Неуспешно изтриване на салона. Моля, опитайте отново.",
+  "success.salon_restored": "Салонът е възстановено успешно",
+  "error.failed_to_restore_salon": "Неуспешно възстановяване на салона. Моля, опитайте отново.",
   "onboarding": {
     "welcome": "Добре дошли в SalonEase!",
     "setup_message": "Нека настроим първия ви салон. Кликнете напред, за да започнете.",
@@ -151,5 +154,15 @@
         "message": "Изглежда, че търсеният от вас салон не съществува."
       }
     }
+  },
+  "status": {
+    "deleted": "Изтрит"
+  },
+  "deleted_at": "Изтрит на {{date}}",
+  "success": {
+    "salon_restored": "Салон възстановено успешно"
+  },
+  "error": {
+    "failed_to_restore_salon": "Неуспешно възстановяване на салона. Моля, опитайте отново."
   }
 }

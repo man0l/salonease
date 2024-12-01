@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
@@ -8,9 +8,18 @@ import { useTranslation } from 'react-i18next';
 function Login() {
   const { t } = useTranslation('auth');
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const pendingSetupIntent = sessionStorage.getItem('pendingSetupIntent');
+    if (user && pendingSetupIntent) {
+      sessionStorage.removeItem('pendingSetupIntent');
+      const { returnUrl } = JSON.parse(pendingSetupIntent);
+      navigate(returnUrl);
+    }
+  }, [user, navigate]);
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);

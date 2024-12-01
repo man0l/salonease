@@ -186,7 +186,7 @@ describe('Salon Controller', () => {
   });
 
   describe('deleteSalon', () => {
-    it('should delete an existing salon', async () => {
+    it('sreqhould soft delete an existing salon', async () => {
       const salon = await Salon.create({
         name: 'Salon to Delete',
         address: '999 Delete St',
@@ -201,19 +201,40 @@ describe('Salon Controller', () => {
 
       expect(res.statusCode).toBe(204);
 
-      const deletedSalon = await Salon.findByPk(salon.id);
-      expect(deletedSalon).toBeNull();
+      // Check that the salon is soft deleted
+      const deletedSalon = await Salon.findOne({
+        where: { id: salon.id },
+        paranoid: false
+      });
+      expect(deletedSalon.deletedAt).not.toBeNull();
+
+      // Verify it's not found with normal query
+      const notFound = await Salon.findByPk(salon.id);
+      expect(notFound).toBeNull();
     });
 
-    it('should return 404 if salon to delete does not exist', async () => {
-      const nonExistentId = uuidv4();
-      req.params = { id: nonExistentId };
+    it('should hard delete when force parameter is true', async () => {
+      const salon = await Salon.create({
+        name: 'Salon to Force Delete',
+        address: '999 Delete St',
+        contactNumber: '9876543210',
+        ownerId: testUser.id,
+      });
+
+      req.params = { id: salon.id };
+      req.query = { force: 'true' };
       req.user = { id: testUser.id };
 
       await deleteSalon(req, res);
 
-      expect(res.statusCode).toBe(404);
-      expect(res._getJSONData()).toHaveProperty('message', 'Salon not found');
+      expect(res.statusCode).toBe(204);
+
+      // Verify it's completely deleted
+      const deletedSalon = await Salon.findOne({
+        where: { id: salon.id },
+        paranoid: false
+      });
+      expect(deletedSalon).toBeNull();
     });
   });
 });

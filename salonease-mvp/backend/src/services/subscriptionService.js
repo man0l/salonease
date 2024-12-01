@@ -104,7 +104,9 @@ class SubscriptionService {
   async incrementBasePrice(userId) {
     try {
       const user = await User.findByPk(userId);
-      if (!user?.subscriptionId) return null;
+      if (!user?.subscriptionId) {
+        throw new Error('User has no subscription');
+      }
 
       const subscription = await this.stripe.subscriptions.retrieve(user.subscriptionId);
       const baseItem = subscription.items.data.find(
@@ -149,6 +151,52 @@ class SubscriptionService {
       return subscription;
     } catch (error) {      
       throw new Error('Failed to update subscription booking charge: ' + error.message);
+    }
+  }
+
+  async createSetupIntent(userId) {
+    try {
+      const user = await User.findByPk(userId);
+      if (!user) throw new Error('User not found');
+
+      if (!user.stripeCustomerId) {
+        await this.createCustomer(user);
+      }
+
+      const setupIntent = await this.stripe.setupIntents.create({
+        customer: user.stripeCustomerId,
+        payment_method_types: ['card', 'link'],
+        metadata: {
+          userId: user.id
+        }
+      });
+
+      return setupIntent;
+    } catch (error) {
+      throw new Error('Failed to create setup intent');
+    }
+  }
+
+  async attachPaymentMethod(userId, paymentMethodId) {
+    try {
+      const user = await User.findByPk(userId);
+      if (!user) throw new Error('User not found');
+
+      // Attach payment method to customer
+      await this.stripe.paymentMethods.attach(paymentMethodId, {
+        customer: user.stripeCustomerId,
+      });
+
+      // Set as default payment method
+      await this.stripe.customers.update(user.stripeCustomerId, {
+        invoice_settings: {
+          default_payment_method: paymentMethodId,
+        },
+      });
+
+      return true;
+    } catch (error) {
+      throw new Error('Failed to attach payment method');
     }
   }
 }

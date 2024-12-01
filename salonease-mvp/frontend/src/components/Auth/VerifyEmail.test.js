@@ -52,10 +52,9 @@ describe('VerifyEmail Component', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('Email verified successfully. You can now log in.')).toBeInTheDocument();
+      expect(screen.getByText('Email verification successful')).toBeInTheDocument();
+      expect(screen.getByText('Redirecting to login...')).toBeInTheDocument();
     });
-
-    expect(screen.getByText('Redirecting to login...')).toBeInTheDocument();
 
     // Fast-forward timers
     act(() => {
@@ -84,7 +83,7 @@ describe('VerifyEmail Component', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('Invalid verification link.')).toBeInTheDocument();
+      expect(screen.getByText('Invalid verification link')).toBeInTheDocument();
     });
 
     expect(screen.getByRole('button', { name: 'Go to Login' })).toBeInTheDocument();

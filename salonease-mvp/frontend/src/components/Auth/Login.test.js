@@ -120,4 +120,73 @@ describe('Login Component', () => {
       expect(toast.error).toHaveBeenCalledWith('Invalid email or password');
     });
   });
+
+  test('maintains authentication when navigating to dashboard after login', async () => {
+    // Mock successful login and user state
+    const mockUser = { id: '1', role: 'SalonOwner', onboardingCompleted: true };
+    const mockLogin = jest.fn().mockResolvedValue(true);
+    const mockNavigate = jest.fn();
+    
+    // Mock useAuth to simulate authenticated state
+    jest.spyOn(require('../../hooks/useAuth'), 'useAuth').mockImplementation(() => ({
+      login: mockLogin,
+      user: mockUser,
+      loading: false,
+      isAuthenticated: true
+    }));
+
+    // Mock useNavigate and useLocation
+    jest.spyOn(require('react-router-dom'), 'useNavigate').mockImplementation(() => mockNavigate);
+    jest.spyOn(require('react-router-dom'), 'useLocation').mockImplementation(() => ({
+      pathname: '/dashboard'
+    }));
+
+    // Mock localStorage
+    const mockLocalStorage = {
+      getItem: jest.fn(),
+      setItem: jest.fn(),
+      removeItem: jest.fn()
+    };
+    Object.defineProperty(window, 'localStorage', {
+      value: mockLocalStorage
+    });
+    mockLocalStorage.getItem.mockImplementation((key) => {
+      if (key === 'token') return 'mock-token';
+      if (key === 'refreshToken') return 'mock-refresh-token';
+      return null;
+    });
+
+    renderLogin();
+    
+    const emailInput = screen.getByPlaceholderText(/email address/i);
+    const passwordInput = screen.getByPlaceholderText(/password/i);
+    const signInButton = screen.getByRole('button', { name: /sign in/i });
+
+    // Perform login
+    await act(async () => {
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+      fireEvent.change(passwordInput, { target: { value: 'password123' } });
+      fireEvent.click(signInButton);
+    });
+
+    // Verify initial navigation to dashboard
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
+    });
+
+    // Simulate manual navigation to dashboard
+    await act(async () => {
+      // Update location pathname
+      Object.defineProperty(window, 'location', {
+        value: { pathname: '/dashboard' },
+        writable: true
+      });
+    });
+
+    // Verify we're still on dashboard and not redirected to login
+    await waitFor(() => {
+      expect(mockNavigate).not.toHaveBeenCalledWith('/login');
+      expect(window.location.pathname).toBe('/dashboard');
+    });
+  });
 });

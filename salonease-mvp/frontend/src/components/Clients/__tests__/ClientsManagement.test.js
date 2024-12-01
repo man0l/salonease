@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { act } from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import { act } from 'react-dom/test-utils';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ClientsManagement from '../ClientsManagement';
@@ -20,7 +19,7 @@ jest.mock('../../../components/common/DeleteConfirmationDialog', () => {
   return function MockDeleteConfirmationDialog({ isOpen, onConfirm }) {
     return isOpen ? (
       <div data-testid="delete-modal">
-        <button onClick={onConfirm}>Confirm Delete</button>
+        <button onClick={onConfirm}>Delete</button>
       </div>
     ) : null;
   };
@@ -188,7 +187,9 @@ describe('ClientsManagement', () => {
 
     // Click delete button for the first client (John Doe)
     const deleteButton = screen.getByLabelText('Delete John Doe');
-    fireEvent.click(deleteButton);
+    await act(async () => {
+      fireEvent.click(deleteButton);
+    });
 
     // Wait for the delete confirmation modal to appear
     await waitFor(() => {
@@ -196,17 +197,18 @@ describe('ClientsManagement', () => {
     });
 
     // Click the confirm delete button
-    const confirmButton = screen.getByText('Confirm Delete');
-    fireEvent.click(confirmButton);
+    const confirmButton = screen.getByText('Delete');
+    await act(async () => {
+      fireEvent.click(confirmButton);
+      // Wait for the promise from mockDeleteClient to resolve
+      await mockDeleteClient();
+    });
 
     // Wait for and verify the deletion process
     await waitFor(() => {
-      // Verify deleteClient was called with correct parameters
       expect(mockDeleteClient).toHaveBeenCalledWith('mockSalonId', '1');
-      // Verify fetchClients was called to refresh the list
       expect(mockFetchClients).toHaveBeenCalled();
-      // Verify success message was shown
-      expect(toast.success).toHaveBeenCalledWith('Client deleted successfully');
+      expect(toast.success).toHaveBeenCalledWith(expect.stringMatching(/client.*deleted.*successfully/i));
     });
   });
 

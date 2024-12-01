@@ -28,5 +28,6 @@
     "activity": "Loading activity..."
   },
   "booked": "booked",
-  "with": "with"
+  "with": "with",
+  "no_recent_activity": "No recent activity"
 }

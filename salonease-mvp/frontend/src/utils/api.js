@@ -34,6 +34,20 @@ const onRefreshed = (token) => {
   refreshSubscribers = [];
 }
 
+// Create a separate axios instance for refresh token requests
+const refreshApi = axios.create({
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Separate refresh token function
+const refreshAccessToken = async (refreshToken) => {
+  const response = await refreshApi.post('/auth/refresh-token', { refreshToken });
+  return response.data;
+};
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -41,7 +55,6 @@ api.interceptors.response.use(
 
     if (error.response.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
-        // If a refresh is already in progress, wait for it to complete
         return new Promise((resolve) => {
           subscribeTokenRefresh((token) => {
             originalRequest.headers['Authorization'] = `Bearer ${token}`;
@@ -55,14 +68,13 @@ api.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        const response = await authApi.refreshToken(refreshToken);
-        const { token, refreshToken: newRefreshToken } = response.data;
-
+        // Use the separate refresh function instead
+        const { token, refreshToken: newRefreshToken } = await refreshAccessToken(refreshToken);
+        
         localStorage.setItem('token', token);
         localStorage.setItem('refreshToken', newRefreshToken);
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-        // Resolve all waiting requests
         onRefreshed(token);
 
         originalRequest.headers['Authorization'] = `Bearer ${token}`;
@@ -81,13 +93,13 @@ api.interceptors.response.use(
   }
 );
 
+// Then define authApi using the main api instance
 const authApi = {
   register: (userData) => api.post('/auth/register', userData),
   login: (credentials) => api.post('/auth/login', credentials),
   verifyEmail: (token) => api.get(`/auth/verify-email?token=${token}`),
   forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
   resetPassword: (token, newPassword) => api.post('/auth/reset-password', { token, newPassword }),
-  refreshToken: (refreshToken) => api.post('/auth/refresh-token', { refreshToken }),
   logout: (refreshToken) => api.post('/auth/logout', { refreshToken }),
   me: () => api.get('/auth/me'),
 };
@@ -178,8 +190,11 @@ const reportsApi = {
 };
 
 const subscriptionApi = {
-  incrementBasePrice: () => api.post('/subscription/increment-base-price'),
+  incrementBasePrice: () => api.post('/subscription/increment-base'),
   addBookingCharge: () => api.post('/subscription/add-booking-charge'),
+  createSetupIntent: () => api.post('/subscription/setup-intent'),
+  attachPaymentMethod: (paymentMethodId) => api.post('/subscription/attach-payment-method', { paymentMethodId }),
+  startTrialSubscription: () => api.post('/subscription/start-trial'),
 };
 
 

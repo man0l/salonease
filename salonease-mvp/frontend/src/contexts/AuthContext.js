@@ -1,15 +1,27 @@
-import React, { createContext, useState, useCallback } from 'react';
+import React, { createContext, useState, useCallback, useEffect } from 'react';
 import { api, authApi } from '../utils/api';
 
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(() => localStorage.getItem('token'));
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      const storedToken = localStorage.getItem('token');
+      if (storedToken) {
+        api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+        await fetchUser();
+      }
+      setLoading(false);
+    };
+
+    initializeAuth();
+  }, []);
 
   const fetchUser = useCallback(async () => {
-    if (loading) return;
     try {
       setLoading(true);
       const response = await authApi.me();

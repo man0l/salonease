@@ -4,6 +4,7 @@ import '@testing-library/jest-dom/extend-expect';
 import RescheduleModal from '../../Modals/RescheduleModal';
 import { toast } from 'react-toastify';
 import { publicApi } from '../../../../utils/api';
+import '../../../../i18n';
 
 // Add mocks
 jest.mock('../../../../utils/api', () => ({
@@ -17,21 +18,6 @@ jest.mock('react-toastify', () => ({
     error: jest.fn(),
     success: jest.fn(),
   },
-}));
-
-// Add mock for i18next
-jest.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key) => {
-      const translations = {
-        'common:action.close': 'Close',
-        'common:action.confirm_reschedule': 'Confirm Reschedule',
-        'bookings:validation.appointment_date_time.future': 'Appointment date and time must be in the future',
-        'bookings:modal.reschedule.title': 'Reschedule Booking'
-      };
-      return translations[key] || key;
-    }
-  })
 }));
 
 const mockBooking = {
@@ -91,7 +77,7 @@ describe('RescheduleModal', () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });
 
-    expect(toast.error).toHaveBeenCalledWith('Appointment date and time must be in the future');
+    expect(toast.error).toHaveBeenCalledWith('Appointment must be in the future');
   });
 
   it('displays validation error when date is invalid', async () => {
@@ -122,7 +108,7 @@ describe('RescheduleModal', () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });
 
-    expect(toast.error).toHaveBeenCalledWith('Appointment date and time must be in the future');
+    expect(toast.error).toHaveBeenCalledWith('Appointment must be in the future');
   });
 
   it('calls onClose when close button is clicked', async () => {

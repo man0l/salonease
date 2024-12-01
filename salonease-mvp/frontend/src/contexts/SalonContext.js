@@ -15,7 +15,7 @@ export const useSalonContext = () => {
 };
 
 export const SalonProvider = ({ children, navigate, location }) => {
-  const { salons, loading, error, fetchSalons, addSalon: hookAddSalon, updateSalon, deleteSalon: hookDeleteSalon, currentPage, totalPages, setCurrentPage } = useSalon();
+  const { salons, loading, error, fetchSalons, addSalon: hookAddSalon, updateSalon, deleteSalon: hookDeleteSalon, currentPage, totalPages, setCurrentPage, restoreSalon: hookRestoreSalon } = useSalon();
   const [selectedSalon, setSelectedSalon] = useState(null);
   const { user } = useAuth();
   const hasFetchedSalon = useRef(false);
@@ -82,6 +82,14 @@ export const SalonProvider = ({ children, navigate, location }) => {
     return result;
   }, [hookDeleteSalon, selectedSalon, salons]);
 
+  const handleRestoreSalon = useCallback(async (salonId) => {
+    const restoredSalon = await hookRestoreSalon(salonId);
+    if (restoredSalon) {
+      await fetchSalons();
+    }
+    return restoredSalon;
+  }, [hookRestoreSalon, fetchSalons]);
+
   const value = {
     salons,
     loading,
@@ -91,6 +99,7 @@ export const SalonProvider = ({ children, navigate, location }) => {
     addSalon: handleAddSalon,
     updateSalon,
     deleteSalon: handleDeleteSalon,
+    restoreSalon: handleRestoreSalon,
     fetchSalons,
     currentPage,
     totalPages,

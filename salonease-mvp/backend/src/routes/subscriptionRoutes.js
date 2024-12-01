@@ -30,4 +30,23 @@ router.post('/add-booking-charge', [
   }
 });
 
+router.post('/setup-intent', authMiddleware, async (req, res) => {
+  try {
+    const setupIntent = await subscriptionService.createSetupIntent(req.user.id);
+    res.json(setupIntent);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.post('/attach-payment-method', authMiddleware, async (req, res) => {
+  try {
+    const { paymentMethodId } = req.body;
+    await subscriptionService.attachPaymentMethod(req.user.id, paymentMethodId);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router; 

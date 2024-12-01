@@ -6,21 +6,35 @@ import { useSalonContext } from '../../contexts/SalonContext';
 import { useAuth } from '../../hooks/useAuth';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import { FaEdit, FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaPlus, FaMinus, FaUndo } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
-import { subscriptionApi } from '../../utils/api';
 
-const SalonManagement = ({ isOnboarding = false }) => {
+const SalonManagement = ({ isOnboarding = false, onComplete }) => {
   const { t } = useTranslation(['salon', 'common']);
 
   const schema = yup.object().shape({
     name: yup.string().required(t('salon:salon_name_is_required')),
     address: yup.string().required(t('salon:action.address_is_required')),
-    contactNumber: yup.string().required(t('salon:contact_number_is_required')),
+    contactNumber: yup
+      .string()
+      .required(t('salon:contact_number_is_required'))
+      .matches(/^[0-9]{5,20}$/, t('salon:invalid_phone_number')),
     description: yup.string(),
   });
 
-  const { salons, loading, error, addSalon, updateSalon, deleteSalon, currentPage, totalPages, setCurrentPage, fetchSalons, selectedSalon } = useSalonContext();
+  const { 
+    salons, 
+    loading, 
+    error, 
+    addSalon, 
+    updateSalon, 
+    deleteSalon, 
+    restoreSalon,
+    currentPage, 
+    totalPages, 
+    setCurrentPage, 
+    fetchSalons 
+  } = useSalonContext();
   const { user, updateUser } = useAuth();
   const navigate = useNavigate();
   const [editingSalon, setEditingSalon] = useState(null);
@@ -62,16 +76,8 @@ const SalonManagement = ({ isOnboarding = false }) => {
     await fetchSalons();
     setShowForm(false);
 
-    if (isOnboarding) {
-      await updateUser({ ...user, onboardingCompleted: true });
-      toast.success(t('success.onboarding_completed'));
-      navigate('/dashboard');
-    }
-
-    try {
-      await subscriptionApi.incrementBasePrice();
-    } catch (error) {
-      toast.error(t('error.failed_to_update_subscription'));
+    if (onComplete) {
+      onComplete(newSalon);
     }
   };
 
@@ -123,6 +129,20 @@ const SalonManagement = ({ isOnboarding = false }) => {
     }
   }, [deleteSalon, salonToDelete, fetchSalons]);
 
+  const handleRestore = async (salonId) => {
+    try {
+      const restoredSalon = await restoreSalon(salonId);
+      if (restoredSalon) {
+        toast.success(t('success.salon_restored'));
+        await fetchSalons();
+      } else {
+        throw new Error('Failed to restore salon');
+      }
+    } catch (err) {
+      toast.error(t('error.failed_to_restore_salon'));
+    }
+  };
+
   const DeleteConfirmationDialog = ({ isOpen, onClose, onConfirm }) => {
     if (!isOpen) return null;
 
@@ -154,6 +174,71 @@ const SalonManagement = ({ isOnboarding = false }) => {
           </div>
         </div>
       </div>
+    );
+  };
+
+  const renderSalonItem = (salon) => {
+    const isDeleted = Boolean(salon.deletedAt);
+    
+    return (
+      <li 
+        key={salon.id} 
+        className={`border border-gray-200 p-4 rounded-lg shadow-sm hover:shadow-md transition duration-300 
+          ${isDeleted ? 'opacity-60 bg-gray-50' : ''}`}
+      >
+        <div className="flex justify-between items-start">
+          <div className="flex-grow">
+            <h3 className="text-xl font-semibold text-primary-600">
+              {salon.name}
+              {isDeleted && (
+                <span className="ml-2 text-sm text-red-500 font-normal">
+                  {t('salon:status.deleted')}
+                </span>
+              )}
+            </h3>
+            <p className="text-gray-600">{salon.address}</p>
+            <p className="text-gray-600">{salon.contactNumber}</p>
+            <p className="text-gray-600 mt-2">{salon.description}</p>
+          </div>
+          {isDeleted && (
+            <span className="text-sm text-gray-500">
+              {t('salon:deleted_at', { 
+                date: new Date(salon.deletedAt).toLocaleDateString() 
+              })}
+            </span>
+          )}
+        </div>
+        
+        <div className="mt-4 flex space-x-2">
+          {!isDeleted && (
+            <>
+              <button 
+                onClick={() => handleEdit(salon)} 
+                className="bg-secondary-500 hover:bg-secondary-600 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" 
+                aria-label={`${t('common:action.edit')} ${salon.name}`}
+              >
+                <FaEdit className="mr-1" /> {t('common:action.edit')}
+              </button>
+              <button 
+                onClick={() => handleDelete(salon.id)} 
+                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" 
+                aria-label={`${t('common:action.delete')} ${salon.name}`}
+              >
+                <FaTrash className="mr-1" /> {t('common:action.delete')}
+              </button>
+            </>
+          )}
+          {isDeleted && (
+            <button 
+              onClick={() => handleRestore(salon.id)} 
+              className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" 
+              aria-label={`${t('common:action.restore')} ${salon.name}`}
+            >
+              <FaUndo className="mr-1" /> {t('common:action.restore')}
+            </button>
+          )}
+        </div>
+      </li>
     );
   };
 
@@ -221,22 +306,7 @@ const SalonManagement = ({ isOnboarding = false }) => {
             {t('label.your_salons')}
           </h2>
           <ul className="space-y-4" aria-label={t('salon:title.list_of_salons')}>
-            {salons.map((salon) => (
-              <li key={salon.id} className="border border-gray-200 p-4 rounded-lg shadow-sm hover:shadow-md transition duration-300">
-                <h3 className="text-xl font-semibold text-primary-600">{salon.name}</h3>
-                <p className="text-gray-600">{salon.address}</p>
-                <p className="text-gray-600">{salon.contactNumber}</p>
-                <p className="text-gray-600 mt-2">{salon.description}</p>
-                <div className="mt-4 flex space-x-2">
-                  <button onClick={() => handleEdit(salon)} className="bg-secondary-500 hover:bg-secondary-600 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" aria-label={`${t('common:action.edit')} ${salon.name}`}>
-                    <FaEdit className="mr-1" /> {t('common:action.edit')}
-                  </button>
-                  <button onClick={() => handleDelete(salon.id)} className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" aria-label={`${t('common:action.delete')} ${salon.name}`}>
-                    <FaTrash className="mr-1" /> {t('common:action.delete')}
-                  </button>
-                </div>
-              </li>
-            ))}
+            {salons.map(renderSalonItem)}
           </ul>
 
           <div className="mt-6 flex justify-between items-center">
