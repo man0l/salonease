@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { useAuth } from '../../hooks/useAuth';
-import { authApi } from '../../utils/api';
+import { authApi, subscriptionApi } from '../../utils/api';
 
 const SubscriptionComplete = () => {
   const stripe = useStripe();
@@ -40,6 +40,7 @@ const SubscriptionComplete = () => {
             // Start trial subscription after successful payment setup
             try {
               await authApi.completeOnboarding();
+              await subscriptionApi.incrementBasePrice();
               await fetchUser();
               setStatus('success');
               toast.success(t('common:subscription.complete.success'));

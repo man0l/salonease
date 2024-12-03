@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
 import { useTranslation } from 'react-i18next';
-import { formatCurrency } from '../../utils/currencyFormatter';
 import { toast } from 'react-toastify';
-import { FaCheck } from 'react-icons/fa';
+import appConfig from '../../config/appConfig';
 
 const PaymentForm = ({ onSuccess, salonData }) => {
   const stripe = useStripe();
@@ -25,12 +24,8 @@ const PaymentForm = ({ onSuccess, salonData }) => {
             billing_details: {
               name: salonData?.name,
               email: salonData?.email,
-              address: {
-                line1: salonData?.address,
-                city: salonData?.city,
-                state: salonData?.state,
-                postal_code: salonData?.postalCode,
-                country: 'BG',
+              address: {                
+                country: appConfig.defaultCountry,
               },
             },
           },

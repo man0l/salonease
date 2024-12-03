@@ -294,6 +294,7 @@ exports.completeOnboarding = async (req, res) => {
     
     // Start trial subscription
     await subscriptionServiceInstance.startTrialSubscription(req.user.id);
+    await subscriptionServiceInstance.incrementBasePrice(req.user.id);
 
     // Mark onboarding as completed
     await User.update({

@@ -3,11 +3,10 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useSalonContext } from '../../contexts/SalonContext';
-import { useAuth } from '../../hooks/useAuth';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash, FaPlus, FaMinus, FaUndo } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
+import { subscriptionApi } from '../../utils/api';
 
 const SalonManagement = ({ isOnboarding = false, onComplete }) => {
   const { t } = useTranslation(['salon', 'common']);
@@ -35,8 +34,7 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
     setCurrentPage, 
     fetchSalons 
   } = useSalonContext();
-  const { user, updateUser } = useAuth();
-  const navigate = useNavigate();
+  
   const [editingSalon, setEditingSalon] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [salonToDelete, setSalonToDelete] = useState(null);
@@ -73,7 +71,7 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
 
     toast.success(t('success.salon_added'));
     reset();
-    await fetchSalons();
+    await fetchSalons();    
     setShowForm(false);
 
     if (onComplete) {

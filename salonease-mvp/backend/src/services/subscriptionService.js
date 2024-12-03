@@ -36,7 +36,7 @@ class SubscriptionService {
       if (!user.stripeCustomerId) {
         customer = await this.createCustomer(user);
       }
-
+      console.log(user.stripeCustomerId || customer.id);
       const subscription = await this.stripe.subscriptions.create({
         customer: user.stripeCustomerId || customer.id,
         trial_period_days: 14,
@@ -113,20 +113,28 @@ class SubscriptionService {
         item => item.price.id === process.env.STRIPE_BASE_PRICE_ID
       );
 
-      if (baseItem) {
-        await this.stripe.subscriptionItems.update(baseItem.id, {
-          quantity: baseItem.quantity + 1
-        });
+      if (!baseItem) {
+        throw new Error('Base price item not found in subscription');
       }
+
+      // Create a usage record for metered billing
+      await this.stripe.subscriptionItems.createUsageRecord(
+        baseItem.id,
+        {
+          quantity: 1,
+          timestamp: 'now',
+          action: 'increment'
+        }
+      );
 
       return subscription;
     } catch (error) {
       console.error('Failed to increment base price:', error);
-      throw new Error('Failed to update subscription base price');
+      throw new Error('Failed to update subscription base price: ' + error.message);
     }
   }
 
-  async addBookingCharge(userId) {
+  async addBookingCharge(userId, quantity = 1) {
     let user;
     try {
       user = await User.findByPk(userId);
@@ -142,10 +150,15 @@ class SubscriptionService {
         item => item.price.id === process.env.STRIPE_BOOKING_PRICE_ID
       );
 
-      if (bookingItem) {
-        await this.stripe.subscriptionItems.update(bookingItem.id, {
-          quantity: bookingItem.quantity + 1
-        });
+      if (bookingItem) {        
+        await this.stripe.subscriptionItems.createUsageRecord(
+          bookingItem.id,
+          {
+            quantity: quantity,
+            timestamp: 'now',
+            action: 'increment'
+          }
+        );
       }
 
       return subscription;
@@ -159,12 +172,15 @@ class SubscriptionService {
       const user = await User.findByPk(userId);
       if (!user) throw new Error('User not found');
 
-      if (!user.stripeCustomerId) {
-        await this.createCustomer(user);
+      // Create customer first if it doesn't exist
+      let stripeCustomerId = user.stripeCustomerId;
+      if (!stripeCustomerId) {
+        const customer = await this.createCustomer(user);
+        stripeCustomerId = customer.id;
       }
 
       const setupIntent = await this.stripe.setupIntents.create({
-        customer: user.stripeCustomerId,
+        customer: stripeCustomerId,
         payment_method_types: ['card', 'link'],
         metadata: {
           userId: user.id
@@ -173,7 +189,7 @@ class SubscriptionService {
 
       return setupIntent;
     } catch (error) {
-      throw new Error('Failed to create setup intent');
+      throw new Error('Failed to create setup intent: ' + error.message);
     }
   }
 
@@ -202,3 +218,4 @@ class SubscriptionService {
 }
 
 module.exports = SubscriptionService;
+
