@@ -40,7 +40,6 @@ const SubscriptionComplete = () => {
             // Start trial subscription after successful payment setup
             try {
               await authApi.completeOnboarding();
-              await subscriptionApi.incrementBasePrice();
               await fetchUser();
               setStatus('success');
               toast.success(t('common:subscription.complete.success'));

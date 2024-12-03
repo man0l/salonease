@@ -36,7 +36,7 @@ class SubscriptionService {
       if (!user.stripeCustomerId) {
         customer = await this.createCustomer(user);
       }
-      console.log(user.stripeCustomerId || customer.id);
+      
       const subscription = await this.stripe.subscriptions.create({
         customer: user.stripeCustomerId || customer.id,
         trial_period_days: 14,
@@ -117,15 +117,14 @@ class SubscriptionService {
         throw new Error('Base price item not found in subscription');
       }
 
-      // Create a usage record for metered billing
-      await this.stripe.subscriptionItems.createUsageRecord(
-        baseItem.id,
-        {
-          quantity: 1,
-          timestamp: 'now',
-          action: 'increment'
+      // Create a meter event instead of a usage record
+      await this.stripe.billing.meterEvents.create({
+        event_name: 'salons',
+        payload: {
+          stripe_customer_id: user.stripeCustomerId,
+          value: 1
         }
-      );
+      });
 
       return subscription;
     } catch (error) {
@@ -134,7 +133,7 @@ class SubscriptionService {
     }
   }
 
-  async addBookingCharge(userId, quantity = 1) {
+  async addBookingCharge(userId, quantity = null) {
     let user;
     try {
       user = await User.findByPk(userId);
@@ -150,15 +149,14 @@ class SubscriptionService {
         item => item.price.id === process.env.STRIPE_BOOKING_PRICE_ID
       );
 
-      if (bookingItem) {        
-        await this.stripe.subscriptionItems.createUsageRecord(
-          bookingItem.id,
-          {
-            quantity: quantity,
-            timestamp: 'now',
-            action: 'increment'
+      if (bookingItem) {
+        await this.stripe.billing.meterEvents.create({
+          event_name: 'booking_request',
+          payload: {
+            stripe_customer_id: user.stripeCustomerId,
+            value: quantity ? quantity : bookingItem.quantity
           }
-        );
+        });
       }
 
       return subscription;
