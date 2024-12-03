@@ -44,15 +44,20 @@ const StaffManagement = () => {
           id: editingStaff.id
         });
         toast.success(t('staff:success.staff_updated'));
+        reset();
+        setEditingStaff(null);
+        setShowForm(false);
       } else {
-        await inviteStaff(data);
-        toast.success(t('staff:success.staff_added'));
+        const result = await inviteStaff(data);
+        if (result) {
+          toast.success(t('staff:success.staff_added'));
+          reset();
+          setEditingStaff(null);
+          setShowForm(false);
+        }
       }
-      reset();
-      setEditingStaff(null);
-      setShowForm(false);
     } catch (err) {
-      toast.error(err.message || t('staff:error.failed_to_update'));
+      console.error('Staff operation failed:', err);
     }
   };
 

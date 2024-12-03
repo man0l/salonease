@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { useAuth } from '../../hooks/useAuth';
-import { authApi, subscriptionApi } from '../../utils/api';
+import { authApi } from '../../utils/api';
 
 const SubscriptionComplete = () => {
   const stripe = useStripe();

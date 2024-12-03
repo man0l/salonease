@@ -213,7 +213,7 @@ const BookingsManagement = () => {
       <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
         <h1 className="text-2xl font-bold">{t('title.bookings_management')}</h1>
         <button
-          onClick={showCreateModal ? () => setShowCreateModal(false) : handleAddNewBooking}
+          onClick={() => setShowCreateModal(true)}
           className="bg-primary-500 hover:bg-primary-600 text-white px-3 sm:px-4 py-2 rounded-full transition duration-300 flex items-center whitespace-nowrap"
         >
           <FaPlus className="mr-1 sm:mr-2" />

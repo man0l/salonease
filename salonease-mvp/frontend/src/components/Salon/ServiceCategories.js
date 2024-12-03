@@ -74,6 +74,24 @@ const ServiceCategories = ({ services = [], categories = [], staff = [], salonId
     setShowBookingModal(true);
   };
 
+  const renderServiceButton = (service) => {
+    if (staff && staff.length > 0) {
+      return (
+        <button 
+          onClick={() => handleServiceSelect(service)}
+          className="px-4 py-2 text-sm bg-primary-500 text-white rounded-md hover:bg-primary-600 transition-colors whitespace-nowrap"
+        >
+          {t('service:action.choose')}
+        </button>
+      );
+    }
+    return (
+      <span className="text-sm text-gray-500">
+        {t('service:message.no_staff_available')}
+      </span>
+    );
+  };
+
   const renderCategory = (category, depth = 0) => {
     const isExpanded = expandedCategories.includes(category.id);
     const hasSubcategories = category.subcategories.length > 0;
@@ -132,12 +150,7 @@ const ServiceCategories = ({ services = [], categories = [], staff = [], salonId
                   <span className="font-semibold text-gray-900 whitespace-nowrap">
                     {formatCurrency(service.price)}
                   </span>
-                  <button 
-                    onClick={() => handleServiceSelect(service)}
-                    className="px-4 py-2 text-sm bg-primary-500 text-white rounded-md hover:bg-primary-600 transition-colors whitespace-nowrap"
-                  >
-                    {t('service:action.choose')}
-                  </button>
+                  {renderServiceButton(service)}
                 </div>
               </div>
             ))}

@@ -77,6 +77,10 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
     if (onComplete) {
       onComplete(newSalon);
     }
+
+    if (!isOnboarding) {
+      await subscriptionApi.incrementBasePrice();
+    }
   };
 
   const onSubmit = async (data) => {
