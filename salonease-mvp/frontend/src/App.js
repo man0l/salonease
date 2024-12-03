@@ -33,6 +33,7 @@ import './i18n';
 import { LanguageProvider } from './contexts/LanguageContext';
 import SubscriptionComplete from './components/Subscription/SubscriptionComplete';
 import StripeWrapper from './components/Subscription/StripeWrapper';
+import PublicRoute from './components/Routes/PublicRoute';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -68,15 +69,43 @@ function AppContent() {
           <div className="container mx-auto px-6 py-8">
             <ToastContainer />
             <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/registration-success" element={<RegistrationSuccess />} />
-              <Route path="/verify-email" element={<VerifyEmail />} />
-              <Route path="/accept-invitation" element={<AcceptInvitation />} />
+              <Route path="/login" element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              } />
+              <Route path="/register" element={
+                <PublicRoute>
+                  <Register />
+                </PublicRoute>
+              } />
+              <Route path="/registration-success" element={
+                <PublicRoute>
+                  <RegistrationSuccess />
+                </PublicRoute>
+              } />
+              <Route path="/verify-email" element={
+                <PublicRoute>
+                  <VerifyEmail />
+                </PublicRoute>
+              } />
+              <Route path="/forgot-password" element={
+                <PublicRoute>
+                  <ForgotPassword />
+                </PublicRoute>
+              } />
+              <Route path="/reset-password" element={
+                <PublicRoute>
+                  <ResetPassword />
+                </PublicRoute>
+              } />
+              <Route path="/accept-invitation" element={
+                <PublicRoute>
+                  <AcceptInvitation />
+                </PublicRoute>
+              } />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
               <Route 
                 path="/" 
                 element={
