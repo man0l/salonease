@@ -8,8 +8,8 @@ const baseClientSchema = {
   email: Joi.string().email().allow(null).messages({
     'string.email': 'Email is invalid'
   }),
-  phone: Joi.string().pattern(/^[0-9]*$/).messages({
-    'string.pattern.base': 'Phone number must contain only digits'
+  phone: Joi.string().pattern(/^[+\d]+$/).messages({
+    'string.pattern.base': 'Phone number can only contain digits and + symbol'
   }),
   notes: Joi.string().allow('', null)
 };

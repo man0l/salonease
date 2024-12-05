@@ -80,10 +80,6 @@ const BookingSuccess = ({ booking, onClose }) => {
           )}
         </div>
 
-        <div className="text-center text-sm text-gray-600 mb-6">
-          <p>{t('bookings:message.thank_you_for_choosing')}</p>
-        </div>
-
         <button
           onClick={onClose}
           className="w-full bg-primary-600 text-white py-3 px-4 rounded-md hover:bg-primary-700 transition duration-300"

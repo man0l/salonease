@@ -164,7 +164,7 @@ const UnauthorizedBookingModal = ({ isOpen, onClose, salonId, service, staff }) 
               {...register('clientName')}
               data-testid="clientName"
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              placeholder={t('common:label.enter_your_name')}
+              placeholder="Виктория Иванова"
             />
             <p className="mt-1 text-xs text-gray-500">{t('common:form.required', { field: t('common:label.name') })}</p>
             {errors.clientName && (
@@ -181,6 +181,7 @@ const UnauthorizedBookingModal = ({ isOpen, onClose, salonId, service, staff }) 
               data-testid="clientEmail"
               {...register('clientEmail')}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              placeholder="salon@example.com"
             />
             {errors.clientEmail && (
               <p className="mt-1 text-sm text-red-600">{errors.clientEmail.message}</p>

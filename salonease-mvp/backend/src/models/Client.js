@@ -39,7 +39,12 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: true,
       validate: {
-        is: /^[0-9]*$/,
+        isValidPhoneNumber(value) {
+          // Allow + and digits
+          if (value && !/^[+\d]+$/.test(value)) {
+            throw new Error('Phone number can only contain digits and + symbol');
+          }
+        }
       },
       unique: 'uniquePhonePerSalon'
     },

@@ -1,160 +1,126 @@
-import React, { useState, useMemo } from 'react';
-import { FaChevronRight, FaClock } from 'react-icons/fa';
-import { formatCurrency } from '../../utils/currencyFormatter';
-import UnauthorizedBookingModal from '../Modals/UnauthorizedBookingModal';
+import React, { useMemo, useState } from 'react';
+import { FaChevronDown, FaChevronRight } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '../../utils/currencyFormatter';
+import CategoryNav from './CategoryNav';
+import './ServiceCategories.css';
+import UnauthorizedBookingModal from '../Modals/UnauthorizedBookingModal';
 
-const ServiceCategories = ({ services = [], categories = [], staff = [], salonId }) => {
-  const { t } = useTranslation(['service']);
+const ServiceCategories = ({ services, salonId, staff = [] }) => {
+  const { t } = useTranslation(['service', 'common']);
+  const [expandedCategories, setExpandedCategories] = useState(new Set());
   const [selectedService, setSelectedService] = useState(null);
-  const [showBookingModal, setShowBookingModal] = useState(false);
-
-  const buildCategoryTree = useMemo(() => {
-    const categoryMap = new Map();
-
-    services.forEach(service => {
-      let category = service.category;
-      while (category) {
-        if (!categoryMap.has(category.id)) {
-          categoryMap.set(category.id, {
-            id: category.id,
-            name: category.name,
-            parentId: category.parentId,
-            subcategories: [],
-            services: []
-          });
-        }
-        if (category.id === service.category.id) {
-          categoryMap.get(category.id).services.push(service);
-        }
-        category = category.parent;
-      }
-    });
-
-    categoryMap.forEach(category => {
-      if (category.parentId !== null) {
-        const parentCategory = categoryMap.get(category.parentId);
-        if (parentCategory) {
-          parentCategory.subcategories.push(category);
-        }
-      }
-    });
-
-    return Array.from(categoryMap.values()).filter(category => category.parentId === null);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  
+  // Get root categories for CategoryNav
+  const rootCategories = useMemo(() => {
+    return services
+      .map(service => service.categoryHierarchy[0])
+      .filter((category, index, self) => 
+        index === self.findIndex(c => c.id === category.id)
+      );
   }, [services]);
 
-  const [expandedCategories, setExpandedCategories] = useState(() => {
-    const firstCategory = buildCategoryTree[0];
-    if (!firstCategory) return [];
-    
-    const ids = [firstCategory.id];
-    
-    if (firstCategory.subcategories.length > 0) {
-      const firstSubcat = firstCategory.subcategories[0];
-      ids.push(firstSubcat.id);
-      
-      if (firstSubcat.subcategories.length > 0) {
-        ids.push(firstSubcat.subcategories[0].id);
-      }
+  // Initialize selectedRootCategory with the first category's ID
+  const [selectedRootCategory, setSelectedRootCategory] = useState(
+    rootCategories.length > 0 ? rootCategories[0].id : null
+  );
+
+  // Filter services based on selected root category
+  const filteredServices = useMemo(() => {
+    if (!selectedRootCategory) {
+      return [];  // Return empty array instead of all services when no category is selected
     }
-    
-    return ids;
-  });
+    return services.filter(service => 
+      service.categoryHierarchy[0].id === selectedRootCategory
+    );
+  }, [services, selectedRootCategory]);
 
   const toggleCategory = (categoryId) => {
-    setExpandedCategories(prev =>
-      prev.includes(categoryId)
-        ? prev.filter(id => id !== categoryId)
-        : [...prev, categoryId]
-    );
+    setExpandedCategories(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(categoryId)) {
+        newSet.delete(categoryId);
+      } else {
+        newSet.add(categoryId);
+      }
+      return newSet;
+    });
   };
 
-  const handleServiceSelect = (service) => {
-    setSelectedService(service);
-    setShowBookingModal(true);
-  };
+  const ServiceCard = ({ service }) => (
+    <div className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow duration-200">
+      <div className="text-xs text-gray-500 mb-2">
+        {service.categoryHierarchy.map((category, index) => (
+          <span key={category.id}>
+            {category.name}
+            {index < service.categoryHierarchy.length - 1 && (
+              <span className="mx-1">›</span>
+            )}
+          </span>
+        ))}
+      </div>
 
-  const renderServiceButton = (service) => {
-    if (staff && staff.length > 0) {
-      return (
-        <button 
-          onClick={() => handleServiceSelect(service)}
-          className="px-4 py-2 text-sm bg-primary-500 text-white rounded-md hover:bg-primary-600 transition-colors whitespace-nowrap"
-        >
-          {t('service:action.choose')}
-        </button>
-      );
-    }
+      <div className="flex justify-between items-start">
+        <div>
+          <h4 className="font-semibold text-gray-800">{service.name}</h4>
+          {service.description && (
+            <p className="text-sm text-gray-600 mt-1">{service.description}</p>
+          )}
+        </div>
+        <div className="text-right">
+          <p className="font-bold text-primary-600">{formatCurrency(service.price)}</p>
+          <p className="text-sm text-gray-500">{t('service:duration.minutes', { duration: service.duration })}</p>
+          <button
+            onClick={() => {
+              setSelectedService(service);
+              setIsBookingModalOpen(true);
+            }}
+            className="mt-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors duration-200"
+          >
+            {t('service:action.book')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const CategorySection = ({ category, isRoot = false }) => {
+    const isExpanded = expandedCategories.has(category.id);
+    const hasSubcategories = Object.keys(category.subcategories || {}).length > 0;
+    const hasServices = category.services?.length > 0;
+
     return (
-      <span className="text-sm text-gray-500">
-        {t('service:message.no_staff_available')}
-      </span>
-    );
-  };
-
-  const renderCategory = (category, depth = 0) => {
-    const isExpanded = expandedCategories.includes(category.id);
-    const hasSubcategories = category.subcategories.length > 0;
-    const hasServices = category.services.length > 0;
-
-    return (
-      <div key={category.id} className="border-b last:border-b-0">
+      <div className={`${isRoot ? 'mb-8' : 'ml-4 mb-4'}`}>
         <button
           onClick={() => toggleCategory(category.id)}
-          className={`
-            w-full p-4 flex items-center justify-between
-            ${depth === 0 ? 'bg-gray-50 hover:bg-gray-100' : 'hover:bg-gray-50'}
-            ${depth === 1 ? 'pl-8 bg-white' : ''}
-            ${depth === 2 ? 'pl-12 bg-white' : ''}
-            transition-colors
-          `}
+          className="flex items-center w-full text-left py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors duration-200"
         >
-          <span className={`
-            ${depth === 0 ? 'font-semibold text-lg' : ''}
-            ${depth === 1 ? 'font-medium text-md' : ''}
-            ${depth === 2 ? 'text-md text-gray-700' : ''}
-          `}>
+          {hasSubcategories || hasServices ? (
+            isExpanded ? (
+              <FaChevronDown className="w-4 h-4 text-gray-500 mr-2" />
+            ) : (
+              <FaChevronRight className="w-4 h-4 text-gray-500 mr-2" />
+            )
+          ) : (
+            <span className="w-4 mr-2" />
+          )}
+          <span className={`font-semibold ${isRoot ? 'text-xl text-primary-700' : 'text-lg text-gray-700'}`}>
             {category.name}
           </span>
-          {(hasSubcategories || hasServices) && (
-            <FaChevronRight
-              className={`h-4 w-4 text-gray-400 transition-transform duration-200 
-                ${isExpanded ? "rotate-90" : ""}
-              `}
-            />
-          )}
         </button>
-        
+
         {isExpanded && (
-          <div className={`
-            ${depth === 0 ? 'bg-white' : 'bg-white'}
-            ${depth === 1 ? 'ml-4' : ''}
-            ${depth === 2 ? 'ml-8' : ''}
-          `}>
-            {hasServices && category.services.map(service => (
-              <div
-                key={service.id}
-                className="p-4 flex items-center justify-between border-b last:border-b-0 hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex-1">
-                  <div className="font-medium text-gray-800">{service.name}</div>
-                  {service.description && (
-                    <div className="text-sm text-gray-600 mt-1">{service.description}</div>
-                  )}
-                  <div className="text-sm text-gray-500 flex items-center gap-1 mt-1">
-                    <FaClock className="h-4 w-4" />
-                    {t('service:duration.minutes', { duration: service.duration })}
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 ml-4">
-                  <span className="font-semibold text-gray-900 whitespace-nowrap">
-                    {formatCurrency(service.price)}
-                  </span>
-                  {renderServiceButton(service)}
-                </div>
-              </div>
+          <div className="mt-2 space-y-3">
+            {/* Render subcategories */}
+            {Object.values(category.subcategories || {}).map(subcategory => (
+              <CategorySection key={subcategory.id} category={subcategory} />
             ))}
-            {hasSubcategories && category.subcategories.map(subcat => renderCategory(subcat, depth + 1))}
+            
+            {/* Render services */}
+            {category.services?.map(service => (
+              <ServiceCard key={service.id} service={service} />
+            ))}
           </div>
         )}
       </div>
@@ -162,22 +128,31 @@ const ServiceCategories = ({ services = [], categories = [], staff = [], salonId
   };
 
   return (
-    <>
-      <div className="bg-white rounded-lg shadow-lg divide-y divide-gray-200">
-        {buildCategoryTree.map(category => renderCategory(category))}
-      </div>
-      
-      <UnauthorizedBookingModal
-        isOpen={showBookingModal}
-        onClose={() => {
-          setShowBookingModal(false);
-          setSelectedService(null);
-        }}
-        salonId={salonId}
-        service={selectedService}
-        staff={staff}
+    <div className="space-y-6">
+      <CategoryNav 
+        categories={rootCategories}
+        onCategorySelect={setSelectedRootCategory}
       />
-    </>
+      
+      <div className="space-y-4">
+        {filteredServices.map(service => (
+          <ServiceCard key={service.id} service={service} />
+        ))}
+      </div>
+
+      {selectedService && (
+        <UnauthorizedBookingModal
+          isOpen={isBookingModalOpen}
+          onClose={() => {
+            setIsBookingModalOpen(false);
+            setSelectedService(null);
+          }}
+          salonId={salonId}
+          service={selectedService}
+          staff={staff}
+        />
+      )}
+    </div>
   );
 };
 

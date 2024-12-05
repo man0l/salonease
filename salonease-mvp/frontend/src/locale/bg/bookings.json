@@ -97,7 +97,9 @@
     "failed_to_load_slots": "Грешка при зареждане на свободните часове"
   },
   "success": {
-    "booking_created": "Резервацията е създадена успешно"
+    "booking_created": "Резервацията е създадена успешно",
+    "booking_confirmed": "Резервацията е потвърдена!",
+    "appointment_scheduled": "Часът беше успешно запазен"
   },
   "modal": {
     "reschedule": {
@@ -113,9 +115,15 @@
     "select_existing_client": "Изберете съществуващ клиент",
     "new_client": "Нов клиент",
     "add_booking": "Добави резервация",
-    "today": "Днес"
+    "today": "Днес",
+    "complete": "Завърши резервация",
+    "confirm_complete": "Потвърди завършването"
   },
   "title": {
     "create_new_booking": "Създаване на нова резервация"
+  },
+  "message": {
+    "confirm_complete": "Сигурни ли сте, че искате да маркирате тази резервация като завършена?",
+    "thank_you_for_choosing": "Благодарим ви, че избрахте нашия салон. Очакваме ви с нетърпение!"
   }
 }

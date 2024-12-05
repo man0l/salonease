@@ -33,7 +33,12 @@ exports.getSalonPublicServices = async (req, res) => {
         include: [{
           model: Category,
           as: 'parent',
-          attributes: ['id', 'name', 'parentId']
+          attributes: ['id', 'name', 'parentId'],
+          include: [{
+            model: Category,
+            as: 'parent',
+            attributes: ['id', 'name', 'parentId']
+          }]
         }]
       }],
       order: [
@@ -41,8 +46,42 @@ exports.getSalonPublicServices = async (req, res) => {
         ['name', 'ASC']
       ]
     });
+
+    // Process services to include full category hierarchy
+    const processedServices = services.map(service => {
+      const serviceData = service.toJSON();
+      
+      // Build category chain
+      if (serviceData.category) {
+        let currentCategory = serviceData.category;
+        const categoryChain = [currentCategory];
+        
+        // Traverse up the category tree
+        while (currentCategory.parent) {
+          currentCategory = currentCategory.parent;
+          categoryChain.unshift(currentCategory);
+        }
+
+        // Replace category data with the full chain
+        serviceData.categoryHierarchy = categoryChain.map(cat => ({
+          id: cat.id,
+          name: cat.name,
+          parentId: cat.parentId
+        }));
+
+        // Keep the direct category for backward compatibility
+        serviceData.category = {
+          id: serviceData.category.id,
+          name: serviceData.category.name,
+          parentId: serviceData.category.parentId,
+          parent: serviceData.category.parent
+        };
+      }
+
+      return serviceData;
+    });
     
-    res.json(services);
+    res.json(processedServices);
   } catch (error) {
     console.error('Error fetching salon services:', error);
     res.status(500).json({ message: 'Error fetching salon services' });

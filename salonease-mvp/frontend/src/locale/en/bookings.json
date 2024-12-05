@@ -97,7 +97,9 @@
     "failed_to_load_slots": "Failed to load available time slots"
   },
   "success": {
-    "booking_created": "Booking created successfully"
+    "booking_created": "Booking created successfully",
+    "booking_confirmed": "Booking Confirmed!",
+    "appointment_scheduled": "The appointment has been successfully scheduled"
   },
   "modal": {
     "reschedule": {
@@ -113,9 +115,15 @@
     "select_existing_client": "Select Existing Client",
     "new_client": "New Client",
     "add_booking": "Add Booking",
-    "today": "Today"
+    "today": "Today",
+    "complete": "Complete Booking",
+    "confirm_complete": "Confirm Completion"
   },
   "title": {
     "create_new_booking": "Create New Booking"
+  },
+  "message": {
+    "confirm_complete": "Are you sure you want to mark this booking as completed?",
+    "thank_you_for_choosing": "Thank you for choosing our salon. We look forward to seeing you!"
   }
 }

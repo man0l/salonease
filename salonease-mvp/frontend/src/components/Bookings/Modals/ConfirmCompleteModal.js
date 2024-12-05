@@ -9,7 +9,7 @@ const ConfirmCompleteModal = ({ show, onClose, booking, onComplete }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-4">{t('common:complete_booking')}</h2>
+        <h2 className="text-2xl font-bold mb-4">{t('bookings:action.confirm_complete')}</h2>
         
         <div className="space-y-4">
           <p className="text-gray-600">
@@ -30,7 +30,7 @@ const ConfirmCompleteModal = ({ show, onClose, booking, onComplete }) => {
             onClick={() => onComplete(booking.id)}
             className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition duration-300"
           >
-            {t('common:complete_booking')}
+            {t('bookings:action.confirm_complete')}
           </button>
           <button
             onClick={onClose}
