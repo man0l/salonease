@@ -1,0 +1,126 @@
+{
+  "title": {
+    "billing": "Billing",
+    "subscription": "Subscription",
+    "payment_details": "Payment Details",
+    "cancel_subscription": "Cancel Subscription"
+  },
+  "subscription": {
+    "title": "Subscription",
+    "no_subscription": "No active subscription found",
+    "status": {
+      "active": "Active",
+      "trialing": "Trial Period",
+      "past_due": "Payment Due",
+      "canceled": "Canceled",
+      "incomplete": "Incomplete",
+      "unknown": "Unknown Status"
+    },
+    "pricing": {
+      "title": {
+        "start_your_journey": "Start your journey"
+      },
+      "base_price": "Monthly Base Price",
+      "usage_price": "Price per Booking",
+      "salons": "salons",
+      "per_salon": "per salon",
+      "per_booking": "per booking",
+      "usage_description": "Pricing is based on your monthly booking volume. The more bookings you process, the lower the price per booking.",
+      "billing_note": "All prices are in BGN. Base price is billed monthly. Booking fees are calculated based on your monthly volume and billed at the end of each month.",
+      "after_trial": "After Trial Pricing",
+      "bookings": "bookings"
+    },
+    "trial": {
+      "title": "30-Day Free Trial",
+      "duration": "30 days",
+      "feature1": "Unlimited bookings during trial",
+      "feature2": "Full access to all features",
+      "feature3": "No credit card required",
+      "feature4": "Cancel anytime"
+    },
+    "action": {
+      "start_trial": "Start Free Trial",
+      "processing": "Processing...",
+      "cancel": "Cancel",
+      "confirm_cancel": "Confirm Cancellation"
+    },
+    "message": {
+      "confirm_cancel": "Are you sure you want to cancel your subscription? Your access will continue until the end of the current billing period.",
+      "cancel_success": "Your subscription has been canceled successfully",
+      "cancel_error": "Failed to cancel subscription. Please try again.",
+      "no_subscription": "No active subscription found"
+    },
+    "status_label": "Status",
+    "inactive": "Inactive",
+    "active": "Active",
+    "no_active_plan": "You don't have an active subscription plan",
+    "plan": "Plan",
+    "base_plan": "{{amount}} {{currency}} per {{interval}}",
+    "current_period": "Current Period",
+    "payment_method": "Payment Method",
+    "expires": "Card Expires",
+    "cancel_button": "Cancel Subscription",
+    "intervals": {
+      "month": "month",
+      "year": "year"
+    },
+    "usage_meters": "Usage This Period",
+    "meters": {
+      "salons": "Active Salons",
+      "bookings": "Booking Requests"
+    }
+  },
+  "payment": {
+    "details": "Payment Details",
+    "errors": {
+      "setup_failed": "Payment setup failed. Please try again.",
+      "validation": "Please check your payment details and try again.",
+      "card": {
+        "card_declined": "Your card was declined. Please try another card.",
+        "expired_card": "Your card has expired. Please use a different card.",
+        "incorrect_cvc": "Your card's security code is incorrect.",
+        "insufficient_funds": "Your card has insufficient funds.",
+        "invalid_number": "Your card number is invalid.",
+        "invalid_expiry_month": "Your card's expiration month is invalid.",
+        "invalid_expiry_year": "Your card's expiration year is invalid.",
+        "invalid_expiry_year_past": "Your card's expiration year is in the past.",
+        "invalid_cvc": "Your card's security code is invalid.",
+        "processing_error": "An error occurred while processing your card.",
+        "incomplete_number": "Your card number is incomplete.",
+        "incomplete_cvc": "Your card's security code is incomplete.",
+        "incomplete_expiry": "Your card's expiration date is incomplete.",
+        "incomplete_zip": "Your card's zip code is incomplete."
+      }
+    }
+  },
+  "usage": {
+    "title": "Usage",
+    "next_invoice": "Next Invoice",
+    "billing_period": "Billing Period",
+    "usage_details": "Usage Details",
+    "quantity": "Quantity",
+    "subtotal": "Subtotal",
+    "tax": "Tax",
+    "total": "Total",
+    "payment_due": "Payment Due",
+    "no_data": "No invoice data available"
+  },
+  "loading": "Loading...",
+  "errors": {
+    "fetch_failed": "Failed to fetch billing data",
+    "fetch_failed_log": "Failed to fetch billing data:",
+    "cancel_failed_log": "Failed to cancel subscription:"
+  },
+  "invoices": {
+    "title": "Invoices",
+    "date": "Date",
+    "amount": "Amount",
+    "status": "Status",
+    "actions": "Actions",
+    "status_paid": "Paid",
+    "status_open": "Open",
+    "status_void": "Void",
+    "status_draft": "Draft",
+    "status_uncollectible": "Uncollectible"
+  }
+} 

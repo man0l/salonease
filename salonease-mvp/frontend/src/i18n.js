@@ -15,7 +15,8 @@ i18n.use(initReactI18next).init({
       legal: require('./locale/en/legal.json'),
       staff: require('./locale/en/staff.json'),
       reports: require('./locale/en/reports.json'),
-      modals: require('./locale/en/modals.json')
+      modals: require('./locale/en/modals.json'),
+      billing: require('./locale/en/billing.json')
     },
     bg: {
       navigation: require('./locale/bg/navigation.json'),
@@ -29,7 +30,8 @@ i18n.use(initReactI18next).init({
       legal: require('./locale/bg/legal.json'),
       staff: require('./locale/bg/staff.json'),
       reports: require('./locale/bg/reports.json'),
-      modals: require('./locale/bg/modals.json')
+      modals: require('./locale/bg/modals.json'),
+      billing: require('./locale/bg/billing.json')
     },
   },
   lng: "en", // default language

@@ -34,6 +34,7 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import SubscriptionComplete from './components/Subscription/SubscriptionComplete';
 import StripeWrapper from './components/Subscription/StripeWrapper';
 import PublicRoute from './components/Routes/PublicRoute';
+import InvoiceDashboard from './components/Billing/InvoiceDashboard';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -193,6 +194,14 @@ function AppContent() {
                 element={
                   <PrivateRoute allowedRoles={[ROLES.SALON_OWNER]}>
                     <FinancialReports />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/salons/:salonId/billing" 
+                element={
+                  <PrivateRoute allowedRoles={[ROLES.SALON_OWNER]}>
+                    <InvoiceDashboard />
                   </PrivateRoute>
                 } 
               />

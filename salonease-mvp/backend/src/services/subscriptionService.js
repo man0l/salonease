@@ -68,11 +68,47 @@ class SubscriptionService {
       const user = await User.findByPk(userId);
       if (!user?.subscriptionId) return null;
 
+      // Retrieve subscription
+      
       const subscription = await this.stripe.subscriptions.retrieve(user.subscriptionId);
-      return subscription;
+
+      const usage = await this.getSubscriptionUsage(user, subscription);
+      const nextInvoice = await this.stripe.invoices.retrieveUpcoming({
+        customer: user.stripeCustomerId
+      });
+
+      return  {
+        ...subscription,
+        usage,
+        nextInvoice
+      };
     } catch (error) {
+      console.error('Error getting subscription status:', error);
       return null;
     }
+  }
+
+  async getSubscriptionUsage(user, subscription) {
+    const meters = await this.stripe.billing.meters.list({
+      limit: 100,
+      status: 'active'
+    });
+    
+    const usageData = [];
+    for (const meter of meters.data) {
+      const usage = await this.stripe.billing.meters.listEventSummaries(meter.id, 
+        {
+          customer: user.stripeCustomerId,
+          start_time: subscription.current_period_start,
+          end_time: subscription.current_period_end
+        }
+      );
+
+      if (usage.data.length > 0) {
+        usageData.push( {meter: meter, usage: usage.data[0]});
+      }
+    }
+    return usageData;
   }
 
   async updateSubscriptionStatus(userId, status, trialEnd = null) {

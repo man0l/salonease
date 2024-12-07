@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { HomeIcon, CalendarDaysIcon, ClipboardDocumentListIcon, UserGroupIcon, CreditCardIcon, ChartBarIcon, Cog6ToothIcon, Bars3Icon, BuildingStorefrontIcon } from '@heroicons/react/24/outline';
+import { HomeIcon, CalendarDaysIcon, ClipboardDocumentListIcon, UserGroupIcon, CreditCardIcon, ChartBarIcon, Cog6ToothIcon, Bars3Icon, BuildingStorefrontIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../hooks/useAuth';
 import { useSalonContext } from '../contexts/SalonContext';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +20,7 @@ const Sidebar = () => {
     { name: t('navigation:sidebar.staff'), icon: UserGroupIcon, route: '/salons/:salonId/staff', roles: ['SalonOwner', 'SuperAdmin'] },
     { name: t('navigation:sidebar.staff_availability'), icon: CalendarDaysIcon, route: '/salons/:salonId/staff-availability', roles: ['SalonOwner', 'SuperAdmin'] },
     { name: t('navigation:sidebar.services'), icon: () => <span className="text-xl">{t('common:emoji.scissors')}</span>, route: '/salons/:salonId/services', roles: ['SalonOwner'] },
-    { name: t('navigation:sidebar.billing'), icon: CreditCardIcon, route: '/billing', roles: ['SalonOwner'] },
+    { name: t('navigation:sidebar.billing'), icon: CreditCardIcon, route: '/salons/:salonId/billing', roles: ['SalonOwner'] },
     { name: t('navigation:sidebar.financial_reports'), icon: ChartBarIcon, route: '/salons/:salonId/reports/financial', roles: ['SalonOwner'] },
     { name: t('navigation:sidebar.settings'), icon: Cog6ToothIcon, route: '/settings', roles: ['SalonOwner', 'SuperAdmin', 'Staff'] },
     { name: t('navigation:sidebar.admin_dashboard'), icon: HomeIcon, route: '/admin-dashboard', roles: ['SuperAdmin'] },

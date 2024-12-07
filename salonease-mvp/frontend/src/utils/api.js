@@ -222,6 +222,17 @@ const subscriptionApi = {
   startTrialSubscription: () => api.post('/subscription/start-trial'),
 };
 
+const billingApi = {
+  getInvoices: async (salonId) => {
+    return api.get(`/billing/${salonId}/invoices`);
+  },
+  getSubscriptionDetails: async (salonId) => {
+    return api.get(`/billing/${salonId}/subscription`);
+  },
+  cancelSubscription: async (salonId) => {
+    return api.post(`/billing/${salonId}/cancel-subscription`);
+  }
+};
 
 export { 
   api, 
@@ -233,5 +244,6 @@ export {
   publicApi,
   dashboardApi,
   reportsApi,
-  subscriptionApi
+  subscriptionApi,
+  billingApi
 };

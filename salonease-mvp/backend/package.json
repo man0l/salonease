@@ -28,7 +28,8 @@
     "react-toastify": "^10.0.6",
     "sequelize": "^6.6.5",
     "stripe": "^17.4.0",
-    "supertest": "^7.0.0"
+    "supertest": "^7.0.0",
+    "pdfkit": "^0.13.0"
   },
   "devDependencies": {
     "jest": "^27.2.5",

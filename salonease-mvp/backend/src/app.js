@@ -22,7 +22,7 @@ const publicRoutes = require('./routes/publicRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
-
+const invoiceRoutes = require('./routes/invoiceRoutes');
 // Use routes
 app.use('/api/auth', authRoutes);
 app.use('/api/public', publicRoutes);
@@ -38,6 +38,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/subscription', subscriptionRoutes);
+app.use('/api/billing', invoiceRoutes);
 
 // Basic route
 app.get('/', (req, res) => {
