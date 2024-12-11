@@ -116,6 +116,7 @@
       "base_price": "Monthly Base Price",
       "usage_price": "Price per Booking",
       "salons": "salons",
+      "salon": "salon",
       "per_salon": "per salon",
       "per_booking": "per booking",
       "usage_description": "Pricing is based on your monthly booking volume. The more bookings you process, the lower the price per booking.",

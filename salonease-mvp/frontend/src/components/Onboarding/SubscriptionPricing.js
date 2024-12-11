@@ -15,18 +15,23 @@ const SubscriptionPricing = ({ onComplete, salonData }) => {
   
   const pricingTiers = [
     {
-      range: '1-5',
+      range: '1',
       price: 20,
       perUnit: true
     },
     {
-      range: '6-8',
+      range: '2-5',
       price: 50,
       perUnit: true
     },
     {
-      range: '9+',
+      range: '6-8',
       price: 100,
+      perUnit: true
+    },
+    {
+      range: '8+',
+      price: 120,
       perUnit: true
     }
   ];
@@ -117,7 +122,11 @@ const SubscriptionPricing = ({ onComplete, salonData }) => {
                 <div className="space-y-3">
                   {pricingTiers.map((tier, index) => (
                     <div key={index} className="flex justify-between items-center text-sm sm:text-base">
-                      <span>{tier.range} {t('common:subscription.pricing.salons')}</span>
+                      <span>
+                        {tier.range} {tier.range === '1' 
+                          ? t('common:subscription.pricing.salon') 
+                          : t('common:subscription.pricing.salons')}
+                      </span>
                       <span className="font-semibold">
                         {formatCurrency(tier.price)} {tier.perUnit ? t('common:subscription.pricing.per_salon') : ''}
                       </span>
