@@ -13,9 +13,11 @@ const SalonOwnerOnboarding = () => {
   const { user, updateUser } = useAuth();
   const { t } = useTranslation(['salon']);
   const navigate = useNavigate();
+  const [isFormValid, setIsFormValid] = useState(false);
 
   const handleSalonComplete = (salon) => {
     setSalonData(salon);
+    setIsFormValid(true);
     setStep(step + 1);
   };
 
@@ -40,24 +42,12 @@ const SalonOwnerOnboarding = () => {
         return <SalonManagement isOnboarding={true} onComplete={handleSalonComplete} />;
       case 3:
         return <SubscriptionPricing salonData={salonData} onComplete={() => setStep(step + 1)} />;
-      case 4:
-        return <div className="text-center">
-          <h2 className="text-2xl font-semibold mb-4">
-            {t('salon:onboarding.complete')}
-          </h2>
-          <p className="mb-6 text-gray-600">
-            {t('salon:onboarding.complete_message')}
-          </p>
-          <button onClick={handleOnboardingComplete} className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105">
-            {t('common:action.complete')}
-          </button>
-        </div>;
       default:
         return null;
     }
   };
 
-  const TOTAL_STEPS = 4;
+  const TOTAL_STEPS = 3;
 
   return (
     <div className="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
@@ -78,7 +68,11 @@ const SalonOwnerOnboarding = () => {
         {step < TOTAL_STEPS && (
           <button
             onClick={() => setStep(step + 1)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105"
+            disabled={step === 2 && !isFormValid}
+            className={`py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105
+              ${step === 2 && !isFormValid
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-blue-500 hover:bg-blue-600 text-white font-bold hover:scale-105'}`}
           >
             {t('common:action.next')}
           </button>
