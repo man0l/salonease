@@ -19,13 +19,12 @@ const Register = () => {
       // Clear any existing auth data
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
-      delete authApi.defaults.headers.common['Authorization'];
 
       const response = await authApi.register(data);
       toast.success(t('success.registration_success'));
       navigate('/registration-success');
     } catch (error) {
-      toast.error(error.response?.data?.message || t('error.registration_failed'));
+      toast.error(error.message || error.response?.data?.message || t('error.registration_failed'));
     }
   };
 
