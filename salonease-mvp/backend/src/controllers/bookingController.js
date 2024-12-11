@@ -1,10 +1,12 @@
-const { Booking, Staff, Service, Client, StaffAvailability } = require('../config/db');
+const { Booking, Staff, Service, Client, Salon } = require('../config/db');
 const { Op } = require('sequelize');
 const BOOKING_STATUSES = require('../config/bookingStatuses');
 const { validateCreateBooking, validateUpdateBooking } = require('../validators/bookingValidator');
 const sequelize = require('../config/db').sequelize;
 const moment = require('moment');
 const ROLES = require('../config/roles');
+const SubscriptionService = require('../services/subscriptionService');
+const subscriptionService = new SubscriptionService();
 
 exports.getBookings = async (req, res) => {
   try {
@@ -131,6 +133,17 @@ exports.createBooking = async (req, res) => {
       endTime,
       status: BOOKING_STATUSES.PENDING
     });
+
+    // Add subscription charge for the booking
+    try {
+      const salon = await Salon.findOne({ where: { id: salonId } });
+      const subscription = await subscriptionService.getSubscriptionStatus(salon.ownerId);
+      console.log(subscription.usage);
+      await subscriptionService.addBookingCharge(salon.ownerId);
+    } catch (subscriptionError) {
+      console.error('Error adding booking charge:', subscriptionError);
+      // Continue even if subscription charge fails
+    }
 
     res.status(201).json(result);
   } catch (error) {

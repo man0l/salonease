@@ -1,5 +1,6 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { User } = require('../config/db');
+const { User, Salon } = require('../config/db');
+const ROLES = require('../config/roles');
 
 class SubscriptionService {
   constructor() {
@@ -180,22 +181,15 @@ class SubscriptionService {
 
       if (!user?.subscriptionId) return null;
 
-      const subscription = await this.stripe.subscriptions.retrieve(user.subscriptionId);
-      const bookingItem = subscription.items.data.find(
-        item => item.price.id === process.env.STRIPE_BOOKING_PRICE_ID
-      );
-
-      if (bookingItem) {
-        await this.stripe.billing.meterEvents.create({
-          event_name: 'booking_request',
-          payload: {
+      const meterEvent = await this.stripe.billing.meterEvents.create({
+        event_name: 'booking_request',
+        payload: {
             stripe_customer_id: user.stripeCustomerId,
-            value: quantity ? quantity : bookingItem.quantity
-          }
-        });
-      }
+            value: quantity ? quantity : 1
+        }
+      });
 
-      return subscription;
+      return meterEvent;
     } catch (error) {      
       throw new Error('Failed to update subscription booking charge: ' + error.message);
     }
