@@ -154,16 +154,14 @@ class SubscriptionService {
         throw new Error('Base price item not found in subscription');
       }
 
-      // Create a meter event instead of a usage record
-      await this.stripe.billing.meterEvents.create({
-        event_name: 'salons',
-        payload: {
-          stripe_customer_id: user.stripeCustomerId,
-          value: 1
-        }
+      // Update the subscription item quantity
+      await this.stripe.subscriptionItems.update(baseItem.id, {
+        quantity: (baseItem.quantity || 0) + 1
       });
 
-      return subscription;
+      // Retrieve updated subscription
+      const updatedSubscription = await this.stripe.subscriptions.retrieve(user.subscriptionId);
+      return updatedSubscription;
     } catch (error) {
       console.error('Failed to increment base price:', error);
       throw new Error('Failed to update subscription base price: ' + error.message);

@@ -20,11 +20,6 @@ const SalonOwnerOnboarding = () => {
   };
 
   const handleOnboardingComplete = async () => {
-
-    await subscriptionApi.incrementBasePrice();
-
-    updateUser({ ...user, onboardingCompleted: true });
-    toast.success(t('success.onboarding_completed'));
     navigate('/dashboard');
   };
 
