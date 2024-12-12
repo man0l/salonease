@@ -25,7 +25,7 @@ const ContactForm = ({ onSubmit }) => {
           <input
             {...register('name')}
             placeholder={t('common:booking.name')}
-            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           />
           {errors.name && (
             <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
@@ -66,7 +66,7 @@ const ContactForm = ({ onSubmit }) => {
 
         <button
           type="submit"
-          className="w-full bg-primary-600 text-white py-2 px-4 rounded hover:bg-primary-700 transition-colors duration-200"
+          className="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700 transition-colors duration-200"
         >
           {t('common:booking.complete_booking')}
         </button>

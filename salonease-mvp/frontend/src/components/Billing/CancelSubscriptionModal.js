@@ -30,7 +30,7 @@ const CancelSubscriptionModal = ({ isOpen, onClose, onConfirm }) => {
               {t('billing:subscription.action.cancel')}
             </button>
             <button
-              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+              className="px-4 py-2 bg-rose-600 text-white rounded-md hover:bg-rose-700 transition-colors"
               onClick={onConfirm}
             >
               {t('billing:subscription.action.confirm_cancel')}

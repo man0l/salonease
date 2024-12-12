@@ -49,7 +49,7 @@ const TimeSelector = ({ date, duration, onSelect }) => {
 
   if (error) {
     return (
-      <div className="p-4 text-red-600">
+      <div className="p-4 text-rose-600">
         {error}
       </div>
     );
@@ -63,7 +63,7 @@ const TimeSelector = ({ date, duration, onSelect }) => {
           <button
             key={time}
             onClick={() => onSelect(time)}
-            className="p-2 text-center border border-gray-200 rounded hover:bg-primary-50 hover:border-primary-200 transition-colors duration-200"
+            className="p-2 text-center border border-gray-200 rounded hover:bg-indigo-50 hover:border-indigo-200 transition-colors duration-200"
           >
             {time}
           </button>

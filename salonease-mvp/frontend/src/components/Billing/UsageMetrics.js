@@ -82,7 +82,7 @@ const UsageMetrics = ({ subscription }) => {
 
           <div className="flex justify-between text-base font-medium pt-2 border-t">
             <span className="text-gray-900">{t('billing:usage.total')}</span>
-            <span className="text-gray-900">
+            <span className="text-indigo-600">
               {(invoice.total / 100).toFixed(2)} {invoice.currency.toUpperCase()}
             </span>
           </div>
@@ -90,7 +90,10 @@ const UsageMetrics = ({ subscription }) => {
 
         {/* Payment Status */}
         <div className="text-sm text-gray-500">
-          {t('billing:usage.payment_due')}: {format(new Date(invoice.next_payment_attempt * 1000), 'dd/MM/yyyy')}
+          {t('billing:usage.payment_due')}: 
+          <span className="text-indigo-600 ml-1">
+            {format(new Date(invoice.next_payment_attempt * 1000), 'dd/MM/yyyy')}
+          </span>
         </div>
       </div>
     </div>

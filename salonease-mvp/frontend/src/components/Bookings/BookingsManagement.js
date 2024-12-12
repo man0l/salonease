@@ -136,13 +136,13 @@ const BookingsManagement = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case BOOKING_STATUSES.CONFIRMED:
-        return 'text-green-600';
+        return 'text-emerald-600';
       case BOOKING_STATUSES.PENDING:
-        return 'text-yellow-600';
+        return 'text-amber-600';
       case BOOKING_STATUSES.CANCELLED:
-        return 'text-red-600';
+        return 'text-rose-600';
       case BOOKING_STATUSES.COMPLETED:
-        return 'text-blue-600';
+        return 'text-indigo-600';
       case BOOKING_STATUSES.NO_SHOW:
         return 'text-gray-600';
       case BOOKING_STATUSES.RESCHEDULED:
@@ -214,7 +214,7 @@ const BookingsManagement = () => {
         <h1 className="text-2xl font-bold">{t('title.bookings_management')}</h1>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="bg-primary-500 hover:bg-primary-600 text-white px-3 sm:px-4 py-2 rounded-full transition duration-300 flex items-center whitespace-nowrap"
+          className="bg-indigo-500 hover:bg-indigo-600 text-white px-3 sm:px-4 py-2 rounded-full transition duration-300 flex items-center whitespace-nowrap"
         >
           <FaPlus className="mr-1 sm:mr-2" />
           <span className="hidden sm:inline">{t('action.add_booking')}</span>

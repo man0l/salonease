@@ -10,9 +10,9 @@ const StaffSelector = ({ staff, onSelect }) => {
           <button
             key={member.id}
             onClick={() => onSelect(member)}
-            className="w-full p-2 text-left hover:bg-gray-100 rounded transition-colors duration-200 flex items-center space-x-3"
+            className="w-full p-2 text-left hover:bg-indigo-50 rounded transition-colors duration-200 flex items-center space-x-3"
           >
-            <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center text-primary-600">
+            <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
               {member.fullName.charAt(0)}
             </div>
             <div>

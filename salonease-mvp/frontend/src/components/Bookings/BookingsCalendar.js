@@ -19,11 +19,11 @@ const localizer = momentLocalizer(moment);
 
 // Reuse the color styles from StaffAvailability
 const colorStyles = [
-  { bgClass: 'blue-500', textClass: 'white', bg: '#3B82F6', border: '#2563EB' },
-  { bgClass: 'green-500', textClass: 'white', bg: '#22C55E', border: '#16A34A' },
-  { bgClass: 'yellow-500', textClass: 'black', bg: '#EAB308', border: '#CA8A04' },
-  { bgClass: 'red-500', textClass: 'white', bg: '#EF4444', border: '#DC2626' },
-  { bgClass: 'purple-500', textClass: 'white', bg: '#A855F7', border: '#9333EA' },
+  { bgClass: 'indigo-500', textClass: 'white', bg: '#6366F1', border: '#4F46E5' },
+  { bgClass: 'emerald-500', textClass: 'white', bg: '#10B981', border: '#059669' },
+  { bgClass: 'amber-500', textClass: 'black', bg: '#F59E0B', border: '#D97706' },
+  { bgClass: 'rose-500', textClass: 'white', bg: '#F43F5E', border: '#E11D48' },
+  { bgClass: 'violet-500', textClass: 'white', bg: '#8B5CF6', border: '#7C3AED' },
 ];
 
 const BookingsCalendar = () => {
@@ -157,7 +157,9 @@ const BookingsCalendar = () => {
       <div className="mb-4 flex justify-between items-center">
         <div>
           <button
-            className={`px-4 py-2 rounded-l-lg ${view === 'day' ? 'bg-primary-600 text-white' : 'bg-gray-200'}`}
+            className={`px-4 py-2 rounded-l-lg ${
+              view === 'day' ? 'bg-indigo-600 text-white' : 'bg-gray-200'
+            }`}
             onClick={() => setView('day')}
           >
             {t('staff:availability.calendar.dayView')}

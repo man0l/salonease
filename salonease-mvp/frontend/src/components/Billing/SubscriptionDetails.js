@@ -74,9 +74,7 @@ const SubscriptionDetails = ({ subscription, onCancelClick }) => {
           </p>
           <p className="font-medium text-gray-900">
             {t(`billing:subscription.status.${status || 'unknown'}`)}
-            {status === 'active' && (
-              <span className="ml-2 text-green-600">●</span>
-            )}
+            <span className={`ml-2 text-emerald-600 ${status === 'active' ? '' : 'hidden'}`}>●</span>
             {status === 'trialing' && (
               <span className="ml-2 text-blue-600">●</span>
             )}
@@ -114,7 +112,7 @@ const SubscriptionDetails = ({ subscription, onCancelClick }) => {
         <div className="pt-4 border-t">
           <button
             onClick={onCancelClick}
-            className="text-red-600 hover:text-red-700 text-sm font-medium"
+            className="text-rose-600 hover:text-rose-700 text-sm font-medium"
           >
             {t('billing:subscription.cancel_button')}
           </button>

@@ -32,7 +32,7 @@ const BookingSuccess = ({ booking, onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
         <div className="text-center">
-          <FaCheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+          <FaCheckCircle className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2" data-testid="booking-confirmed-title">{t('bookings:success.booking_confirmed')}</h2>
           <p className="text-gray-600 mb-6" data-testid="appointment-scheduled-message">{t('bookings:success.appointment_scheduled')}</p>
         </div>
@@ -56,7 +56,7 @@ const BookingSuccess = ({ booking, onClose }) => {
 
           {serviceName && (
             <div className="flex items-center gap-3">
-              <FaCut className="w-5 h-5 text-primary-600" />
+              <FaCut className="w-5 h-5 text-indigo-600" />
               <div>
                 <p className="font-medium">{t('common:service')}</p>
                 <div className="text-gray-600">
@@ -82,7 +82,7 @@ const BookingSuccess = ({ booking, onClose }) => {
 
         <button
           onClick={onClose}
-          className="w-full bg-primary-600 text-white py-3 px-4 rounded-md hover:bg-primary-700 transition duration-300"
+          className="w-full bg-indigo-600 text-white py-3 px-4 rounded-md hover:bg-indigo-700 transition duration-300"
         >
           {t('common:action.done')}
         </button>
