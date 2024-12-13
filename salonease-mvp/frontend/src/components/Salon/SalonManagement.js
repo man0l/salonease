@@ -4,7 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useSalonContext } from '../../contexts/SalonContext';
 import { toast } from 'react-toastify';
-import { FaEdit, FaTrash, FaPlus, FaMinus, FaUndo } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaPlus, FaMinus, FaUndo, FaSave } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import { subscriptionApi } from '../../utils/api';
 
@@ -150,26 +150,26 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h3 className="text-lg font-medium mb-4">
+        <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-800">
+          <h3 className="text-lg font-medium mb-4 text-gray-100">
             {t('action.confirm_deletion')}
           </h3>
-          <p className="mb-4">
+          <p className="mb-4 text-gray-300">
             {t('action.are_you_sure_you_want_to_delete_this_salon')}
           </p>
-          <div className="flex justify-end">
+          <div className="flex justify-end space-x-2">
             <button
               onClick={() => {
                 onConfirm();
                 onClose();
               }}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mr-2 transition duration-300"
+              className="bg-red-600 hover:bg-red-700 text-gray-100 px-4 py-2 rounded-md transition duration-300"
             >
               {t('action.delete')}
             </button>
             <button
               onClick={onClose}
-              className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded transition duration-300"
+              className="bg-gray-700 hover:bg-gray-600 text-gray-100 px-4 py-2 rounded-md transition duration-300"
             >
               {t('action.cancel')}
             </button>
@@ -185,8 +185,7 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
     return (
       <li 
         key={salon.id} 
-        className={`border border-gray-800 p-4 rounded-lg shadow-sm hover:shadow-md transition duration-300 
-          ${isDeleted ? 'opacity-60 bg-gray-800' : 'bg-gray-900'}`}
+        className="flex justify-between items-center p-4 border border-gray-800 rounded-lg bg-gray-900 hover:bg-gray-800 transition duration-300"
       >
         <div className="flex justify-between items-start">
           <div className="flex-grow">
@@ -251,15 +250,15 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
   );
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-gray-800 rounded-lg shadow-lg border border-gray-700">
-      <h1 className="text-3xl font-bold mb-6 text-white">
+    <div className="max-w-4xl mx-auto p-6">
+      <h1 className="text-2xl font-semibold mb-6 text-gray-100">
         {isOnboarding ? t('action.set_up_your_first_salon') : t('action.salon_management')}
       </h1>
       
       {!isOnboarding && (
         <button
           onClick={showForm ? () => setShowForm(false) : handleAddNewSalon}
-          className="mb-6 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full transition duration-300 flex items-center"
+          className="mb-6 bg-primary-600 hover:bg-primary-700 text-gray-100 px-4 py-2 rounded-full transition duration-300 flex items-center"
         >
           {showForm ? <FaMinus className="mr-2" /> : <FaPlus className="mr-2" />}
           {showForm ? t('action.hide_form') : t('action.add_new_salon')}
@@ -267,74 +266,90 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
       )}
 
       {showForm && (
-        <>
-          <h2 className="text-2xl font-bold mb-4 text-white">
+        <div className="bg-gray-900 rounded-lg shadow-lg p-6 mb-8 animate-slide-in border border-gray-800">
+          <h3 className="text-xl font-semibold mb-4 text-primary-400">
             {editingSalon ? t('action.edit_salon') : t('action.add_new_salon')}
-          </h2>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 animate-slide-in">
+          </h3>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <label htmlFor="name" className="block mb-1 text-sm font-medium text-gray-200">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-200 mb-1">
                 {t('label.salon_name')}
               </label>
               <input 
                 id="name" 
                 {...register('name')} 
-                className="w-full bg-gray-700 border-gray-600 text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" 
+                className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-md text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-400" 
               />
               {errors.name && <span role="alert" className="text-red-400 text-sm">{errors.name.message}</span>}
             </div>
             <div>
-              <label htmlFor="address" className="block mb-1 text-sm font-medium text-gray-200">
+              <label htmlFor="address" className="block text-sm font-medium text-gray-200 mb-1">
                 {t('action.address')}
               </label>
-              <input id="address" {...register('address')} className="w-full bg-gray-700 border-gray-600 text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" aria-invalid={errors.address ? "true" : "false"} />
+              <input 
+                id="address" 
+                {...register('address')} 
+                className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-md text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-400" 
+              />
               {errors.address && <span role="alert" className="text-red-400 text-sm">{errors.address.message}</span>}
             </div>
             <div>
-              <label htmlFor="contactNumber" className="block mb-1 text-sm font-medium text-gray-200">
+              <label htmlFor="contactNumber" className="block text-sm font-medium text-gray-200 mb-1">
                 {t('contact_number')}
               </label>
-              <input id="contactNumber" {...register('contactNumber')} className="w-full bg-gray-700 border-gray-600 text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" aria-invalid={errors.contactNumber ? "true" : "false"} />
+              <input 
+                id="contactNumber" 
+                {...register('contactNumber')} 
+                className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-md text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-400" 
+              />
               {errors.contactNumber && <span role="alert" className="text-red-400 text-sm">{errors.contactNumber.message}</span>}
             </div>
             <div>
-              <label htmlFor="description" className="block mb-1 text-sm font-medium text-gray-200">
+              <label htmlFor="description" className="block text-sm font-medium text-gray-200 mb-1">
                 {t('label.description')}
               </label>
-              <textarea id="description" {...register('description')} className="w-full bg-gray-700 border-gray-600 text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" rows="3" />
+              <textarea 
+                id="description" 
+                {...register('description')} 
+                className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-md text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-400" 
+                rows="3" 
+              />
             </div>
-            <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md transition duration-300">
+            <button 
+              type="submit" 
+              className="w-full bg-primary-600 hover:bg-primary-700 text-gray-100 px-4 py-2 rounded-md transition duration-300 flex items-center justify-center"
+            >
+              <FaSave className="mr-2" />
               {editingSalon ? t('action.update_salon') : t('action.add_salon')}
             </button>
           </form>
-        </>
+        </div>
       )}
 
       {!isOnboarding && (
-        <>
-          <h2 className="text-2xl font-bold mt-8 mb-4 text-white">
+        <div className="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800">
+          <h3 className="text-xl font-semibold mb-4 text-primary-300">
             {t('label.your_salons')}
-          </h2>
+          </h3>
           <ul className="space-y-4" aria-label={t('salon:title.list_of_salons')}>
             {salons.map(salon => (
               <li 
                 key={salon.id} 
-                className={`border border-gray-600 p-4 rounded-lg shadow-sm hover:shadow-md transition duration-300 
-                  ${salon.deletedAt ? 'bg-gray-700 opacity-75' : 'bg-gray-700'}`}
+                className="flex justify-between items-center p-4 border border-gray-800 rounded-lg bg-gray-900 hover:bg-gray-800 transition duration-300"
               >
                 <div className="flex justify-between items-start">
                   <div className="flex-grow">
-                    <h3 className="text-xl font-semibold text-indigo-400">
+                    <h3 className="text-xl font-semibold text-primary-400">
                       {salon.name}
                       {salon.deletedAt && (
-                        <span className="ml-2 text-sm text-red-400 font-normal">
+                        <span className="ml-2 text-sm text-red-500 font-normal">
                           {t('salon:status.deleted')}
                         </span>
                       )}
                     </h3>
-                    <p className="text-gray-300">{salon.address}</p>
-                    <p className="text-gray-300">{salon.contactNumber}</p>
-                    <p className="text-gray-300 mt-2">{salon.description}</p>
+                    <p className="text-gray-600">{salon.address}</p>
+                    <p className="text-gray-600">{salon.contactNumber}</p>
+                    <p className="text-gray-600 mt-2">{salon.description}</p>
                   </div>
                 </div>
 
@@ -343,15 +358,15 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
                     <>
                       <button 
                         onClick={() => handleEdit(salon)} 
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" 
+                        className="bg-primary-600 hover:bg-primary-700 text-gray-100 py-1 px-3 rounded-md text-sm transition duration-300 flex items-center" 
                       >
-                        <FaEdit className="mr-1" /> {t('common:action.edit')}
+                        <FaEdit className="mr-1" title={t('common:action.edit')} />
                       </button>
                       <button 
                         onClick={() => handleDelete(salon.id)} 
-                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" 
+                        className="bg-red-600 hover:bg-red-700 text-gray-100 py-1 px-3 rounded-md text-sm transition duration-300 flex items-center" 
                       >
-                        <FaTrash className="mr-1" /> {t('common:action.delete')}
+                        <FaTrash className="mr-1" title={t('common:action.delete')} />
                       </button>
                     </>
                   )}
@@ -360,7 +375,7 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
                       onClick={() => handleRestore(salon.id)} 
                       className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" 
                     >
-                      <FaUndo className="mr-1" /> {t('common:action.restore')}
+                      <FaUndo className="mr-1" title={t('common:action.restore')} />
                     </button>
                   )}
                 </div>
@@ -372,27 +387,29 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
             <button 
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
               disabled={currentPage === 1}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md transition duration-300 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed"
+              className="bg-primary-600 hover:bg-primary-700 text-gray-100 px-4 py-2 rounded-md transition duration-300 disabled:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
             >
               {t('common:action.previous')}
             </button>
-            <span className="text-gray-300">{t('common:action.page')} {currentPage} {t('common:action.of')} {totalPages}</span>
+            <span className="text-gray-400">
+              {t('common:action.page')} {currentPage} {t('common:action.of')} {totalPages}
+            </span>
             <button 
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
               disabled={currentPage === totalPages}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md transition duration-300 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed"
+              className="bg-primary-600 hover:bg-primary-700 text-gray-100 px-4 py-2 rounded-md transition duration-300 disabled:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
             >
               {t('common:action.next')}
             </button>
           </div>
-
-          <DeleteConfirmationDialog
-            isOpen={isDeleteDialogOpen}
-            onClose={() => setIsDeleteDialogOpen(false)}
-            onConfirm={confirmDelete}
-          />
-        </>
+        </div>
       )}
+
+      <DeleteConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 };

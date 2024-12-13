@@ -118,8 +118,8 @@ const StaffManagement = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-card">
-      <h2 className="text-3xl font-bold mb-6 text-primary-700">
+    <div className="max-w-4xl mx-auto p-6">
+      <h2 className="text-2xl font-semibold mb-6 text-gray-100">
         {t('staff:title.staff_management')}
       </h2>
       
@@ -129,43 +129,47 @@ const StaffManagement = () => {
           setEditingStaff(null);
           reset({ email: '', fullName: '' });
         }}
-        className="mb-6 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-full transition duration-300 flex items-center"
+        className="mb-6 bg-primary-600 hover:bg-primary-700 text-gray-100 px-4 py-2 rounded-full transition duration-300 flex items-center"
       >
         {showForm ? <FaMinus className="mr-2" /> : <FaPlus className="mr-2" />}
         {showForm ? t('staff:action.hide_form') : t('staff:action.add_new_staff')}
       </button>
 
       {showForm && (
-        <div className="bg-background rounded-lg shadow-card p-6 mb-8 animate-slide-in">
-          <h3 className="text-xl font-semibold mb-4 text-primary-600">
+        <div className="bg-gray-900 rounded-lg shadow-lg p-6 mb-8 animate-slide-in border border-gray-800">
+          <h3 className="text-xl font-semibold mb-4 text-primary-400">
             {editingStaff ? t('staff:title.edit_staff') : t('staff:title.add_staff')}
           </h3>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-200 mb-1">
                 {t('staff:label.email')}
               </label>
               <input
                 id="email"
                 type="email"
                 {...register('email')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-md text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-400"
               />
-              {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}
+              {errors.email && <span className="text-red-400 text-sm">{errors.email.message}</span>}
             </div>
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="fullName" className="block text-sm font-medium text-gray-200 mb-1">
                 {t('staff:label.full_name')}
               </label>
               <input
                 id="fullName"
                 type="text"
                 {...register('fullName')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-md text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-400"
               />
-              {errors.fullName && <span className="text-red-500 text-sm">{errors.fullName.message}</span>}
+              {errors.fullName && <span className="text-red-400 text-sm">{errors.fullName.message}</span>}
             </div>
-            <button data-testid="submit-button-invite-staff" type="submit" className="w-full bg-secondary-600 text-white py-2 px-4 rounded-md hover:bg-secondary-700 transition duration-300 flex items-center justify-center">
+            <button 
+              data-testid="submit-button-invite-staff" 
+              type="submit" 
+              className="w-full bg-primary-600 text-gray-100 py-2 px-4 rounded-md hover:bg-primary-700 transition duration-300 flex items-center justify-center"
+            >
               <FaUserPlus className="mr-2" />
               {editingStaff ? t('staff:action.update_staff') : t('staff:action.invite_staff')}
             </button>
@@ -173,35 +177,37 @@ const StaffManagement = () => {
         </div>
       )}
 
-      <div className="bg-background rounded-lg shadow-card p-6">
-        <h3 className="text-xl font-semibold mb-4 text-primary-600">
+      <div className="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800">
+        <h3 className="text-xl font-semibold mb-4 text-primary-400">
           {t('title.current_staff')}
         </h3>
         {loading ? (
-          <p className="text-gray-600">{t('message.loading')}</p>
+          <div className="flex justify-center py-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-400"></div>
+          </div>
         ) : error ? (
-          <p className="text-red-500">{error}</p>
+          <div className="text-red-400 text-center py-4">{error}</div>
         ) : staff.length === 0 ? (
-          <p className="text-gray-600">{t('message.no_staff')}</p>
+          <p className="text-gray-400">{t('message.no_staff')}</p>
         ) : (
           <ul className="space-y-4">
             {staff.map((member) => (
-              <li key={member.id} className="flex justify-between items-center p-4 border border-gray-200 rounded-lg hover:shadow-md transition duration-300">
+              <li key={member.id} className="flex justify-between items-center p-4 border border-gray-800 rounded-lg bg-gray-900 hover:bg-gray-800 transition duration-300">
                 <div>
-                  <span className="font-semibold text-primary-600">{member.fullName}</span>
-                  <span className="ml-2 text-sm text-gray-600">({member.email})</span>
+                  <span className="font-semibold text-primary-400">{member.fullName}</span>
+                  <span className="ml-2 text-sm text-gray-400">({member.email})</span>
                 </div>
-                <div className="space-x-2">
+                <div className="flex space-x-2">
                   <button
                     onClick={() => handleEdit(member)}
-                    className="bg-secondary-500 hover:bg-secondary-600 text-white py-1 px-3 rounded-md text-sm transition duration-300"
+                    className="bg-primary-600 hover:bg-primary-700 text-gray-100 py-1 px-3 rounded-md text-sm transition duration-300"
                     aria-label={t('action.edit')}
                   >
                     <FaEdit />
                   </button>
                   <button
                     onClick={() => handleDelete(member.id)}
-                    className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md text-sm transition duration-300"
+                    className="bg-red-600 hover:bg-red-700 text-gray-100 py-1 px-3 rounded-md text-sm transition duration-300"
                     aria-label={t('action.delete')}
                   >
                     <FaTrash />
