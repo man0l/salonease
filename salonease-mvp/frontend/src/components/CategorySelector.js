@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { FaChevronDown, FaChevronRight, FaChevronDown as FaChevronExpanded, FaTimes } from 'react-icons/fa';
+import { FaChevronDown, FaChevronRight, FaChevronDown as FaChevronExpanded } from 'react-icons/fa';
 import useOutsideClick from '../hooks/useOutsideClick';
 import CategoryList from './CategoryList';
 import SearchInput from './SearchInput';
@@ -14,14 +14,12 @@ const CategorySelector = ({ categories, value, onChange, id }) => {
     if (isOpen) setIsOpen(false);
   });
 
-  // New: Handle Escape key press
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'Escape') {
       setIsOpen(false);
     }
   }, []);
 
-  // New: Add event listener for keydown
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
     return () => {
@@ -67,16 +65,22 @@ const CategorySelector = ({ categories, value, onChange, id }) => {
       <button
         id={id}
         type="button"
-        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 flex justify-between items-center"
+        className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-md text-gray-100 
+                 focus:outline-none focus:ring-2 focus:ring-primary-400 
+                 hover:bg-gray-800 transition-colors duration-200
+                 flex justify-between items-center"
         onClick={() => setIsOpen(!isOpen)}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
-        {selectedCategory ? selectedCategory.name : 'Select a category'}
-        <FaChevronDown className="h-5 w-5" />
+        <span className="truncate">
+          {selectedCategory ? selectedCategory.name : 'Select a category'}
+        </span>
+        <FaChevronDown className="h-5 w-5 text-gray-400" />
       </button>
+
       {isOpen && (
-        <div className="absolute z-10 w-full mt-2 bg-white rounded-md shadow-lg">
+        <div className="max-h-60 overflow-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
           <SearchInput search={search} setSearch={setSearch} />
           <CategoryList
             categories={categories}

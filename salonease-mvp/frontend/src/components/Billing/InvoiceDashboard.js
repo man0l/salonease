@@ -26,7 +26,6 @@ const InvoiceDashboard = () => {
     try {
       setLoading(true);
       const subData = await billingApi.getSubscriptionDetails(selectedSalon.id);
-      console.log('Subscription Data:', subData.data);
       setSubscription(subData.data);
     } catch (error) {
       toast.error(t('billing:errors.fetch_failed'));
@@ -50,31 +49,45 @@ const InvoiceDashboard = () => {
   };
 
   if (!selectedSalon) {
-    return <div className="text-center py-8">{t('billing:errors.no_salon_selected')}</div>;
+    return (
+      <div className="flex justify-center items-center min-h-[200px]">
+        <p className="text-gray-400">{t('billing:errors.no_salon_selected')}</p>
+      </div>
+    );
   }
 
   if (loading) {
-    return <div className="animate-pulse">{t('billing:loading')}</div>;
+    return (
+      <div className="flex justify-center items-center min-h-[200px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-400"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">
-        {t('billing:title.billing')}
-      </h1>
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <SubscriptionDetails 
-          subscription={subscription}
-          onCancelClick={() => setShowCancelModal(true)}
-        />
-
-        <UsageMetrics           
-          subscription={subscription}
-        />
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gray-950">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-semibold text-gray-100">
+          {t('billing:title.billing')}
+        </h1>
       </div>
 
-      <div className="mt-8">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-8">
+        <div className="bg-gray-900 rounded-lg shadow-lg border border-gray-800">
+          <SubscriptionDetails 
+            subscription={subscription}
+            onCancelClick={() => setShowCancelModal(true)}
+          />
+        </div>
+
+        <div className="bg-gray-900 rounded-lg shadow-lg border border-gray-800">
+          <UsageMetrics           
+            subscription={subscription}
+          />
+        </div>
+      </div>
+
+      <div className="bg-gray-900 rounded-lg shadow-lg border border-gray-800">
         <InvoiceList salonId={selectedSalon.id} />
       </div>
 

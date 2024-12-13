@@ -11,12 +11,10 @@ const InvoiceList = ({ salonId }) => {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Get the appropriate locale based on current language
   const getLocale = () => {
     return i18n.language.startsWith('bg') ? bg : enUS;
   };
 
-  // Format date with localization
   const formatDate = (timestamp) => {
     return format(new Date(timestamp * 1000), 'PPP', {
       locale: getLocale()
@@ -53,7 +51,6 @@ const InvoiceList = ({ salonId }) => {
 
   const downloadInvoice = async (invoice) => {
     try {
-      // Open invoice PDF URL in new tab
       window.open(invoice.invoice_pdf, '_blank');
     } catch (error) {
       console.error('Failed to open invoice:', error);
@@ -61,54 +58,55 @@ const InvoiceList = ({ salonId }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h2 className="text-lg font-medium text-gray-900">
+    <div className="bg-gray-900 rounded-lg shadow-lg border border-gray-800">
+      <div className="px-6 py-4 border-b border-gray-800">
+        <h2 className="text-lg font-medium text-gray-100">
           {t('billing:invoices.title')}
         </h2>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full divide-y divide-gray-800">
+          <thead className="bg-gray-800">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 {t('billing:invoices.date')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 {t('billing:invoices.amount')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 {t('billing:invoices.status')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 {t('billing:invoices.actions')}
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-gray-900 divide-y divide-gray-800">
             {invoices.map((invoice) => (
-              <tr key={invoice.id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <tr key={invoice.id} className="hover:bg-gray-800 transition-colors duration-200">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   {formatDate(invoice.created)}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   {formatCurrency(invoice.amount_due / 100)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                     ${invoice.status === 'paid' 
-                      ? 'bg-emerald-100 text-emerald-800'
-                      : 'bg-amber-100 text-amber-800'
+                      ? 'bg-emerald-900 text-emerald-200'
+                      : 'bg-amber-900 text-amber-200'
                     }`}
                   >
                     {t(`billing:invoices.status_${invoice.status}`)}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-sm">
                   <button
                     onClick={() => downloadInvoice(invoice)}
-                    className="text-indigo-600 hover:text-indigo-900"
+                    className="text-primary-400 hover:text-primary-300 transition-colors duration-200"
+                    title={t('billing:invoices.download')}
                   >
                     <FaDownload className="h-5 w-5" />
                   </button>
@@ -117,6 +115,16 @@ const InvoiceList = ({ salonId }) => {
             ))}
           </tbody>
         </table>
+
+        {loading ? (
+          <div className="text-center py-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-400 mx-auto"></div>
+          </div>
+        ) : invoices.length === 0 ? (
+          <div className="text-center py-8 text-gray-400">
+            {t('billing:invoices.no_invoices')}
+          </div>
+        ) : null}
       </div>
     </div>
   );
