@@ -191,12 +191,12 @@ const BookingsManagement = () => {
   };
 
   return (
-    <div className="container mx-auto px-4">
+    <div className="max-w-4xl mx-auto p-6">
       <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
-        <h1 className="text-2xl font-bold">{t('title.bookings_management')}</h1>
+        <h1 className="text-2xl font-semibold text-gray-100">{t('title.bookings_management')}</h1>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="bg-indigo-500 hover:bg-indigo-600 text-white px-3 sm:px-4 py-2 rounded-full transition duration-300 flex items-center whitespace-nowrap"
+          className="bg-primary-600 hover:bg-primary-700 text-gray-100 px-3 sm:px-4 py-2 rounded-full transition duration-300 flex items-center whitespace-nowrap"
         >
           <FaPlus className="mr-1 sm:mr-2" />
           <span className="hidden sm:inline">{t('action.add_booking')}</span>
@@ -207,10 +207,10 @@ const BookingsManagement = () => {
       {/* Filters */}
       <div className="mb-4">
         <div className="flex justify-between items-center mb-2">
-          <h2 className="text-lg font-semibold">{t('title.filters')}</h2>
+          <h2 className="text-lg font-semibold text-gray-100">{t('title.filters')}</h2>
           <button
             onClick={handleResetFilters}
-            className="flex items-center gap-2 text-gray-600 hover:text-primary-500 transition-colors duration-200"
+            className="flex items-center gap-2 text-gray-400 hover:text-primary-500 transition-colors duration-200"
             title={t('action.reset_filters')}
           >
             <FaUndo className="w-4 h-4" />
@@ -245,7 +245,7 @@ const BookingsManagement = () => {
                 endDate={filters.endDate}
                 maxDate={filters.endDate}
                 placeholderText={t('placeholder.select_start_date')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-md text-gray-100 focus:ring-primary-500 focus:border-primary-500"
                 dateFormat="MM/dd/yyyy"
               />
             </div>
@@ -261,7 +261,7 @@ const BookingsManagement = () => {
                 endDate={filters.endDate}
                 minDate={filters.startDate}
                 placeholderText={t('placeholder.select_end_date')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-md text-gray-100 focus:ring-primary-500 focus:border-primary-500"
                 dateFormat="MM/dd/yyyy"
               />
             </div>
@@ -276,7 +276,7 @@ const BookingsManagement = () => {
               <select
                 value={filters.staffId}
                 onChange={e => setFilters(prev => ({ ...prev, staffId: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-md text-gray-100 focus:ring-primary-500 focus:border-primary-500"
                 disabled={staffLoading}
               >
                 <option value="">{t('label.all_staff')}</option>
@@ -294,7 +294,7 @@ const BookingsManagement = () => {
               <select
                 value={filters.serviceId}
                 onChange={e => setFilters(prev => ({ ...prev, serviceId: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-md text-gray-100 focus:ring-primary-500 focus:border-primary-500"
                 disabled={servicesLoading}
               >
                 <option value="">{t('label.all_services')}</option>
@@ -319,12 +319,12 @@ const BookingsManagement = () => {
           />
         </div>
       ) : (
-        <div className="grid gap-4">
+        <div className="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800">
           {Array.isArray(bookings) && bookings.length > 0 ? (
             bookings.map(booking => (
               <div 
                 key={booking.id}
-                className="bg-white p-4 sm:p-6 rounded-lg shadow hover:shadow-md transition-shadow duration-200"
+                className="mb-4 p-4 border border-gray-800 rounded-lg bg-gray-900 hover:bg-gray-800 transition duration-300"
               >
                 {/* Main Content */}
                 <div className="flex flex-col lg:flex-row gap-4">
@@ -458,7 +458,7 @@ const BookingsManagement = () => {
               </div>
             ))
           ) : (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-gray-400">
               {t('error.no_bookings')}
             </div>
           )}
@@ -471,7 +471,7 @@ const BookingsManagement = () => {
             <button
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="px-2 sm:px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+              className="px-2 sm:px-4 py-2 bg-gray-900 border border-gray-800 rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base text-gray-100"
             >
               <span className="hidden sm:inline">{t('action.previous')}</span>
               <span className="sm:hidden">{t('action.prev')}</span>
@@ -482,7 +482,7 @@ const BookingsManagement = () => {
             <button
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="px-2 sm:px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+              className="px-2 sm:px-4 py-2 bg-gray-900 border border-gray-800 rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base text-gray-100"
             >
               <span className="hidden sm:inline">{t('action.next')}</span>
               <span className="sm:hidden">{t('action.next')}</span>
