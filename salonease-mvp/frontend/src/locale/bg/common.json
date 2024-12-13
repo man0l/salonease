@@ -195,5 +195,9 @@
         }
       }
     }
+  },
+  "date": {
+    "monthYear": "{{date, MMMM YYYY}}",
+    "dateRange": "{{startDate, MMMM DD}} – {{endDate, DD}}, {{startDate, YYYY}}"
   }
 }

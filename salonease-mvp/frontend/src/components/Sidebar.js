@@ -18,7 +18,7 @@ const Sidebar = () => {
     { name: t('navigation:sidebar.bookings'), icon: ClipboardDocumentListIcon, route: '/salons/:salonId/bookings', roles: ['SalonOwner', 'Staff'], alwaysEnabled: true },
     { name: t('navigation:sidebar.clients'), icon: UserGroupIcon, route: '/salons/:salonId/clients', roles: ['SalonOwner', 'Staff'], alwaysEnabled: true },
     { name: t('navigation:sidebar.staff'), icon: UserGroupIcon, route: '/salons/:salonId/staff', roles: ['SalonOwner', 'SuperAdmin'] },
-    { name: t('navigation:sidebar.staff_availability'), icon: CalendarDaysIcon, route: '/salons/:salonId/staff-availability', roles: ['SalonOwner', 'SuperAdmin'] },
+    // { name: t('navigation:sidebar.staff_availability'), icon: CalendarDaysIcon, route: '/salons/:salonId/staff-availability', roles: ['SalonOwner', 'SuperAdmin'] },
     { name: t('navigation:sidebar.services'), icon: () => <span className="text-xl">{t('common:emoji.scissors')}</span>, route: '/salons/:salonId/services', roles: ['SalonOwner'] },
     { name: t('navigation:sidebar.billing'), icon: CreditCardIcon, route: '/salons/:salonId/billing', roles: ['SalonOwner'] },
     { name: t('navigation:sidebar.financial_reports'), icon: ChartBarIcon, route: '/salons/:salonId/reports/financial', roles: ['SalonOwner'] },

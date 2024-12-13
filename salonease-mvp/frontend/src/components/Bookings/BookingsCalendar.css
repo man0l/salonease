@@ -1,0 +1,118 @@
+.calendar-custom {
+    .rbc-time-header {
+      background-color: rgb(15, 23, 42);
+    }
+    
+    .rbc-time-slot {
+      background-color: rgb(17, 24, 39);
+    }
+  
+    .rbc-time-gutter {
+      color: rgb(148, 163, 184);
+    }
+    
+    .rbc-header {
+      border-bottom: 1px solid rgb(30, 41, 59);
+      color: rgb(203, 213, 225);
+    }
+
+    .rbc-event {
+      color: rgb(226, 232, 240) !important;
+    }
+
+    .rbc-today {
+      background-color: rgba(51, 65, 85, 0.4);
+    }
+
+    .rbc-current-time-indicator {
+      background-color: rgb(99, 102, 241);
+    }
+
+    .rbc-time-content {
+      border-top: 1px solid rgb(30, 41, 59);
+    }
+
+    .rbc-time-view {
+      border: 1px solid rgb(30, 41, 59);
+    }
+
+    .rbc-time-content > * + * > * {
+        border-left: 1px solid rgb(30, 41, 59);
+    }
+
+    .rbc-timeslot-group {
+        border-bottom: 1px solid rgb(30, 41, 59);
+        min-height: 40px;
+        display: flex;
+        flex-flow: column nowrap;
+    }
+
+    .rbc-day-slot .rbc-time-slot {
+        border-top: 1px solid rgb(30, 41, 59);
+    }
+
+    /* Fix white background in time slots and overall calendar */
+    background-color: rgb(17, 24, 39);
+    
+    .rbc-time-view, 
+    .rbc-time-content,
+    .rbc-day-slot,
+    .rbc-events-container,
+    .rbc-day-bg {
+        background-color: rgb(17, 24, 39);
+    }
+
+    .rbc-time-content > .rbc-day-slot {
+        background-color: rgb(17, 24, 39);
+    }
+
+    /* Fix any remaining white spaces in the header */
+    .rbc-allday-cell {
+        background-color: rgb(17, 24, 39);
+    }
+
+    .rbc-row {
+        background-color: rgb(15, 23, 42);
+    }
+
+    /* Remove leftmost vertical line */
+    .rbc-time-content > .rbc-time-gutter {
+        border-right: none;
+    }
+
+    /* Navigation buttons and toolbar styling */
+    .rbc-btn-group {
+        button {
+            background-color: rgb(30, 41, 59);
+            border: 1px solid rgb(51, 65, 85);
+            color: rgb(148, 163, 184);
+            padding: 6px 12px;
+            border-radius: 6px;
+            margin: 0 2px;
+            
+            &:hover {
+                background-color: rgb(51, 65, 85);
+                color: rgb(226, 232, 240);
+            }
+            
+            &.rbc-active {
+                background-color: rgb(51, 65, 85);
+                color: rgb(226, 232, 240);
+            }
+        }
+    }
+
+    /* Date range label styling */
+    .rbc-toolbar-label {
+        color: rgb(226, 232, 240);
+        font-size: 1.1rem;
+        padding: 0 10px;
+    }
+
+    /* Toolbar container */
+    .rbc-toolbar {
+        padding: 10px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid rgb(30, 41, 59);
+    }
+}

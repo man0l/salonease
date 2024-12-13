@@ -11,19 +11,19 @@ import RescheduleModal from './Modals/RescheduleModal';
 import CreateBookingModal from './Modals/CreateBookingModal';
 import { BOOKING_STATUSES } from '../../utils/constants';
 import useBookings from '../../hooks/useBookings';
-import CancelBookingModal from './Modals/CancelBookingModal';
-import ReassignStaffModal from './Modals/ReassignStaffModal';
 import { useTranslation } from 'react-i18next';
+import './BookingsCalendar.css';
+import i18next from 'i18next';
 
 const localizer = momentLocalizer(moment);
 
-// Reuse the color styles from StaffAvailability
+// Update color styles to match dark theme UI
 const colorStyles = [
-  { bgClass: 'indigo-500', textClass: 'white', bg: '#6366F1', border: '#4F46E5' },
-  { bgClass: 'emerald-500', textClass: 'white', bg: '#10B981', border: '#059669' },
-  { bgClass: 'amber-500', textClass: 'black', bg: '#F59E0B', border: '#D97706' },
-  { bgClass: 'rose-500', textClass: 'white', bg: '#F43F5E', border: '#E11D48' },
-  { bgClass: 'violet-500', textClass: 'white', bg: '#8B5CF6', border: '#7C3AED' },
+  { bgClass: 'blue-600', textClass: 'white', bg: '#2563eb', border: '#1d4ed8' },
+  { bgClass: 'purple-600', textClass: 'white', bg: '#9333ea', border: '#7e22ce' },
+  { bgClass: 'emerald-600', textClass: 'white', bg: '#059669', border: '#047857' },
+  { bgClass: 'orange-600', textClass: 'white', bg: '#ea580c', border: '#c2410c' },
+  { bgClass: 'rose-600', textClass: 'white', bg: '#e11d48', border: '#be123c' },
 ];
 
 const BookingsCalendar = () => {
@@ -158,14 +158,20 @@ const BookingsCalendar = () => {
         <div>
           <button
             className={`px-4 py-2 rounded-l-lg ${
-              view === 'day' ? 'bg-indigo-600 text-white' : 'bg-gray-200'
+              view === 'day' 
+                ? 'bg-slate-700 text-white' 
+                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
             }`}
             onClick={() => setView('day')}
           >
             {t('staff:availability.calendar.dayView')}
           </button>
           <button
-            className={`px-4 py-2 rounded-r-lg ${view === 'week' ? 'bg-primary-600 text-white' : 'bg-gray-200'}`}
+            className={`px-4 py-2 rounded-r-lg ${
+              view === 'week' 
+                ? 'bg-slate-700 text-white' 
+                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+            }`}
             onClick={() => setView('week')}
           >
             {t('staff:availability.calendar.weekView')}
@@ -181,10 +187,10 @@ const BookingsCalendar = () => {
               key={member.id}
               onClick={() => handleStaffToggle(member.id)}
               style={{
-                backgroundColor: selectedStaffIds.includes(member.id) ? colorStyle.bg : '#e5e7eb',
-                color: selectedStaffIds.includes(member.id) ? (colorStyle.textClass === 'white' ? 'white' : 'black') : '#374151',
+                backgroundColor: selectedStaffIds.includes(member.id) ? colorStyle.bg : '#1e293b',
+                color: selectedStaffIds.includes(member.id) ? '#ffffff' : '#94a3b8',
               }}
-              className={`px-3 py-1 rounded-full text-sm`}
+              className={`px-3 py-1 rounded-full text-sm hover:opacity-80 transition-all`}
             >
               {member.fullName}
             </button>
@@ -192,7 +198,7 @@ const BookingsCalendar = () => {
         })}
       </div>
 
-      <div className="flex-grow bg-white rounded-lg shadow-md p-4 overflow-x-auto">
+      <div className="flex-grow bg-slate-900 rounded-lg shadow-lg p-4 overflow-x-auto border border-slate-700">
         <Calendar
           ref={calendarRef}
           localizer={localizer}
@@ -215,7 +221,7 @@ const BookingsCalendar = () => {
           resourceIdAccessor="id"
           resourceTitleAccessor="fullName"
           eventPropGetter={eventStyleGetter}
-          className="h-full min-w-[800px]"
+          className="h-full min-w-[800px] text-slate-200 calendar-custom"
           messages={{
             next: t('bookings:action.next'),
             previous: t('bookings:action.prev'),
@@ -227,15 +233,21 @@ const BookingsCalendar = () => {
             timeGutterFormat: 'HH:mm',
             eventTimeRangeFormat: ({ start, end, event }) => {
               if (!start || !end) return '';
-              
               const timeStr = `${moment(start).format('HH:mm')} - ${moment(end).format('HH:mm')}`;
-              
               if (view === 'week' && event?.resourceId) {
                 const staffMember = staff.find(s => s.id === event.resourceId);
                 return staffMember ? `${timeStr} - ${staffMember.fullName}` : timeStr;
               }
-              
               return timeStr;
+            },
+            monthHeaderFormat: (date) => t('common:date.monthYear', { date: moment(date) }),
+            dayRangeHeaderFormat: ({ start, end }) => {
+              moment.locale(i18next.language);
+              
+              const startStr = moment(start).format('MMMM DD');
+              const endStr = moment(end).format('DD');
+              const year = moment(start).format('YYYY');
+              return `${startStr} – ${endStr}, ${year}`;
             }
           }}
           components={{
@@ -243,20 +255,29 @@ const BookingsCalendar = () => {
               <div className="text-xs h-full">
                 <div className="p-1 h-full flex flex-col justify-between">
                   <div>
-                    <div className="font-bold truncate">{props.event.booking.client.name}</div>
-                    <div className="text-xs opacity-75 truncate">{props.event.booking.service.name}</div>
+                    <div className="font-bold truncate text-white">{props.event.booking.client.name}</div>
+                    <div className="text-xs text-slate-300 truncate">{props.event.booking.service.name}</div>
                     {view === 'week' && props.event.resourceId && (
-                      <div className="truncate text-xs opacity-75">
+                      <div className="truncate text-xs text-slate-300">
                         {staff.find(s => s.id === props.event.resourceId)?.fullName}
                       </div>
                     )}
                   </div>
-                  <div className="text-xs opacity-75">
+                  <div className="text-xs text-slate-300">
                     {t('bookings:status.' + props.event.status.toLowerCase())}
                   </div>
                 </div>
               </div>
             )
+          }}
+          style={{
+            backgroundColor: 'rgb(17, 24, 39)',
+            '& .rbc-time-column': {
+              borderRight: '1px solid rgb(30, 41, 59)'
+            },
+            '& .rbc-timeslot-group': {
+              borderBottom: '1px solid rgb(30, 41, 59)'
+            }
           }}
         />
       </div>
