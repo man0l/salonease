@@ -8,8 +8,8 @@ const RevenueChart = ({ data, loading }) => {
 
   if (loading) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-card h-80 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500"></div>
+      <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 h-80 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-400"></div>
       </div>
     );
   }
@@ -44,21 +44,33 @@ const RevenueChart = ({ data, loading }) => {
   });
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-card">
-      <h2 className="text-xl font-semibold mb-4">{t('reports:revenue.title')}</h2>
+    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+      <h2 className="text-xl font-semibold mb-4 text-white">{t('reports:revenue.title')}</h2>
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={formattedData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
-            <YAxis tickFormatter={(value) => formatCurrency(value)} />
-            <Tooltip formatter={(value) => formatCurrency(value)} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <XAxis dataKey="date" stroke="#9CA3AF" />
+            <YAxis tickFormatter={(value) => formatCurrency(value)} stroke="#9CA3AF" />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: '#1F2937', 
+                border: '2px solid #341146',
+                borderRadius: '6px',
+                padding: '8px',
+                color: '#fff',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.2)'
+              }}
+              itemStyle={{ color: '#fff' }}
+              labelStyle={{ color: '#9CA3AF', marginBottom: '4px' }}
+            />
             <Line 
               type="monotone" 
               dataKey="revenue" 
-              stroke="#0EA5E9" 
+              name={t('reports:revenue.tooltip')}
+              stroke="#341146" 
               strokeWidth={2}
-              dot={{ fill: '#0EA5E9' }}
+              dot={{ fill: '#341146' }}
             />
           </LineChart>
         </ResponsiveContainer>

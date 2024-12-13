@@ -20,19 +20,32 @@ const StaffPerformance = ({ data, loading }) => {
   })) || [];
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-card">
-      <h2 className="text-xl font-semibold mb-4">{t('reports:staff_performance.title')}</h2>
+    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+      <h2 className="text-xl font-semibold mb-4 text-white">{t('reports:staff_performance.title')}</h2>
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={formattedData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis tickFormatter={(value) => formatCurrency(value)} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <XAxis dataKey="name" stroke="#9CA3AF" />
+            <YAxis tickFormatter={(value) => formatCurrency(value)} stroke="#9CA3AF" />
             <Tooltip 
-              formatter={(value) => formatCurrency(value)}
-              labelFormatter={(label) => t('reports:staff_performance.tooltip.staff', { name: label })}
+              contentStyle={{ 
+                backgroundColor: '#1F2937', 
+                border: '2px solid #341146',
+                borderRadius: '6px',
+                padding: '8px',
+                color: '#fff',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.2)'
+              }}
+              itemStyle={{ color: '#fff' }}
+              labelStyle={{ color: '#9CA3AF', marginBottom: '4px' }}
+              cursor={{ fill: 'rgba(52, 17, 70, 0.1)' }}
             />
-            <Bar dataKey="revenue" fill="#0EA5E9" />
+            <Bar 
+              dataKey="revenue" 
+              name={t('reports:staff_performance.tooltip.revenue')}
+              fill="#341146" 
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

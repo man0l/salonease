@@ -59,32 +59,29 @@ const FinancialReports = () => {
     setCustomRange(customDates);
   };
 
-  if (error) {
-    return (
-      <div className="text-red-500">
-        {t('reports:error.loading', { message: error })}
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-gray-900 p-6 rounded-lg">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900"> {t('reports:title')} </h1>
+        <h1 className="text-2xl font-bold text-white">
+          {t('reports:title')}
+        </h1>
         <div className="flex space-x-4">
           <button
             onClick={() => handleExport('csv')}
-            className="flex items-center px-4 py-2 bg-secondary-500 text-white rounded-md hover:bg-secondary-600 transition"
+            className="flex items-center px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition duration-200"
           >
             <FaFileDownload className="mr-2" /> {t('reports:export.csv')}
           </button>
         </div>
       </div>
 
-      <DateRangeSelector 
-        value={dateRange} 
-        onChange={handleDateRangeChange} 
-      />
+      {error && (
+        <div className="text-accent-500 bg-gray-800 p-4 rounded-lg">
+          {t('reports:error.loading', { message: error })}
+        </div>
+      )}
+
+      <DateRangeSelector value={dateRange} onChange={handleDateRangeChange} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <RevenueChart data={reportData} loading={loading} />

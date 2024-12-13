@@ -17,11 +17,13 @@
     "title": "Staff Performance",
     "loading": "Loading staff data...",
     "tooltip": {
-      "staff": "Staff: {{name}}"
+      "staff": "Staff: {{name}}",
+      "revenue": "Revenue"
     }
   },
   "revenue": {
-    "title": "Revenue"
+    "title": "Revenue",
+    "tooltip": "Revenue"
   },
   "service_breakdown": {
     "title": "Service Breakdown"

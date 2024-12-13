@@ -40,10 +40,10 @@ const DateRangeSelector = ({ value, onChange }) => {
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-card">
+    <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
       <div className="flex items-center space-x-2 mb-4">
-        <FaCalendar className="text-primary-500" />
-        <span className="font-medium">{t('reports:date_range.title')}</span>
+        <FaCalendar className="text-primary-400" />
+        <span className="font-medium text-white">{t('reports:date_range.title')}</span>
       </div>
       
       <div className="flex flex-wrap gap-2 mb-4">
@@ -58,7 +58,7 @@ const DateRangeSelector = ({ value, onChange }) => {
             className={`px-4 py-2 rounded-md transition-colors ${
               value === range.id
                 ? 'bg-primary-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-gray-700 text-gray-200 hover:bg-gray-600'
             }`}
           >
             {range.label}
@@ -74,7 +74,7 @@ const DateRangeSelector = ({ value, onChange }) => {
             selectsStart
             startDate={customStartDate}
             endDate={customEndDate}
-            className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full px-4 py-2 rounded-md border border-gray-600 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
             placeholderText={t('reports:date_range.placeholder.start_date')}
             dateFormat="MMM d, yyyy"
             isClearable
@@ -90,6 +90,7 @@ const DateRangeSelector = ({ value, onChange }) => {
                 }
               }
             ]}
+            calendarClassName="bg-gray-800 border-gray-700 text-white"
           />
         </div>
         <div className="relative">
@@ -100,7 +101,7 @@ const DateRangeSelector = ({ value, onChange }) => {
             startDate={customStartDate}
             endDate={customEndDate}
             minDate={customStartDate}
-            className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full px-4 py-2 rounded-md border border-gray-600 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
             placeholderText={t('reports:date_range.placeholder.end_date')}
             dateFormat="MMM d, yyyy"
             isClearable
@@ -116,6 +117,7 @@ const DateRangeSelector = ({ value, onChange }) => {
                 }
               }
             ]}
+            calendarClassName="bg-gray-800 border-gray-700 text-white"
           />
         </div>
       </div>

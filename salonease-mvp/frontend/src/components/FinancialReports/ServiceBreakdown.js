@@ -3,7 +3,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 import { formatCurrency } from '../../utils/currencyFormatter';
 import { useTranslation } from 'react-i18next';
 
-const COLORS = ['#0EA5E9', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
+const COLORS = ['#341146', '#6D4F86', '#ED5DA7', '#8B6BA5', '#D1C5DB'];
 
 const ServiceBreakdown = ({ data, loading }) => {
   const { t } = useTranslation(['reports']);
@@ -22,8 +22,8 @@ const ServiceBreakdown = ({ data, loading }) => {
   })) || [];
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-card">
-      <h2 className="text-xl font-semibold mb-4">{t('reports:service_breakdown.title')}</h2>
+    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+      <h2 className="text-xl font-semibold mb-4 text-white">{t('reports:service_breakdown.title')}</h2>
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -40,8 +40,19 @@ const ServiceBreakdown = ({ data, loading }) => {
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip formatter={(value) => formatCurrency(value)} />
-            <Legend />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: '#1F2937', 
+                border: '2px solid #341146',
+                borderRadius: '6px',
+                padding: '8px',
+                color: '#fff',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.2)'
+              }}
+              itemStyle={{ color: '#fff' }}
+              labelStyle={{ color: '#9CA3AF', marginBottom: '4px' }}
+            />
+            <Legend formatter={(value) => <span className="text-gray-200">{value}</span>} />
           </PieChart>
         </ResponsiveContainer>
       </div>
