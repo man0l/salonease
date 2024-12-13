@@ -27,11 +27,11 @@ const SalonSelector = () => {
 
   if (userRole === ROLES.STAFF) {
     return selectedSalon ? (
-      <div className="bg-white text-primary-600 border border-primary-600 rounded px-2 py-1">
+      <div className="bg-gray-900 text-primary-400 border border-primary-400 rounded px-2 py-1">
         {selectedSalon.name}
       </div>
     ) : (
-      <div>{t('error.no_associated_salon')}</div>
+      <div className="text-gray-300">{t('error.no_associated_salon')}</div>
     );
   }
 
@@ -48,7 +48,7 @@ const SalonSelector = () => {
   return (
     userRole === ROLES.SALON_OWNER && salons.length > 0 ? (
       <select 
-        className="bg-white text-primary border border-primary rounded px-2 py-1"
+        className="bg-gray-900 text-gray-300 border border-gray-800 rounded py-1 focus:border-primary-500 focus:ring-primary-500"
         value={selectedSalon?.id || ''}
         onChange={handleSalonChange}
         aria-label={t('label.select_salon')}
@@ -58,7 +58,7 @@ const SalonSelector = () => {
         ))}
       </select>
     ) : (
-      <div>{t('error.no_salons')}</div>
+      <div className="text-gray-300">{t('error.no_salons')}</div>
     )
   );
 };

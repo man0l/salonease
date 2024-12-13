@@ -78,8 +78,32 @@ exports.createBooking = async (req, res) => {
       return res.status(400).json({ message: 'Validation error', errors: errorMessages });
     }
 
-    const { staffId, appointmentDateTime, serviceId } = value;
+    const { staffId, appointmentDateTime, serviceId, clientName, clientEmail, clientPhone } = value;
     const { salonId } = req.params;
+
+    // If clientName and clientPhone are provided, create a new client first
+    let clientId = value.clientId;
+    if (!clientId && clientName && clientPhone) {
+      const [client] = await Client.findOrCreate({
+        where: { 
+          phone: clientPhone,
+          salonId 
+        },
+        defaults: {
+          name: clientName,
+          email: clientEmail,
+          salonId
+        }
+      });
+      clientId = client.id;
+    }
+
+    // Add clientId to the booking data
+    const bookingData = {
+      ...value,
+      clientId,
+      salonId
+    };
 
     // Check if staff belongs to salon
     const staff = await Staff.findOne({ 
@@ -128,8 +152,7 @@ exports.createBooking = async (req, res) => {
     }
 
     const result = await Booking.create({
-      ...value,
-      salonId,
+      ...bookingData,
       endTime,
       status: BOOKING_STATUSES.PENDING
     });

@@ -13,7 +13,9 @@ const createBookingSchema = Joi.object({
   status: Joi.string().valid(...Object.values(BOOKING_STATUSES)).default(BOOKING_STATUSES.PENDING)
 }).custom((value, helpers) => {
   if (!value.clientId && (!value.clientName || !value.clientPhone)) {
-    return helpers.message('Either clientId or both clientName and clientPhone must be provided');
+    return helpers.error('any.custom', { 
+      message: 'Either clientId or both clientName and clientPhone must be provided'
+    });
   }
   return value;
 });

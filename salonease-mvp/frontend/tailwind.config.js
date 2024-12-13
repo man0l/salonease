@@ -46,6 +46,11 @@ module.exports = {
         },
         background: '#F9FAFB',
         text: '#1F2937',
+        gray: {
+          800: '#1f2937',
+          900: '#111827',
+          950: '#030712',
+        },
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

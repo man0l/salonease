@@ -113,8 +113,8 @@ const ClientsManagement = () => {
   );
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-card">
-      <h1 className="text-3xl font-bold mb-6 text-primary-700">
+    <div className="max-w-4xl mx-auto p-6 bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+      <h1 className="text-3xl font-bold mb-6 text-white">
         {t('title.client_management')}
       </h1>
 
@@ -126,20 +126,20 @@ const ClientsManagement = () => {
               placeholder={t('search_clients')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           </div>
         </div>
         <button
           onClick={() => exportClients(selectedFields)}
-          className="bg-secondary-500 hover:bg-secondary-600 text-white px-4 py-2 rounded-md transition duration-300 flex items-center"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md transition duration-300 flex items-center"
         >
           <FaFileExport className="mr-2" /> {t('action.export_clients')}
         </button>
         <button
           onClick={showForm ? () => setShowForm(false) : handleAddNewClient}
-          className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-full transition duration-300 flex items-center"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full transition duration-300 flex items-center"
         >
           {showForm ? <FaMinus className="mr-2" /> : <FaPlus className="mr-2" />}
           {showForm ? t('action.hide_form') : t('action.add_client')}
@@ -155,67 +155,67 @@ const ClientsManagement = () => {
               onChange={() => setSelectedFields(prev => 
                 prev.includes(field) ? prev.filter(f => f !== field) : [...prev, field]
               )}
-              className="form-checkbox h-5 w-5 text-primary-600"
+              className="form-checkbox h-5 w-5 text-indigo-600 bg-gray-700 border-gray-600"
             />
-            <span className="ml-2 text-gray-700 capitalize">{field}</span>
+            <span className="ml-2 text-gray-200 capitalize">{field}</span>
           </label>
         ))}
       </div>
 
       {showForm && (
-        <div className="bg-background rounded-lg shadow-card p-6 mb-8 animate-slide-in">
-          <h3 className="text-xl font-semibold mb-4 text-primary-600">
+        <div className="bg-gray-700 rounded-lg shadow-lg p-6 mb-8 animate-slide-in border border-gray-600">
+          <h3 className="text-xl font-semibold mb-4 text-indigo-400">
             {selectedClient ? t('title.edit_client') : t('title.add_new_client')}
           </h3>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-200 mb-1">
                 {t('label.name')}:
               </label>
               <input
                 id="name"
                 type="text"
                 {...register('name')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
-              {errors.name && <span className="text-red-500 text-sm">{errors.name.message}</span>}
+              {errors.name && <span className="text-red-400 text-sm">{errors.name.message}</span>}
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-200 mb-1">
                 {t('label.email')}:
               </label>
               <input
                 id="email"
                 type="email"
                 {...register('email')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
-              {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}
+              {errors.email && <span className="text-red-400 text-sm">{errors.email.message}</span>}
             </div>
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-200 mb-1">
                 {t('label.phone')}:
               </label>
               <input
                 id="phone"
                 type="tel"
                 {...register('phone')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
-              {errors.phone && <span className="text-red-500 text-sm">{errors.phone.message}</span>}
+              {errors.phone && <span className="text-red-400 text-sm">{errors.phone.message}</span>}
             </div>
             <div>
-              <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="notes" className="block text-sm font-medium text-gray-200 mb-1">
                 {t('notes')}:
               </label>
               <textarea
                 id="notes"
                 {...register('notes')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 rows="3"
               />
             </div>
-            <button type="submit" className="w-full bg-secondary-600 text-white py-2 px-4 rounded-md hover:bg-secondary-700 transition duration-300 flex items-center justify-center">
+            <button type="submit" className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-300 flex items-center justify-center">
               <FaSave className="mr-2" />
               {selectedClient ? t('action.update_client') : t('action.add_client')}
             </button>
@@ -223,35 +223,37 @@ const ClientsManagement = () => {
         </div>
       )}
 
-      <div className="bg-background rounded-lg shadow-card p-6">
-        <h3 className="text-xl font-semibold mb-4 text-primary-600">
+      <div className="bg-gray-700 rounded-lg shadow-lg p-6 border border-gray-600">
+        <h3 className="text-xl font-semibold mb-4 text-indigo-400">
           {t('title.client_list')}
         </h3>
         {filteredClients.length === 0 ? (
-          <p className="text-gray-600">{t('no_clients_found')}</p>
+          <p className="text-gray-300">{t('no_clients_found')}</p>
         ) : (
           <ul className="space-y-4">
             {filteredClients.map((client) => (
-              <li key={client.id} className="flex justify-between items-center p-4 border border-gray-200 rounded-lg hover:shadow-md transition duration-300">
+              <li key={client.id} className="flex justify-between items-center p-4 border border-gray-600 rounded-lg bg-gray-800 hover:bg-gray-750 transition duration-300">
                 <div>
-                  <span className="font-semibold text-primary-600">{client.name}</span>
-                  <p className="text-sm text-gray-600">{client.email}</p>
-                  <p className="text-sm text-gray-600">{client.phone}</p>
+                  <span className="font-semibold text-indigo-400">{client.name}</span>
+                  <p className="text-sm text-gray-300">{client.email}</p>
+                  <p className="text-sm text-gray-300">{client.phone}</p>
                   {client.lastAppointmentDate && (
-                    <p className="text-sm text-gray-600">Last Appointment: {new Date(client.lastAppointmentDate).toLocaleDateString()}</p>
+                    <p className="text-sm text-gray-400">
+                      Last Appointment: {new Date(client.lastAppointmentDate).toLocaleDateString()}
+                    </p>
                   )}
                 </div>
                 <div className="flex space-x-2">
                   <button
                     onClick={() => handleEdit(client)}
-                    className="bg-secondary-500 hover:bg-secondary-600 text-white py-1 px-3 rounded-md text-sm transition duration-300"
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white py-1 px-3 rounded-md text-sm transition duration-300"
                     aria-label={`Edit ${client.name}`}
                   >
                     <FaEdit />
                   </button>
                   <button
                     onClick={() => handleDelete(client)}
-                    className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md text-sm transition duration-300"
+                    className="bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded-md text-sm transition duration-300"
                     aria-label={`Delete ${client.name}`}
                   >
                     <FaTrash />

@@ -58,17 +58,17 @@ function AppContent() {
   const { user } = useAuth();
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gray-950">
       <Header />
       <div className="flex-grow flex">
         {user && (
           <PrivateRoute allowedRoles={[ROLES.SALON_OWNER, ROLES.STAFF, ROLES.SUPER_ADMIN]}>
-            <Sidebar className="w-64 flex-shrink-0 bg-background border-r border-gray-200" />
+            <Sidebar className="w-64 flex-shrink-0 bg-gray-900 border-r border-gray-800" />
           </PrivateRoute>
         )}
-        <main className="flex-grow overflow-x-hidden overflow-y-auto bg-gray-50">
+        <main className="flex-grow bg-gray-950 text-gray-100 overflow-x-hidden overflow-y-auto">
           <div className="container mx-auto px-6 py-8">
-            <ToastContainer />
+            <ToastContainer theme="dark" />
             <Routes>
               <Route path="/login" element={
                 <PublicRoute>
@@ -217,7 +217,7 @@ function AppContent() {
           </div>
         </main>
       </div>
-      <Footer />
+      <Footer className="bg-gray-900 border-t border-gray-800" />
     </div>
   );
 }

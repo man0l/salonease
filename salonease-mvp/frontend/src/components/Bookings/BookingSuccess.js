@@ -30,36 +30,40 @@ const BookingSuccess = ({ booking, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+      <div className="bg-gray-800 p-8 rounded-lg shadow-lg max-w-md w-full border border-gray-700">
         <div className="text-center">
           <FaCheckCircle className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-800 mb-2" data-testid="booking-confirmed-title">{t('bookings:success.booking_confirmed')}</h2>
-          <p className="text-gray-600 mb-6" data-testid="appointment-scheduled-message">{t('bookings:success.appointment_scheduled')}</p>
+          <h2 className="text-2xl font-bold text-gray-100 mb-2">
+            {t('bookings:success.booking_confirmed')}
+          </h2>
+          <p className="text-gray-400 mb-6">
+            {t('bookings:success.appointment_scheduled')}
+          </p>
         </div>
 
         <div className="space-y-4 mb-6">
           <div className="flex items-center gap-3">
-            <FaCalendarAlt className="w-5 h-5 text-primary-600" />
+            <FaCalendarAlt className="w-5 h-5 text-primary-500" />
             <div>
-              <p className="font-medium">{t('common:label.date')}</p>
-              <p className="text-gray-600">{formatDate(appointmentDate)}</p>
+              <p className="font-medium text-gray-200">{t('common:label.date')}</p>
+              <p className="text-gray-400">{formatDate(appointmentDate)}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <FaClock className="w-5 h-5 text-primary-600" />
+            <FaClock className="w-5 h-5 text-primary-500" />
             <div>
-              <p className="font-medium">{t('common:label.time')}</p>
-              <p className="text-gray-600">{formatTime(appointmentDate)}</p>
+              <p className="font-medium text-gray-200">{t('common:label.time')}</p>
+              <p className="text-gray-400">{formatTime(appointmentDate)}</p>
             </div>
           </div>
 
           {serviceName && (
             <div className="flex items-center gap-3">
-              <FaCut className="w-5 h-5 text-indigo-600" />
+              <FaCut className="w-5 h-5 text-indigo-500" />
               <div>
-                <p className="font-medium">{t('common:service')}</p>
-                <div className="text-gray-600">
+                <p className="font-medium text-gray-200">{t('common:service')}</p>
+                <div className="text-gray-400">
                   <p data-testid="service-name">{serviceName}</p>
                   {servicePrice && (
                     <p className="text-sm">{formatCurrency(servicePrice)}</p>
@@ -71,10 +75,10 @@ const BookingSuccess = ({ booking, onClose }) => {
 
           {staffMember && (
             <div className="flex items-center gap-3">
-              <FaUser className="w-5 h-5 text-primary-600" />
+              <FaUser className="w-5 h-5 text-primary-500" />
               <div>
-                <p className="font-medium">{t('common:staff_member')}</p>
-                <p className="text-gray-600" data-testid="staff-member-name">{staffMember}</p>
+                <p className="font-medium text-gray-200">{t('common:staff_member')}</p>
+                <p className="text-gray-400" data-testid="staff-member-name">{staffMember}</p>
               </div>
             </div>
           )}
@@ -82,7 +86,7 @@ const BookingSuccess = ({ booking, onClose }) => {
 
         <button
           onClick={onClose}
-          className="w-full bg-indigo-600 text-white py-3 px-4 rounded-md hover:bg-indigo-700 transition duration-300"
+          className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 px-4 rounded-md transition duration-300"
         >
           {t('common:action.done')}
         </button>

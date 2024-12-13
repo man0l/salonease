@@ -16,13 +16,31 @@ const Dashboard = () => {
 
   switch (user.role) {
     case 'SuperAdmin':
-      return <SuperAdminDashboard />;
+      return (
+        <div className="bg-gray-950 min-h-screen">
+          <SuperAdminDashboard />
+        </div>
+      );
     case 'SalonOwner':
-      return <SalonOwnerDashboard />;
+      return (
+        <div className="bg-gray-950 min-h-screen">
+          <SalonOwnerDashboard />
+        </div>
+      );
     case 'Staff':
-      return <StaffDashboard />;
+      return (
+        <div className="bg-gray-950 min-h-screen">
+          <StaffDashboard />
+        </div>
+      );
     default:
-      return <div>{t('dashboard:error.invalid_user_role')}</div>;
+      return (
+        <div className="bg-gray-950 min-h-screen flex items-center justify-center">
+          <div className="text-red-500 font-medium">
+            {t('dashboard:error.invalid_user_role')}
+          </div>
+        </div>
+      );
   }
 };
 

@@ -81,74 +81,58 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-4">{t('bookings:modal.reschedule.title')}</h2>
-        
+      <div className="bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full border border-gray-700">
+        <h2 className="text-2xl font-bold mb-4 text-gray-100">
+          {t('bookings:action.reschedule')}
+        </h2>
+
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('bookings:modal.reschedule.new_date_time')}
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              {t('bookings:label.new_date_and_time')}
             </label>
-            
-            <div className="sm:flex sm:space-x-4 space-y-4 sm:space-y-0">
-              <div className="flex-1">
-                <DatePicker
-                  selected={newDateTime}
-                  onChange={handleDateChange}
-                  dateFormat="MMMM d, yyyy"
-                  minDate={new Date()}
-                  placeholderText={t('bookings:modal.reschedule.select_date')}
-                  className={`w-full px-3 py-2 border rounded-md ${
-                    error ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  calendarClassName="mobile-friendly-calendar"
-                  withPortal
-                />
-              </div>
-
-              <div className="flex-1">
-                <DatePicker
-                  data-testid="time-picker"
-                  selected={newDateTime}
-                  onChange={handleTimeChange}
-                  showTimeSelect
-                  showTimeSelectOnly
-                  timeIntervals={15}
-                  timeCaption="Time"
-                  dateFormat="h:mm aa"
-                  className={`w-full px-3 py-2 border rounded-md ${
-                    error ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  withPortal
-                  includeTimes={availableSlots}
-                  placeholderText={loading ? t('common.status.loading') : t('bookings:modal.reschedule.select_time')}
-                  disabled={loading || availableSlots.length === 0}
-                />
-              </div>
+            <div className="grid grid-cols-2 gap-4">
+              <DatePicker
+                selected={newDateTime}
+                onChange={handleDateChange}
+                dateFormat="MMMM d, yyyy"
+                minDate={new Date()}
+                className="w-full bg-gray-700 border border-gray-600 text-gray-100 rounded-md focus:ring-primary-500 focus:border-primary-500"
+              />
+              <DatePicker
+                selected={newDateTime}
+                onChange={handleTimeChange}
+                showTimeSelect
+                showTimeSelectOnly
+                timeIntervals={15}
+                dateFormat="h:mm aa"
+                includeTimes={availableSlots}
+                className="w-full bg-gray-700 border border-gray-600 text-gray-100 rounded-md focus:ring-primary-500 focus:border-primary-500"
+              />
             </div>
-
-            {error && (
-              <p className="mt-1 text-sm text-red-600">{error}</p>
-            )}
-            
-            {availableSlots.length === 0 && !loading && (
-              <p className="mt-1 text-sm text-amber-600">
-                {t('bookings:modal.reschedule.no_slots')}
-              </p>
-            )}
           </div>
+
+          {error && (
+            <p className="text-red-400">{error}</p>
+          )}
+          
+          {availableSlots.length === 0 && !loading && (
+            <p className="text-amber-400">
+              {t('bookings:modal.reschedule.no_slots')}
+            </p>
+          )}
         </div>
 
         <div className="mt-6 flex justify-end space-x-2">
           <button
             onClick={onClose}
-            className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded transition duration-300"
+            className="bg-gray-700 hover:bg-gray-600 text-gray-300 px-4 py-2 rounded transition duration-300"
           >
             {t('common:action.close')}
           </button>
           <button
             onClick={handleReschedule}
-            className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded transition duration-300"
+            className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded transition duration-300"
             disabled={!!error || loading || availableSlots.length === 0}
           >
             {t('common:action.confirm_reschedule')}

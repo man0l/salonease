@@ -185,8 +185,8 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
     return (
       <li 
         key={salon.id} 
-        className={`border border-gray-200 p-4 rounded-lg shadow-sm hover:shadow-md transition duration-300 
-          ${isDeleted ? 'opacity-60 bg-gray-50' : ''}`}
+        className={`border border-gray-800 p-4 rounded-lg shadow-sm hover:shadow-md transition duration-300 
+          ${isDeleted ? 'opacity-60 bg-gray-800' : 'bg-gray-900'}`}
       >
         <div className="flex justify-between items-start">
           <div className="flex-grow">
@@ -251,13 +251,15 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
   );
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-card">
-      <h1 className="text-3xl font-bold mb-6 text-primary-700">{isOnboarding ? t('action.set_up_your_first_salon') : t('action.salon_management')}</h1>
+    <div className="max-w-4xl mx-auto p-6 bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+      <h1 className="text-3xl font-bold mb-6 text-white">
+        {isOnboarding ? t('action.set_up_your_first_salon') : t('action.salon_management')}
+      </h1>
       
       {!isOnboarding && (
         <button
           onClick={showForm ? () => setShowForm(false) : handleAddNewSalon}
-          className="mb-6 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-full transition duration-300 flex items-center"
+          className="mb-6 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full transition duration-300 flex items-center"
         >
           {showForm ? <FaMinus className="mr-2" /> : <FaPlus className="mr-2" />}
           {showForm ? t('action.hide_form') : t('action.add_new_salon')}
@@ -266,36 +268,42 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
 
       {showForm && (
         <>
-          <h2 className="text-2xl font-bold mb-4 text-primary-600">{editingSalon ? t('action.edit_salon') : t('action.add_new_salon')}</h2>
+          <h2 className="text-2xl font-bold mb-4 text-white">
+            {editingSalon ? t('action.edit_salon') : t('action.add_new_salon')}
+          </h2>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 animate-slide-in">
             <div>
-              <label htmlFor="name" className="block mb-1 text-sm font-medium text-gray-700">
+              <label htmlFor="name" className="block mb-1 text-sm font-medium text-gray-200">
                 {t('label.salon_name')}
               </label>
-              <input id="name" {...register('name')} className="w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500" aria-invalid={errors.name ? "true" : "false"} />
-              {errors.name && <span role="alert" className="text-red-500 text-sm">{errors.name.message}</span>}
+              <input 
+                id="name" 
+                {...register('name')} 
+                className="w-full bg-gray-700 border-gray-600 text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" 
+              />
+              {errors.name && <span role="alert" className="text-red-400 text-sm">{errors.name.message}</span>}
             </div>
             <div>
-              <label htmlFor="address" className="block mb-1 text-sm font-medium text-gray-700">
+              <label htmlFor="address" className="block mb-1 text-sm font-medium text-gray-200">
                 {t('action.address')}
               </label>
-              <input id="address" {...register('address')} className="w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500" aria-invalid={errors.address ? "true" : "false"} />
-              {errors.address && <span role="alert" className="text-red-500 text-sm">{errors.address.message}</span>}
+              <input id="address" {...register('address')} className="w-full bg-gray-700 border-gray-600 text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" aria-invalid={errors.address ? "true" : "false"} />
+              {errors.address && <span role="alert" className="text-red-400 text-sm">{errors.address.message}</span>}
             </div>
             <div>
-              <label htmlFor="contactNumber" className="block mb-1 text-sm font-medium text-gray-700">
+              <label htmlFor="contactNumber" className="block mb-1 text-sm font-medium text-gray-200">
                 {t('contact_number')}
               </label>
-              <input id="contactNumber" {...register('contactNumber')} className="w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500" aria-invalid={errors.contactNumber ? "true" : "false"} />
-              {errors.contactNumber && <span role="alert" className="text-red-500 text-sm">{errors.contactNumber.message}</span>}
+              <input id="contactNumber" {...register('contactNumber')} className="w-full bg-gray-700 border-gray-600 text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" aria-invalid={errors.contactNumber ? "true" : "false"} />
+              {errors.contactNumber && <span role="alert" className="text-red-400 text-sm">{errors.contactNumber.message}</span>}
             </div>
             <div>
-              <label htmlFor="description" className="block mb-1 text-sm font-medium text-gray-700">
+              <label htmlFor="description" className="block mb-1 text-sm font-medium text-gray-200">
                 {t('label.description')}
               </label>
-              <textarea id="description" {...register('description')} className="w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500" rows="3" />
+              <textarea id="description" {...register('description')} className="w-full bg-gray-700 border-gray-600 text-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" rows="3" />
             </div>
-            <button type="submit" className="w-full bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-md transition duration-300">
+            <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md transition duration-300">
               {editingSalon ? t('action.update_salon') : t('action.add_salon')}
             </button>
           </form>
@@ -304,26 +312,75 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
 
       {!isOnboarding && (
         <>
-          <h2 className="text-2xl font-bold mt-8 mb-4 text-primary-700">
+          <h2 className="text-2xl font-bold mt-8 mb-4 text-white">
             {t('label.your_salons')}
           </h2>
           <ul className="space-y-4" aria-label={t('salon:title.list_of_salons')}>
-            {salons.map(renderSalonItem)}
+            {salons.map(salon => (
+              <li 
+                key={salon.id} 
+                className={`border border-gray-600 p-4 rounded-lg shadow-sm hover:shadow-md transition duration-300 
+                  ${salon.deletedAt ? 'bg-gray-700 opacity-75' : 'bg-gray-700'}`}
+              >
+                <div className="flex justify-between items-start">
+                  <div className="flex-grow">
+                    <h3 className="text-xl font-semibold text-indigo-400">
+                      {salon.name}
+                      {salon.deletedAt && (
+                        <span className="ml-2 text-sm text-red-400 font-normal">
+                          {t('salon:status.deleted')}
+                        </span>
+                      )}
+                    </h3>
+                    <p className="text-gray-300">{salon.address}</p>
+                    <p className="text-gray-300">{salon.contactNumber}</p>
+                    <p className="text-gray-300 mt-2">{salon.description}</p>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex space-x-2">
+                  {!salon.deletedAt && (
+                    <>
+                      <button 
+                        onClick={() => handleEdit(salon)} 
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" 
+                      >
+                        <FaEdit className="mr-1" /> {t('common:action.edit')}
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(salon.id)} 
+                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" 
+                      >
+                        <FaTrash className="mr-1" /> {t('common:action.delete')}
+                      </button>
+                    </>
+                  )}
+                  {salon.deletedAt && (
+                    <button 
+                      onClick={() => handleRestore(salon.id)} 
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" 
+                    >
+                      <FaUndo className="mr-1" /> {t('common:action.restore')}
+                    </button>
+                  )}
+                </div>
+              </li>
+            ))}
           </ul>
 
           <div className="mt-6 flex justify-between items-center">
             <button 
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
               disabled={currentPage === 1}
-              className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-md transition duration-300 disabled:bg-gray-300 disabled:cursor-not-allowed"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md transition duration-300 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed"
             >
               {t('common:action.previous')}
             </button>
-            <span className="text-gray-600">{t('common:action.page')} {currentPage} {t('common:action.of')} {totalPages}</span>
+            <span className="text-gray-300">{t('common:action.page')} {currentPage} {t('common:action.of')} {totalPages}</span>
             <button 
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
               disabled={currentPage === totalPages}
-              className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-md transition duration-300 disabled:bg-gray-300 disabled:cursor-not-allowed"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md transition duration-300 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed"
             >
               {t('common:action.next')}
             </button>

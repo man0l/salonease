@@ -29,99 +29,107 @@ const SalonOwnerDashboard = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">      
-      <div className="flex-1 p-10">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-semibold text-gray-900">
-            {selectedSalon.name} {t('dashboard:title.dashboard')}
-          </h1>
-          <Link 
-            to={`/salon/${selectedSalon.id}`} 
-            className="text-primary-600 hover:text-primary-700"
-            target="_blank"
-          >
-            {t('dashboard:action.view_public_page')} →
-          </Link>
+    <div className="flex-1 p-10">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-semibold text-gray-100">
+          {selectedSalon.name} {t('dashboard:title.dashboard')}
+        </h1>
+        <Link 
+          to={`/salon/${selectedSalon.id}`} 
+          className="text-primary-400 hover:text-primary-300"
+          target="_blank"
+        >
+          {t('dashboard:action.view_public_page')} →
+        </Link>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 shadow-lg hover:shadow-xl transition">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">{t('dashboard:today_s_appointments')}</p>
+              <h3 className="text-2xl font-bold text-gray-100">
+                {dashboardStats.todayAppointments}
+              </h3>
+            </div>
+            <FaCalendar className="text-primary-400 text-2xl" />
+          </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 text-sm">{t('dashboard:today_s_appointments')}</p>
-                <h3 className="text-2xl font-bold text-gray-900">
-                  {dashboardStats.todayAppointments}
-                </h3>
-              </div>
-              <FaCalendar className="text-primary-500 text-2xl" />
+        <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 shadow-lg hover:shadow-xl transition">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">{t('dashboard:revenue_this_week')}</p>
+              <h3 className="text-2xl font-bold text-gray-100">
+                {formatCurrency(dashboardStats.weeklyRevenue)}
+              </h3>
             </div>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 text-sm">{t('dashboard:revenue_this_week')}</p>
-                <h3 className="text-2xl font-bold text-gray-900">
-                  {formatCurrency(dashboardStats.weeklyRevenue)}
-                </h3>
-              </div>
-              <FaMoneyBill className="text-primary-500 text-2xl" />
-            </div>
+            <FaMoneyBill className="text-primary-400 text-2xl" />
           </div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-          <Link to={`/salons/${selectedSalon.id}/staff`} 
-                className="bg-white p-6 rounded-lg shadow hover:shadow-md transition group">
-            <h3 className="text-lg font-medium group-hover:text-primary-600">{t('dashboard:title.staff_management')}</h3>
-            <p className="text-sm text-gray-500">{t('dashboard:manage_your_team')}</p>
-          </Link>
-          
-          <Link to={`/salons/${selectedSalon.id}/services`}
-                className="bg-white p-6 rounded-lg shadow hover:shadow-md transition group">
-            <h3 className="text-lg font-medium group-hover:text-primary-600">{t('dashboard:services')}</h3>
-            <p className="text-sm text-gray-500">{t('dashboard:manage_offerings')}</p>
-          </Link>
-          
-          <Link to={`/salons/${selectedSalon.id}/bookings-calendar`}
-                className="bg-white p-6 rounded-lg shadow hover:shadow-md transition group">
-            <h3 className="text-lg font-medium group-hover:text-primary-600">{t('dashboard:calendar')}</h3>
-            <p className="text-sm text-gray-500">{t('dashboard:view_schedule')}</p>
-          </Link>
-          
-          <Link to={`/salons/${selectedSalon.id}/clients`}
-                className="bg-white p-6 rounded-lg shadow hover:shadow-md transition group">
-            <h3 className="text-lg font-medium group-hover:text-primary-600">{t('dashboard:clients')}</h3>
-            <p className="text-sm text-gray-500">{t('dashboard:manage_clients')}</p>
-          </Link>
-        </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        <Link to={`/salons/${selectedSalon.id}/staff`} 
+              className="bg-gray-900 p-6 rounded-lg border border-gray-800 shadow-lg hover:shadow-xl transition group">
+          <h3 className="text-lg font-medium text-gray-100 group-hover:text-primary-400">
+            {t('dashboard:title.staff_management')}
+          </h3>
+          <p className="text-sm text-gray-400">{t('dashboard:manage_your_team')}</p>
+        </Link>
+        
+        <Link to={`/salons/${selectedSalon.id}/services`}
+              className="bg-gray-900 p-6 rounded-lg border border-gray-800 shadow-lg hover:shadow-xl transition group">
+          <h3 className="text-lg font-medium text-gray-100 group-hover:text-primary-400">
+            {t('dashboard:services')}
+          </h3>
+          <p className="text-sm text-gray-400">{t('dashboard:manage_offerings')}</p>
+        </Link>
+        
+        <Link to={`/salons/${selectedSalon.id}/bookings-calendar`}
+              className="bg-gray-900 p-6 rounded-lg border border-gray-800 shadow-lg hover:shadow-xl transition group">
+          <h3 className="text-lg font-medium text-gray-100 group-hover:text-primary-400">
+            {t('dashboard:calendar')}
+          </h3>
+          <p className="text-sm text-gray-400">{t('dashboard:view_schedule')}</p>
+        </Link>
+        
+        <Link to={`/salons/${selectedSalon.id}/clients`}
+              className="bg-gray-900 p-6 rounded-lg border border-gray-800 shadow-lg hover:shadow-xl transition group">
+          <h3 className="text-lg font-medium text-gray-100 group-hover:text-primary-400">
+            {t('dashboard:clients')}
+          </h3>
+          <p className="text-sm text-gray-400">{t('dashboard:manage_clients')}</p>
+        </Link>
+      </div>
 
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">{t('dashboard:recent_activity')}</h2>
-          {loading ? (
-            <div className="flex justify-center py-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500"></div>
-            </div>
-          ) : error ? (
-            <div className="text-red-500 text-center py-4">{error}</div>
-          ) : (
-            <ul className="space-y-4">
-              {recentActivity.length === 0 ? (
-                <li className="text-gray-500 text-center py-4">
-                  {t('dashboard:no_recent_activity')}
+      <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 shadow-lg">
+        <h2 className="text-xl font-semibold text-gray-100 mb-4">
+          {t('dashboard:recent_activity')}
+        </h2>
+        {loading ? (
+          <div className="flex justify-center py-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-400"></div>
+          </div>
+        ) : error ? (
+          <div className="text-red-400 text-center py-4">{error}</div>
+        ) : (
+          <ul className="space-y-4">
+            {recentActivity.length === 0 ? (
+              <li className="text-gray-400 text-center py-4">
+                {t('dashboard:no_recent_activity')}
+              </li>
+            ) : (
+              recentActivity.map((activity) => (
+                <li key={activity.id} className="flex items-center space-x-3 text-sm text-gray-300">
+                  <FaClock className="text-gray-500" />
+                  <span>{activity.description}</span>
+                  <span className="text-gray-500">{activity.timeAgo}</span>
                 </li>
-              ) : (
-                recentActivity.map((activity) => (
-                  <li key={activity.id} className="flex items-center space-x-3 text-sm">
-                    <FaClock className="text-gray-400" />
-                    <span>{activity.client.name} {t('dashboard:booked')} {activity.service.name} {t('dashboard:with')} {activity.staff.fullName}</span>
-                    <span className="text-gray-400">{activity.timeAgo}</span>
-                  </li>
-                ))
-              )}
-            </ul>
-          )}
-        </div>
+              ))
+            )}
+          </ul>
+        )}
       </div>
     </div>
   );

@@ -132,27 +132,26 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      let clientId = data.clientId;
-
-      if (clientMode === 'new') {
-        const clientData = {
-          name: data.clientName,
-          email: data.clientEmail,
-          phone: data.clientPhone
-        };
-        
-        const newClient = await addClient(clientData);
-        clientId = newClient.id;
-        await fetchClients();
-      }
       
+      // Prepare booking data
       const bookingData = {
-        clientId,
         serviceId: data.serviceId,
         staffId: data.staffId,
         appointmentDateTime: data.appointmentDateTime,
         notes: data.notes
       };
+
+      // Add client information based on mode
+      if (clientMode === 'existing') {
+        bookingData.clientId = data.clientId;
+      } else {
+        // For new clients, pass the client info directly
+        bookingData.clientName = data.clientName;
+        bookingData.clientPhone = data.clientPhone;
+        if (data.clientEmail) {
+          bookingData.clientEmail = data.clientEmail;
+        }
+      }
       
       const response = await bookingApi.createBooking(salonId, bookingData);
       if (response.data) {

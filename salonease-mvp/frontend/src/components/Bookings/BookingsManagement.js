@@ -115,24 +115,6 @@ const BookingsManagement = () => {
     }
   };
 
-  const handleAddNewBooking = async (bookingData) => {
-    try {
-      const result = await bookingApi.createBooking(salonId, bookingData);
-      if (result) {
-        try {
-          await subscriptionApi.addBookingCharge();
-        } catch (error) {
-          toast.error(t('error.failed_to_update_subscription'));
-        }
-        toast.success(t('success.booking_created'));
-        fetchBookingsData();
-        setShowCreateModal(false);
-      }
-    } catch (error) {
-      toast.error(t('error.failed_to_create_booking'));
-    }
-  };
-
   const getStatusColor = (status) => {
     switch (status) {
       case BOOKING_STATUSES.CONFIRMED:
