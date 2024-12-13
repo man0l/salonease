@@ -215,18 +215,20 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
     setClientSearch('');
   };
 
-  // Add this helper class for error styling
+  // Update input styling for all form fields
   const inputClassName = (error) => `
-    w-full px-3 py-2 border rounded-md
-    ${error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary-500'}
+    w-full px-3 py-2 rounded-md
+    ${error 
+      ? 'border-red-500 focus:ring-red-500 bg-gray-800 text-gray-300' 
+      : 'bg-gray-800 text-gray-300 focus:ring-primary-500'}
   `;
 
   if (!show) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-4">{t('bookings:title.create_new_booking')}</h2>
+      <div className="bg-gray-900 p-6 rounded-lg shadow-lg max-w-md w-full border border-gray-800">
+        <h2 className="text-2xl font-bold mb-4 text-gray-100">{t('bookings:title.create_new_booking')}</h2>
         
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <input type="hidden" {...register('clientId')} />
@@ -240,7 +242,9 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
                   setValue('clientMode', 'existing');
                 }}
                 className={`px-4 py-2 rounded-md ${
-                  clientMode === 'existing' ? 'bg-primary-600 text-white' : 'bg-gray-200'
+                  clientMode === 'existing' 
+                    ? 'bg-primary-600 text-gray-200' 
+                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                 }`}
               >
                 {t('bookings:action.select_existing_client')}
@@ -252,7 +256,9 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
                   setValue('clientMode', 'new');
                 }}
                 className={`px-4 py-2 rounded-md ${
-                  clientMode === 'new' ? 'bg-primary-600 text-white' : 'bg-gray-200'
+                  clientMode === 'new' 
+                    ? 'bg-primary-600 text-gray-200' 
+                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                 }`}
               >
                 {t('bookings:action.new_client')}
@@ -262,40 +268,40 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
             {clientMode === 'new' ? (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm text-gray-400 mb-1">
                     {t('common:label.name')}:
                   </label>
                   <input
                     {...register('clientName')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className={inputClassName(errors.clientName)}
                   />
                   {errors.clientName && (
-                    <p className="mt-1 text-sm text-red-600">{errors.clientName.message}</p>
+                    <p className="mt-1 text-sm text-red-500">{errors.clientName.message}</p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm text-gray-400 mb-1">
                     {t('common:label.email_address')}:
                   </label>
                   <input
                     type="email"
                     {...register('clientEmail')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className={inputClassName(errors.clientEmail)}
                   />
                   {errors.clientEmail && (
-                    <p className="mt-1 text-sm text-red-600">{errors.clientEmail.message}</p>
+                    <p className="mt-1 text-sm text-red-500">{errors.clientEmail.message}</p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm text-gray-400 mb-1">
                     {t('common:phone_number')}:
                   </label>
                   <input
                     {...register('clientPhone')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className={inputClassName(errors.clientPhone)}
                   />
                   {errors.clientPhone && (
-                    <p className="mt-1 text-sm text-red-600">{errors.clientPhone.message}</p>
+                    <p className="mt-1 text-sm text-red-500">{errors.clientPhone.message}</p>
                   )}
                 </div>
               </div>
@@ -335,23 +341,23 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
                 </div>
 
                 {watch('clientName') && (
-                  <div className="mt-4 p-4 bg-gray-50 rounded-md border border-gray-200">
+                  <div className="mt-4 p-4 bg-gray-800 rounded-md">
                     <div className="flex justify-between items-start">
-                      <h3 className="font-medium text-gray-700 mb-2">
+                      <h3 className="font-medium text-gray-300 mb-2">
                         {t('common:selected_client')}
                       </h3>
                       <button
                         type="button"
                         onClick={resetForm}
-                        className="text-red-500 hover:text-red-700"
+                        className="text-red-500 hover:text-red-400"
                       >
                         <FaTrash className="text-sm" />
                       </button>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-gray-800">{watch('clientName')}</p>
-                      <p className="text-gray-600 text-sm">{watch('clientPhone')}</p>
-                      <p className="text-gray-600 text-sm">{watch('clientEmail')}</p>
+                      <p className="text-gray-300">{watch('clientName')}</p>
+                      <p className="text-gray-400 text-sm">{watch('clientPhone')}</p>
+                      <p className="text-gray-400 text-sm">{watch('clientEmail')}</p>
                     </div>
                   </div>
                 )}
@@ -360,14 +366,14 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm text-gray-400 mb-1">
               {t('common:service')}
             </label>
             <select
               {...register('serviceId')}
-              className={inputClassName(errors.serviceId)}
+              className={`${inputClassName(errors.serviceId)} appearance-none`}
             >
-              <option value="">{t('common:form.pleaseSelect', { field: t('common:service') })}</option>
+              <option value="">{t('bookings:modal.select_service')}</option>
               {services.map(service => (
                 <option key={service.id} value={service.id}>
                   {service.name}
@@ -380,14 +386,14 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm text-gray-400 mb-1">
               {t('common:staff_member')}
             </label>
             <select
               {...register('staffId')}
-              className={inputClassName(errors.staffId)}
+              className={`${inputClassName(errors.staffId)} appearance-none`}
             >
-              <option value="">{t('common:form.pleaseSelect', { field: t('common:staff_member') })}</option>
+              <option value="">{t('bookings:modal.select_staff')}</option>
               {staff.map(member => (
                 <option key={member.id} value={member.id}>
                   {member.fullName}
@@ -400,59 +406,51 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm text-gray-400 mb-1">
               {t('common:appointment_date_time')}
             </label>
             
-            <div className="sm:flex sm:space-x-4 space-y-4 sm:space-y-0">
-              <div className="flex-1">
-                <DatePicker
-                  selected={watch('appointmentDateTime')}
-                  onChange={(date) => {
-                    if (!date) return;
-                    const currentDate = watch('appointmentDateTime');
-                    const newDate = new Date(date);
-                    if (currentDate) {
-                      newDate.setHours(currentDate.getHours());
-                      newDate.setMinutes(currentDate.getMinutes());
-                    }
-                    setValue('appointmentDateTime', newDate, { shouldValidate: true });
-                  }}
-                  dateFormat="MMMM d, yyyy"
-                  minDate={new Date()}
-                  className={`w-full px-3 py-2 border rounded-md ${
-                    errors.appointmentDateTime ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  calendarClassName="mobile-friendly-calendar"
-                  withPortal
-                />
-              </div>
+            <div className="grid grid-cols-2 gap-4">
+              <DatePicker
+                selected={watch('appointmentDateTime')}
+                onChange={(date) => {
+                  if (!date) return;
+                  const currentDate = watch('appointmentDateTime');
+                  const newDate = new Date(date);
+                  if (currentDate) {
+                    newDate.setHours(currentDate.getHours());
+                    newDate.setMinutes(currentDate.getMinutes());
+                  }
+                  setValue('appointmentDateTime', newDate, { shouldValidate: true });
+                }}
+                dateFormat="MMMM d, yyyy"
+                minDate={new Date()}
+                className="w-full px-3 py-2 border border-gray-800 rounded-md bg-gray-900 text-gray-300"
+                calendarClassName="bg-gray-900 border-gray-800 text-gray-300"
+                withPortal
+              />
 
-              <div className="flex-1">
-                <DatePicker
-                  selected={watch('appointmentDateTime')}
-                  onChange={(date) => {
-                    if (!date) return;
-                    const currentDate = watch('appointmentDateTime');
-                    const newDate = new Date(currentDate || defaultDate);
-                    newDate.setHours(date.getHours());
-                    newDate.setMinutes(date.getMinutes());
-                    setValue('appointmentDateTime', newDate, { shouldValidate: true });
-                  }}
-                  showTimeSelect
-                  showTimeSelectOnly
-                  timeIntervals={15}
-                  timeCaption="Time"
-                  dateFormat="h:mm aa"
-                  className={`w-full px-3 py-2 border rounded-md ${
-                    errors.appointmentDateTime ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  withPortal
-                  includeTimes={availableSlots}
-                  placeholderText={loadingSlots ? t('common:status.loading') : t('bookings:modal.select_time')}
-                  disabled={loadingSlots || availableSlots.length === 0 || !watch('staffId')}
-                />
-              </div>
+              <DatePicker
+                selected={watch('appointmentDateTime')}
+                onChange={(date) => {
+                  if (!date) return;
+                  const currentDate = watch('appointmentDateTime');
+                  const newDate = new Date(currentDate || defaultDate);
+                  newDate.setHours(date.getHours());
+                  newDate.setMinutes(date.getMinutes());
+                  setValue('appointmentDateTime', newDate, { shouldValidate: true });
+                }}
+                showTimeSelect
+                showTimeSelectOnly
+                timeIntervals={15}
+                timeCaption="Time"
+                dateFormat="h:mm aa"
+                className="w-full px-3 py-2 border border-gray-800 rounded-md bg-gray-900 text-gray-300"
+                withPortal
+                includeTimes={availableSlots}
+                placeholderText={loadingSlots ? t('common:status.loading') : t('bookings:modal.select_time')}
+                disabled={loadingSlots || availableSlots.length === 0 || !watch('staffId')}
+              />
             </div>
 
             {errors.appointmentDateTime && (
@@ -468,7 +466,7 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
             </label>
             <textarea
               {...register('notes')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className="w-full px-3 py-2 border border-gray-700 rounded-md bg-gray-800 text-gray-100"
               rows="3"
             />
           </div>
@@ -487,7 +485,7 @@ const CreateBookingModal = ({ show, onClose, salonId, onSuccess, staff, services
                 resetForm();
                 onClose();
               }}
-              className="px-4 py-2 text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300"
+              className="bg-gray-700 hover:bg-gray-600 text-gray-300 px-4 py-2 rounded transition duration-300"
             >
               {t('common:action.cancel')}
             </button>
