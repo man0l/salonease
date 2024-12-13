@@ -12,25 +12,25 @@ const CancelSubscriptionModal = ({ isOpen, onClose, onConfirm }) => {
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-lg shadow-lg max-w-md w-full"
+        className="bg-gray-900 rounded-lg shadow-lg max-w-md w-full border border-gray-800"
         onClick={e => e.stopPropagation()}
       >
         <div className="p-6">
-          <h3 className="text-lg font-medium mb-4">
+          <h3 className="text-lg font-medium mb-4 text-gray-100">
             {t('billing:title.cancel_subscription')}
           </h3>
-          <p className="mb-4 text-gray-600">
+          <p className="mb-4 text-gray-400">
             {t('billing:subscription.message.confirm_cancel')}
           </p>
           <div className="flex justify-end gap-4">
             <button
-              className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors duration-300"
               onClick={onClose}
             >
               {t('billing:subscription.action.cancel')}
             </button>
             <button
-              className="px-4 py-2 bg-rose-600 text-white rounded-md hover:bg-rose-700 transition-colors"
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors duration-300"
               onClick={onConfirm}
             >
               {t('billing:subscription.action.confirm_cancel')}
