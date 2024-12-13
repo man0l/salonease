@@ -89,7 +89,7 @@ const RescheduleModal = ({ show, onClose, booking, onReschedule, salonId }) => {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">
-              {t('bookings:label.new_date_and_time')}
+              {t('bookings:modal.reschedule.new_date_time')}
             </label>
             <div className="grid grid-cols-2 gap-4">
               <DatePicker

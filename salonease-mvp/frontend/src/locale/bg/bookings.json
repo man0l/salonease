@@ -99,7 +99,8 @@
   "success": {
     "booking_created": "Резервацията е създадена успешно",
     "booking_confirmed": "Резервацията е потвърдена!",
-    "appointment_scheduled": "Часът беше успешно запазен"
+    "appointment_scheduled": "Часът беше успешно запазен",
+    "are_you_sure_you_want_to_mark_this_booking_as_completed": "Сигурни ли сте, че искате да маркирате тази резервация като завършена?"
   },
   "modal": {
     "reschedule": {
@@ -109,9 +110,28 @@
       "loading_slots": "Зареждане...",
       "select_time": "Изберете час",
       "select_date": "Изберете дата"
+    },
+    "cancel": {
+      "title": "Отмени резервация",
+      "message": "Сигурни ли сте, че искате да отмените тази резервация? Това действие не може да бъде отменено.",
+      "note_placeholder": "Добавете бележка защо резервацията е отменена"
+    },
+    "reassign": {
+      "title": "Преназначаване на служител",
+      "current_staff": "Текущ служител",
+      "select_new_staff": "Изберете нов служител",
+      "no_staff_available": "Няма налични служители"
+    },
+    "complete": {
+      "title": "Потвърди завършването",
+      "message": "Сигурни ли сте, че искате да маркирате тази резервация като завършена?",
+      "booking_details": "Детайли за резервацията"
     }
   },
   "action": {
+    "add_a_note_about_why_this_booking_was_cancelled": "Добавете бележка защо резервацията е отменена",
+    "confirm_cancel": "Потвърди отмяната",
+    "cancel": "Отказ",
     "select_existing_client": "Изберете съществуващ клиент",
     "new_client": "Нов клиент",
     "add_booking": "Добави резервация",

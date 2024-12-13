@@ -91,7 +91,8 @@
     "appointment_date_and_time_future": "Appointment must be in the future"
   },
   "loading": {
-    "available_time_slots": "Loading available time slots..."
+    "available_time_slots": "Loading available time slots...",
+    "bookings": "Loading bookings..."
   },
   "error": {
     "failed_to_load_slots": "Failed to load available time slots"
@@ -104,14 +105,33 @@
   "modal": {
     "reschedule": {
       "title": "Reschedule Booking",
-    "new_date_time": "New Appointment Date & Time",
+      "new_date_time": "New Appointment Date & Time",
       "no_slots": "No available time slots for this date",
       "loading_slots": "Loading...",
       "select_time": "Select time",
       "select_date": "Select date"
+    },
+    "cancel": {
+      "title": "Cancel Booking",
+      "message": "Are you sure you want to cancel this booking? This action cannot be undone.",
+      "note_placeholder": "Add a note about why this booking was cancelled"
+    },
+    "reassign": {
+      "title": "Reassign Staff",
+      "current_staff": "Current Staff Member",
+      "select_new_staff": "Select New Staff Member",
+      "no_staff_available": "No staff members available"
+    },
+    "complete": {
+      "title": "Complete Booking",
+      "message": "Are you sure you want to mark this booking as completed?",
+      "booking_details": "Booking Details"
     }
   },
   "action": {
+    "add_a_note_about_why_this_booking_was_cancelled": "Add a note about why this booking was cancelled",
+    "confirm_cancel": "Confirm Cancellation",
+    "cancel": "Cancel",
     "select_existing_client": "Select Existing Client",
     "new_client": "New Client",
     "add_booking": "Add Booking",
@@ -125,5 +145,15 @@
   "message": {
     "confirm_complete": "Are you sure you want to mark this booking as completed?",
     "thank_you_for_choosing": "Thank you for choosing our salon. We look forward to seeing you!"
+  },
+  "tooltip": {
+    "cannot_reassign": "Cannot reassign staff for cancelled or completed bookings",
+    "click_to_reassign": "Click to reassign staff"
+  },
+  "label": {
+    "unassigned": "Unassigned",
+    "phone": "Phone",
+    "email": "Email",
+    "notes": "Notes"
   }
 }

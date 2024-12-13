@@ -42,7 +42,7 @@ const BookingsManagement = () => {
   const ITEMS_PER_PAGE = 10;
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const { fetchBookings, bookings } = useBookings();
-  const { t } = useTranslation('bookings');
+  const { t } = useTranslation('bookings', 'common');
 
   // Define fetchBookingsData first
   const fetchBookingsData = useCallback(async () => {
@@ -199,8 +199,8 @@ const BookingsManagement = () => {
           className="bg-primary-600 hover:bg-primary-700 text-gray-100 px-3 sm:px-4 py-2 rounded-full transition duration-300 flex items-center whitespace-nowrap"
         >
           <FaPlus className="mr-1 sm:mr-2" />
-          <span className="hidden sm:inline">{t('action.add_booking')}</span>
-          <span className="sm:hidden">{t('action.add')}</span>
+          <span className="hidden sm:inline">{t('common:action.add_booking')}</span>
+          <span className="sm:hidden">{t('common:action.add')}</span>
         </button>
       </div>
       
@@ -473,23 +473,23 @@ const BookingsManagement = () => {
               disabled={currentPage === 1}
               className="px-2 sm:px-4 py-2 bg-gray-900 border border-gray-800 rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base text-gray-100"
             >
-              <span className="hidden sm:inline">{t('action.previous')}</span>
-              <span className="sm:hidden">{t('action.prev')}</span>
+              <span className="hidden sm:inline">{t('common:action.previous')}</span>
+              <span className="sm:hidden">{t('common:action.prev')}</span>
             </button>
             <span className="text-sm text-gray-600">
-              {t('action.page')} {currentPage} {t('action.of')} {totalPages}
+              {t('common:action.page')} {currentPage} {t('common:action.of')} {totalPages}
             </span>
             <button
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
               className="px-2 sm:px-4 py-2 bg-gray-900 border border-gray-800 rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base text-gray-100"
             >
-              <span className="hidden sm:inline">{t('action.next')}</span>
-              <span className="sm:hidden">{t('action.next')}</span>
+              <span className="hidden sm:inline">{t('common:action.next')}</span>
+              <span className="sm:hidden">{t('common:action.next')}</span>
             </button>
           </div>
           <div className="text-xs sm:text-sm text-gray-600 text-center">
-            {t('label.showing_bookings', { 
+            {t('label.showing_entries', { 
               start: ((currentPage - 1) * ITEMS_PER_PAGE) + 1, 
               end: Math.min(currentPage * ITEMS_PER_PAGE, totalItems), 
               total: totalItems 
