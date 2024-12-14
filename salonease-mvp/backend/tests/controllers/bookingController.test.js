@@ -14,6 +14,38 @@ const BOOKING_STATUSES = require('../../src/config/bookingStatuses');
 const { Op } = require('sequelize');
 const STAFF_AVAILABILITY_TYPES = require('../../src/config/staffAvailabilityTypes');
 
+// Mock stripe
+jest.mock('stripe', () => {
+  return jest.fn(() => ({
+    customers: {
+      create: jest.fn().mockResolvedValue({ id: 'cus_mock123' }),
+      retrieve: jest.fn().mockResolvedValue({ id: 'cus_mock123' })
+    },
+    subscriptions: {
+      create: jest.fn().mockResolvedValue({ id: 'sub_mock123' }),
+      retrieve: jest.fn().mockResolvedValue({ id: 'sub_mock123' }),
+      update: jest.fn().mockResolvedValue({ id: 'sub_mock123' })
+    },
+    paymentMethods: {
+      attach: jest.fn().mockResolvedValue({ id: 'pm_mock123' })
+    }
+  }));
+});
+
+// Add this after the stripe mock
+jest.mock('../../src/services/subscriptionService', () => {
+  const mockInstance = {
+    getSubscriptionStatus: jest.fn().mockResolvedValue({
+      usage: 0,
+      limit: 100,
+      isActive: true
+    }),
+    addBookingCharge: jest.fn().mockResolvedValue(true),
+    startTrialSubscription: jest.fn().mockResolvedValue(true)
+  };
+  return jest.fn(() => mockInstance);
+});
+
 describe('Booking Controller', () => {
   let salon, staff, service, client, mockReq, mockRes, owner;
 
@@ -283,6 +315,12 @@ describe('Booking Controller', () => {
           serviceId: service.id
         })
       );
+
+      // Add these expectations to verify subscription service calls
+      const SubscriptionService = require('../../src/services/subscriptionService');
+      const mockSubscriptionInstance = new SubscriptionService();
+      expect(mockSubscriptionInstance.getSubscriptionStatus).toHaveBeenCalledWith(owner.id);
+      expect(mockSubscriptionInstance.addBookingCharge).toHaveBeenCalledWith(owner.id);
     });
   });
 

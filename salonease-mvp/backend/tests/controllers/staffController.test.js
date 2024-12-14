@@ -5,10 +5,47 @@ const emailHelper = require('../../src/utils/helpers/emailHelper');
 const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const path = require('path');
 
 jest.mock('../../src/utils/helpers/emailHelper', () => ({
   sendInvitationEmail: jest.fn().mockResolvedValue(),
   sendWelcomeEmail: jest.fn().mockResolvedValue(),
+}));
+
+// Mock multer
+jest.mock('multer', () => {
+  const mockDiskStorage = () => ({
+    destination: (req, file, cb) => cb(null, '/uploads/profiles'),
+    filename: (req, file, cb) => cb(null, 'test-image.jpg')
+  });
+
+  const mockMulter = () => ({
+    single: () => (req, res, next) => {
+      req.file = {
+        filename: 'test-image.jpg',
+        path: '/uploads/profiles/test-image.jpg'
+      };
+      next();
+    }
+  });
+
+  mockMulter.diskStorage = mockDiskStorage;
+  return mockMulter;
+});
+
+jest.mock('../../src/utils/imageUpload', () => ({
+  uploadSingle: jest.fn().mockImplementation((req, res, next) => next()),
+  uploadMultiple: jest.fn().mockImplementation((req, res, next) => {
+    req.files = [{
+      filename: 'test-image-1.jpg',
+      path: '/uploads/profiles/test-image-1.jpg'
+    }];
+    next();
+  }),
+  getImageUrl: jest.fn().mockImplementation((filename, folder) => {
+    if (!filename) return null;
+    return `/uploads/${folder}/${filename}`;
+  })
 }));
 
 describe('Staff Controller', () => {
@@ -148,6 +185,34 @@ describe('Staff Controller', () => {
 
       expect(res.statusCode).toBe(404);
       expect(res._getJSONData()).toHaveProperty('message', 'Staff not found');
+    });
+
+    it('should update staff with image successfully', async () => {
+      const staff = await Staff.create({
+        salonId: salon.id,
+        fullName: 'Test Staff',
+        email: 'staff@test.com'
+      });
+
+      const req = httpMocks.createRequest({
+        params: { salonId: salon.id, staffId: staff.id },
+        body: { fullName: 'Updated Staff' },
+        file: {
+          filename: 'test-image.jpg'
+        },
+        user: { id: salonOwner.id }
+      });
+      const res = httpMocks.createResponse();
+
+      await updateStaff(req, res);
+
+      expect(res.statusCode).toBe(200);
+      const responseData = res._getJSONData();
+      expect(responseData.fullName).toBe('Updated Staff');
+      expect(responseData.image).toBe('/uploads/profiles/test-image.jpg');
+
+      const updatedStaff = await Staff.findByPk(staff.id);
+      expect(updatedStaff.image).toBe('/uploads/profiles/test-image.jpg');
     });
   });
 

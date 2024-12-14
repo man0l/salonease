@@ -9,6 +9,7 @@ const { validateRegister, validateLogin } = require('../validators/authValidator
 const ROLES = require('../config/roles');
 const SubscriptionService = require('../services/subscriptionService');
 const subscriptionServiceInstance = new SubscriptionService();
+const { uploadSingle, getImageUrl } = require('../utils/imageUpload');
 
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET is not set in the environment variables');
@@ -17,13 +18,11 @@ if (!process.env.JWT_SECRET) {
 
 exports.register = async (req, res) => {
   try {
-    // Validate input
     const { error, value } = validateRegister(req.body);
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    // Check if user already exists
     const existingUser = await User.findOne({ where: { email: value.email } });
     if (existingUser) {
       return res.status(400).json({ message: 'Email already exists' });
@@ -35,10 +34,10 @@ exports.register = async (req, res) => {
       password: hashedPassword,
       role: ROLES.SALON_OWNER,
       onboardingCompleted: false,
+      image: value.image || null
     });
 
     const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
     await emailHelper.sendVerificationEmail(value.email, token);
 
     res.status(201).json({ message: 'Registration successful. Please check your email to verify your account.' });
@@ -263,13 +262,15 @@ exports.updateUser = async (req, res) => {
     const { fullName, onboardingCompleted } = req.body;
 
     const user = await User.findByPk(id);
-
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
     if (fullName !== undefined) user.fullName = fullName;
     if (onboardingCompleted !== undefined) user.onboardingCompleted = onboardingCompleted;
+    if (req.file) {
+      user.image = getImageUrl(req.file.filename, 'profiles');
+    }
 
     await user.save();
 
@@ -279,7 +280,8 @@ exports.updateUser = async (req, res) => {
       email: user.email,
       role: user.role,
       isEmailVerified: user.isEmailVerified,
-      onboardingCompleted: user.onboardingCompleted
+      onboardingCompleted: user.onboardingCompleted,
+      image: user.image
     });
   } catch (error) {
     console.error('Error updating user:', error);
@@ -288,24 +290,28 @@ exports.updateUser = async (req, res) => {
 };
 
 exports.completeOnboarding = async (req, res) => {
-  const transaction = await sequelize.transaction();
-  
   try {   
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: 'User information is required' });
+    }
+
+    const user = await User.findByPk(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
     
     // Start trial subscription
-    await subscriptionServiceInstance.startTrialSubscription(req.user.id);    
+    await subscriptionServiceInstance.startTrialSubscription(user.id);    
+    
     // Mark onboarding as completed
     await User.update({
       onboardingCompleted: true
     }, { 
-      where: { id: req.user.id },
-      transaction 
+      where: { id: user.id }
     });
 
-    await transaction.commit();
     res.json({ message: 'Onboarding completed successfully' });
   } catch (error) {
-    await transaction.rollback();
     res.status(500).json({ message: error.message });
   }
 };

@@ -9,6 +9,7 @@ const StaffAvailabilityModel = require('../models/StaffAvailability');
 const ServiceModel = require('../models/Service');
 const CategoryModel = require('../models/Category');
 const BookingModel = require('../models/Booking');
+const SalonImageModel = require('../models/SalonImage');
 
 const sequelize = new Sequelize(config.database, config.username, config.password, {
   host: config.host,
@@ -26,6 +27,7 @@ const StaffAvailability = StaffAvailabilityModel(sequelize);
 const Service = ServiceModel(sequelize);
 const Category = CategoryModel(sequelize);
 const Booking = BookingModel(sequelize);
+const SalonImage = SalonImageModel(sequelize);
 
 // Add models to sequelize.models
 sequelize.models.User = User;
@@ -37,6 +39,7 @@ sequelize.models.StaffAvailability = StaffAvailability;
 sequelize.models.Service = Service;
 sequelize.models.Category = Category;
 sequelize.models.Booking = Booking;
+sequelize.models.SalonImage = SalonImage;
 
 // Run associations if any
 Object.values(sequelize.models).forEach((model) => {
@@ -69,5 +72,6 @@ module.exports = {
   StaffAvailability,
   Service,
   Category,
-  Booking
+  Booking,
+  SalonImage
 };

@@ -5,6 +5,7 @@ const staffController = require('../controllers/staffController');
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
 const ROLES = require('../config/roles');
+const { uploadSingle } = require('../utils/imageUpload');
 
 // Registration route
 router.post('/register', authController.register);
@@ -29,7 +30,7 @@ router.post('/logout', authController.logout);
 router.post('/accept-invitation', staffController.acceptInvitation);
 
 // Add this new route
-router.put('/update', authMiddleware, authController.updateUser);
+router.put('/update', authMiddleware, uploadSingle, authController.updateUser);
 
 // Add this new route
 router.post('/complete-onboarding', 

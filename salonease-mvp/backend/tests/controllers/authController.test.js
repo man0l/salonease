@@ -1,4 +1,4 @@
-const { register, verifyEmail, login, refreshToken: refreshTokenAction, logout, forgotPassword, completeOnboarding } = require('../../src/controllers/authController');
+const { register, verifyEmail, login, refreshToken: refreshTokenAction, logout, forgotPassword, completeOnboarding, updateUser } = require('../../src/controllers/authController');
 const { User, RefreshToken: RefreshTokenModel, sequelize } = require('../setupTests');
 const httpMocks = require('node-mocks-http');
 const jwt = require('jsonwebtoken');
@@ -7,7 +7,22 @@ const { v4: uuidv4 } = require('uuid');
 const subscriptionService = require('../../src/services/subscriptionService');
 
 // Mock the services
-jest.mock('../../src/services/subscriptionService');
+jest.mock('../../src/services/subscriptionService', () => {
+  const mockStartTrialSubscription = jest.fn().mockResolvedValue(true);
+  const mockSubscriptionService = jest.fn().mockImplementation(() => ({
+    startTrialSubscription: mockStartTrialSubscription,
+    getSubscriptionStatus: jest.fn().mockResolvedValue({
+      isActive: true,
+      usage: 0,
+      limit: 100
+    }),
+    addBookingCharge: jest.fn().mockResolvedValue(true)
+  }));
+  
+  // Expose the mock function for testing
+  mockSubscriptionService.mockStartTrialSubscription = mockStartTrialSubscription;
+  return mockSubscriptionService;
+});
 
 // mock the emailHelper
 jest.mock('../../src/utils/helpers/emailHelper', () => ({
@@ -15,11 +30,60 @@ jest.mock('../../src/utils/helpers/emailHelper', () => ({
   sendPasswordResetEmail: jest.fn().mockResolvedValue(),
 }));
 
+// Mock multer
+jest.mock('multer', () => {
+  const multer = () => ({
+    single: () => (req, res, next) => {
+      req.file = {
+        filename: 'test-image.jpg',
+        path: '/uploads/profiles/test-image.jpg'
+      };
+      next();
+    },
+    array: () => (req, res, next) => {
+      req.files = [{
+        filename: 'test-image-1.jpg',
+        path: '/uploads/profiles/test-image-1.jpg'
+      }, {
+        filename: 'test-image-2.jpg',
+        path: '/uploads/profiles/test-image-2.jpg'
+      }];
+      next();
+    }
+  });
+  
+  multer.diskStorage = () => ({
+    destination: (req, file, cb) => cb(null, '/uploads/profiles'),
+    filename: (req, file, cb) => cb(null, 'test-image.jpg')
+  });
+  
+  return multer;
+});
+
+// Mock stripe
+jest.mock('stripe', () => {
+  return jest.fn(() => ({
+    customers: {
+      create: jest.fn().mockResolvedValue({ id: 'cus_mock123' }),
+      retrieve: jest.fn().mockResolvedValue({ id: 'cus_mock123' })
+    },
+    subscriptions: {
+      create: jest.fn().mockResolvedValue({ id: 'sub_mock123' }),
+      retrieve: jest.fn().mockResolvedValue({ id: 'sub_mock123' }),
+      update: jest.fn().mockResolvedValue({ id: 'sub_mock123' })
+    },
+    paymentMethods: {
+      attach: jest.fn().mockResolvedValue({ id: 'pm_mock123' })
+    }
+  }));
+});
+
 const emailHelper = require('../../src/utils/helpers/emailHelper');
+
 describe('Auth Controller', () => {
   let req, res;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     req = httpMocks.createRequest();
     res = httpMocks.createResponse();
     process.env.JWT_SECRET = 'testsecret';
@@ -213,65 +277,130 @@ describe('Auth Controller', () => {
   });
 
   describe('completeOnboarding', () => {
-    beforeEach(() => {
-      jest.clearAllMocks();
-      User.update = jest.fn().mockResolvedValue([1]);
-      subscriptionService.startTrialSubscription = jest.fn().mockResolvedValue();
+    it('should complete onboarding successfully', async () => {
+      const user = await User.create({
+        fullName: 'Test User',
+        email: 'onboarding@example.com',
+        password: await bcrypt.hash('Test@1234', 10),
+        isEmailVerified: true,
+        onboardingCompleted: false
+      });
+
+      req.user = { id: user.id };
+
+      const subscriptionService = require('../../src/services/subscriptionService');
+      const mockStartTrialSubscription = subscriptionService.mockStartTrialSubscription;
+
+      await completeOnboarding(req, res);
+
+      expect(res.statusCode).toBe(200);
+      expect(res._getJSONData()).toEqual({
+        message: 'Onboarding completed successfully'
+      });
+
+      expect(mockStartTrialSubscription).toHaveBeenCalledWith(user.id);
+
+      const updatedUser = await User.findByPk(user.id);
+      expect(updatedUser.onboardingCompleted).toBe(true);
     });
 
-    it('should complete onboarding successfully', async () => {
-      // create user
+    it('should handle database errors when updating user', async () => {
       const user = await User.create({
-        fullName: 'Forgot Password User',
-        email: 'forgotpassword@example.com',
-        password: await bcrypt.hash('OldPassword123!', 10),
+        fullName: 'DB Error User',
+        email: 'dberror@example.com',
+        password: await bcrypt.hash('Test@1234', 10),
+        isEmailVerified: true,
+        onboardingCompleted: false
+      });
+
+      req.user = { id: user.id };
+
+      jest.spyOn(User, 'update').mockRejectedValueOnce(new Error('Database error'));
+
+      await completeOnboarding(req, res);
+
+      expect(res.statusCode).toBe(500);
+      expect(res._getJSONData()).toEqual({
+        message: 'Database error'
+      });
+
+      jest.restoreAllMocks();
+    });
+
+    it('should handle undefined user in request', async () => {
+      req.user = undefined;
+
+      await completeOnboarding(req, res);
+
+      expect(res.statusCode).toBe(401);
+      expect(res._getJSONData()).toEqual({
+        message: 'User information is required'
+      });
+    });
+
+    it('should handle missing user ID in request', async () => {
+      req.user = {};
+
+      await completeOnboarding(req, res);
+
+      expect(res.statusCode).toBe(401);
+      expect(res._getJSONData()).toEqual({
+        message: 'User information is required'
+      });
+    });
+  });
+
+  describe('updateUser', () => {
+    it('should update user with image successfully', async () => {
+      const user = await User.create({
+        fullName: 'Test User',
+        email: 'test@example.com',
+        password: await bcrypt.hash('password123', 10)
+      });
+
+      const req = httpMocks.createRequest({
+        user: { id: user.id },
+        body: { fullName: 'Updated Name' },
+        file: {
+          filename: 'test-image.jpg'
+        }
+      });
+      const res = httpMocks.createResponse();
+
+      await updateUser(req, res);
+
+      expect(res.statusCode).toBe(200);
+      const responseData = res._getJSONData();
+      expect(responseData.fullName).toBe('Updated Name');
+      expect(responseData.image).toBe('/uploads/profiles/test-image.jpg');
+
+      const updatedUser = await User.findByPk(user.id);
+      expect(updatedUser.image).toBe('/uploads/profiles/test-image.jpg');
+    });
+
+    it('should update user without image successfully', async () => {
+      const user = await User.create({
+        fullName: 'Test User',
+        email: `test${Date.now()}@example.com`,
+        password: await bcrypt.hash('password123', 10),
         isEmailVerified: true,
       });
 
-      const req = { user: { userId: user.id } };
-      const res = {
-        json: jest.fn(),
-        status: jest.fn().mockReturnThis()
-      };
-
-      await completeOnboarding(req, res);
-      
-      // Verify subscription service was called
-      expect(subscriptionService.startTrialSubscription).toHaveBeenCalledWith(user.id);
-      
-      // Verify user update was called
-      expect(User.update).toHaveBeenCalledWith(
-        { onboardingCompleted: true },
-        expect.objectContaining({
-          where: { id: user.id }
-        })
-      );
-      
-      // Verify response
-      expect(res.json).toHaveBeenCalledWith({ 
-        message: 'Onboarding completed successfully' 
+      const req = httpMocks.createRequest({
+        user: { id: user.id },
+        body: { fullName: 'Updated Name' }
       });
-    });
+      const res = httpMocks.createResponse();
 
-    it('should handle onboarding error and rollback transaction', async () => {
-      const req = { user: { userId: 1 } };
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn()
-      };
+      await updateUser(req, res);
 
-      const mockTransaction = {
-        commit: jest.fn(),
-        rollback: jest.fn()
-      };
+      expect(res.statusCode).toBe(200);
+      const responseData = res._getJSONData();
+      expect(responseData.fullName).toBe('Updated Name');
+      expect(responseData.image).toBeNull();
 
-      sequelize.transaction = jest.fn().mockResolvedValue(mockTransaction);
-      subscriptionService.startTrialSubscription = jest.fn().mockRejectedValue(new Error('Subscription error'));
-
-      await completeOnboarding(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Subscription error' });
+      const updatedUser = await User.findByPk(user.id);
+      expect(updatedUser.fullName).toBe('Updated Name');
     });
   });
 });

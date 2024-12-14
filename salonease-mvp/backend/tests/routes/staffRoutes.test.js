@@ -21,7 +21,7 @@ describe('Staff Routes', () => {
     user = await User.create({
       id: uuidv4(),
       fullName: 'Test Owner',
-      email: 'owner@example.com',
+      email: `owner${Date.now()}@example.com`,
       password: hashedPassword,
       role: ROLES.SALON_OWNER,
       isEmailVerified: true
@@ -103,8 +103,9 @@ describe('Staff Routes', () => {
     });
   });
 
-  describe('PUT /api/staff/:salonId/:staffId', () => {
+  describe('PUT /api/staff/:salonId/staff/:staffId', () => {
     it('should update a staff member', async () => {
+      // Create a staff member directly associated with the existing salon and user
       const staff = await Staff.create({
         id: uuidv4(),
         salonId: salon.id,
@@ -113,7 +114,7 @@ describe('Staff Routes', () => {
       });
 
       const response = await request(app)
-        .put(`/api/staff/${salon.id}/${staff.id}`)
+        .put(`/api/staff/${salon.id}/staff/${staff.id}`)
         .set('Authorization', `Bearer ${token}`)
         .send({ fullName: 'Updated Staff Name' });
 
@@ -127,7 +128,7 @@ describe('Staff Routes', () => {
     it('should return 404 if staff does not exist', async () => {
       const nonExistentId = uuidv4();
       const response = await request(app)
-        .put(`/api/staff/${salon.id}/${nonExistentId}`)
+        .put(`/api/staff/${salon.id}/staff/${nonExistentId}`)
         .set('Authorization', `Bearer ${token}`)
         .send({ fullName: 'Updated Name' });
 
@@ -141,7 +142,7 @@ describe('Staff Routes', () => {
       const user = await User.create({
         id: uuidv4(),
         fullName: 'Staff Member',
-        email: 'staff@example.com',
+        email: `staff${Date.now()}_2@example.com`,
         password: await bcrypt.hash('Password123!', 10),
         role: 'Staff',
         isEmailVerified: true
@@ -185,7 +186,7 @@ describe('Staff Routes', () => {
       const staffUser = await User.create({
         id: uuidv4(),
         fullName: 'Staff Member',
-        email: 'staff@example.com',
+        email: `staff${Date.now()}_2@example.com`,
         password: await bcrypt.hash('Password123!', 10),
         role: ROLES.STAFF,
         isEmailVerified: true

@@ -3,6 +3,8 @@ const { sendInvitationEmail, sendWelcomeEmail } = require("../utils/helpers/emai
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const ROLES = require('../config/roles');
+const { uploadSingle, getImageUrl } = require('../utils/imageUpload');
+
 exports.getStaff = async (req, res) => {
   const whereClause = {
     salonId: req.params.salonId
@@ -22,7 +24,7 @@ exports.getStaff = async (req, res) => {
 exports.inviteStaff = async (req, res) => {
   try {
     const { salonId } = req.params;
-    const { email, fullName } = req.body;
+    const { email, fullName, image } = req.body;
 
     // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -69,8 +71,10 @@ exports.inviteStaff = async (req, res) => {
     const newStaff = await Staff.create({ 
       salonId, 
       email, 
-      fullName, 
-      invitationToken 
+      fullName,
+      image,
+      invitationToken,
+      isActive: false 
     });
 
     // Send invitation email with the token
@@ -89,22 +93,49 @@ exports.inviteStaff = async (req, res) => {
 exports.updateStaff = async (req, res) => {
   try {
     const { salonId, staffId } = req.params;
-    const { fullName, isActive } = req.body; // Only allow updating these fields
-    const [updatedRowsCount, [updatedStaff]] = await Staff.update(
-      { fullName, isActive },
-      {
-        where: { id: staffId, salonId },
-        returning: true,
-      }
-    );
+    const { fullName } = req.body;
 
-    if (updatedRowsCount === 0) {
+    // First verify the salon belongs to the current user
+    const salon = await Salon.findOne({ 
+      where: { 
+        id: salonId, 
+        ownerId: req.user.id 
+      } 
+    });
+
+    if (!salon) {
+      return res.status(403).json({ 
+        message: 'You can only update staff in your own salon' 
+      });
+    }
+
+    const staff = await Staff.findOne({
+      where: { 
+        id: staffId, 
+        salonId 
+      }
+    });
+
+    if (!staff) {
       return res.status(404).json({ message: 'Staff not found' });
     }
 
-    res.json(updatedStaff);
+    if (fullName) {
+      staff.fullName = fullName;
+    }
+    
+    if (req.file) {
+      staff.image = getImageUrl(req.file.filename, 'profiles');
+    }
+
+    await staff.save();
+    res.status(200).json(staff);
   } catch (error) {
-    res.status(500).json({ message: 'Error updating staff', error: error.message });
+    console.error('Error updating staff:', error);
+    res.status(500).json({ 
+      message: 'Error updating staff', 
+      error: error.message 
+    });
   }
 };
 

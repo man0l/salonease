@@ -1,6 +1,6 @@
 const request = require('supertest');
 const app = require('../../src/app');
-const { User, Salon, sequelize } = require('../setupTests');
+const { User, Salon, sequelize, SalonImage } = require('../setupTests');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');

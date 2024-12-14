@@ -8,6 +8,7 @@ class Salon extends Model {
       onDelete: 'CASCADE'
     });
     this.hasMany(models.Staff, { foreignKey: 'salonId', as: 'staff' });
+    this.hasMany(models.SalonImage, { foreignKey: 'salonId', as: 'images' });
   }
 }
 

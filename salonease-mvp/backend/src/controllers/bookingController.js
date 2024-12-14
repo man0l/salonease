@@ -160,8 +160,7 @@ exports.createBooking = async (req, res) => {
     // Add subscription charge for the booking
     try {
       const salon = await Salon.findOne({ where: { id: salonId } });
-      const subscription = await subscriptionService.getSubscriptionStatus(salon.ownerId);
-      console.log(subscription.usage);
+      const subscription = await subscriptionService.getSubscriptionStatus(salon.ownerId);      
       await subscriptionService.addBookingCharge(salon.ownerId);
     } catch (subscriptionError) {
       console.error('Error adding booking charge:', subscriptionError);
@@ -368,15 +367,17 @@ exports.createManychatBooking = async (req, res) => {
 
     // Create booking
     const booking = await Booking.create({
-      ...value,
       salonId,
+      clientId: client.id,
+      staffId: value.staffId,
+      serviceId: value.serviceId,
+      appointmentDateTime: value.appointmentDateTime,
       endTime,
       status: BOOKING_STATUSES.PENDING
     }, { transaction });
 
     await transaction.commit();
 
-    // Return success response with booking details
     res.status(201).json({
       booking: {
         id: booking.id,

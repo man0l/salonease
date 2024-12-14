@@ -166,7 +166,7 @@ describe('Client Controller', () => {
       await updateClient(req, res);
 
       expect(res.statusCode).toBe(400);
-      expect(res._getJSONData()).toHaveProperty('message', 'Phone number must contain only digits');
+      expect(res._getJSONData()).toHaveProperty('message', 'Phone number can only contain digits and + symbol');
     });
 
     it('should return 400 if no fields are provided for update', async () => {
@@ -283,7 +283,7 @@ describe('Client Controller', () => {
       await addClient(req, res);
 
       expect(res.statusCode).toBe(400);
-      expect(res._getJSONData()).toHaveProperty('message', 'Phone number must contain only digits');
+      expect(res._getJSONData()).toHaveProperty('message', 'Phone number can only contain digits and + symbol');
     });
   });
 

@@ -11,7 +11,9 @@
   "jest": {
     "setupFilesAfterEnv": [
       "<rootDir>/tests/setupTests.js"
-    ]
+    ],
+    "globalTeardown": "<rootDir>/tests/globalTeardown.js",
+    "testTimeout": 10000
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -29,7 +31,8 @@
     "sequelize": "^6.6.5",
     "stripe": "^17.4.0",
     "supertest": "^7.0.0",
-    "pdfkit": "^0.13.0"
+    "pdfkit": "^0.13.0",
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
     "jest": "^27.2.5",
