@@ -98,7 +98,7 @@ exports.getSalonPublicStaff = async (req, res) => {
   try {
     const staff = await Staff.findAll({
       where: { salonId: req.params.salonId },
-      attributes: ['id', 'fullName', 'isActive']
+      attributes: ['id', 'fullName', 'isActive', 'image']
     });
 
     res.json(staff);

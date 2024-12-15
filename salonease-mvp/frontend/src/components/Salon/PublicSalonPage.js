@@ -16,14 +16,14 @@ const PublicSalonPage = () => {
     if (!salon?.images || salon.images.length === 0) return null;
 
     return (
-      <div className="bg-gray-100 py-12">
+      <div className="bg-gray-900 py-12">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-gray-800 mb-8">{t('salon:public_page.gallery.title')}</h2>
+          <h2 className="text-3xl font-bold text-primary-300 mb-8">{t('salon:public_page.gallery.title')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {salon.images.map((image, index) => (
               <div 
                 key={image.id} 
-                className="relative group cursor-pointer overflow-hidden rounded-lg shadow-lg aspect-w-3 aspect-h-2"
+                className="relative group cursor-pointer overflow-hidden rounded-lg shadow-lg aspect-w-3 aspect-h-2 border border-gray-800"
                 onClick={() => setSelectedImage(image)}
               >
                 <img
@@ -32,7 +32,7 @@ const PublicSalonPage = () => {
                   className="w-full h-full object-cover transform transition-transform duration-300 group-hover:scale-110"
                 />
                 {image.caption && (
-                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 transform translate-y-full transition-transform duration-300 group-hover:translate-y-0">
+                  <div className="absolute bottom-0 left-0 right-0 bg-gray-900 bg-opacity-75 text-gray-100 p-2 transform translate-y-full transition-transform duration-300 group-hover:translate-y-0">
                     <p className="text-sm">{image.caption}</p>
                   </div>
                 )}
@@ -46,10 +46,10 @@ const PublicSalonPage = () => {
 
   const ImageModal = ({ image, onClose }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [isTransitioning, setIsTransitioning] = useState(false);
 
     useEffect(() => {
       if (image) {
-        // Find the index of the clicked image
         const index = salon.images.findIndex(img => img.id === image.id);
         setCurrentIndex(index >= 0 ? index : 0);
       }
@@ -58,15 +58,21 @@ const PublicSalonPage = () => {
     if (!image) return null;
 
     const nextSlide = () => {
+      if (isTransitioning) return;
+      setIsTransitioning(true);
       setCurrentIndex((prevIndex) => 
         prevIndex === salon.images.length - 1 ? 0 : prevIndex + 1
       );
+      setTimeout(() => setIsTransitioning(false), 300);
     };
 
     const prevSlide = () => {
+      if (isTransitioning) return;
+      setIsTransitioning(true);
       setCurrentIndex((prevIndex) => 
         prevIndex === 0 ? salon.images.length - 1 : prevIndex - 1
       );
+      setTimeout(() => setIsTransitioning(false), 300);
     };
 
     const handleKeyDown = (e) => {
@@ -101,18 +107,26 @@ const PublicSalonPage = () => {
           {salon.images.length > 1 && (
             <>
               <button
-                onClick={prevSlide}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-75 transition-all duration-300"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  prevSlide();
+                }}
+                disabled={isTransitioning}
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-primary-500 bg-opacity-75 text-white p-2 rounded-full hover:bg-primary-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-20"
               >
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
               <button
-                onClick={nextSlide}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-75 transition-all duration-300"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  nextSlide();
+                }}
+                disabled={isTransitioning}
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-primary-500 bg-opacity-75 text-white p-2 rounded-full hover:bg-primary-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-20"
               >
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -122,7 +136,7 @@ const PublicSalonPage = () => {
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-white bg-black bg-opacity-50 hover:bg-opacity-75 rounded-full p-2 transition-all duration-300"
+            className="absolute top-4 right-4 text-gray-300 bg-gray-800 hover:bg-gray-700 rounded-full p-2 transition-all duration-300"
           >
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -212,9 +226,9 @@ const PublicSalonPage = () => {
                   style={{ imageRendering: 'crisp-edges' }}
                 />
                 {/* Dark Overlay */}
-                <div className="absolute inset-0 bg-black bg-opacity-30" />
+                <div className="absolute inset-0 bg-black bg-opacity-40" />
                 {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-primary-900 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-primary-900 via-transparent to-transparent opacity-90" />
               </div>
             ))}
           </div>
@@ -247,7 +261,7 @@ const PublicSalonPage = () => {
                 prevSlide();
               }}
               disabled={isTransitioning}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-20"
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-primary-500 bg-opacity-75 text-white p-2 rounded-full hover:bg-primary-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-20"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -259,7 +273,7 @@ const PublicSalonPage = () => {
                 nextSlide();
               }}
               disabled={isTransitioning}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-20"
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-primary-500 bg-opacity-75 text-white p-2 rounded-full hover:bg-primary-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-20"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -315,30 +329,27 @@ const PublicSalonPage = () => {
 
   if (!salon) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('salon:public_page.error.not_found.title')}</h2>
-          <p className="text-gray-600">{t('salon:public_page.error.not_found.message')}</p>
+          <h2 className="text-2xl font-bold text-primary-300 mb-4">{t('salon:public_page.error.not_found.title')}</h2>
+          <p className="text-gray-300">{t('salon:public_page.error.not_found.message')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900">
       {/* Hero Carousel */}
       <ImageCarousel />
-
-      {/* Image Gallery */}
-      <ImageGallery />
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-12">
         {/* About Section */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">{t('salon:public_page.about.title')}</h2>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-gray-600 leading-relaxed">
+          <h2 className="text-3xl font-bold text-primary-300 mb-6">{t('salon:public_page.about.title')}</h2>
+          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+            <p className="text-gray-300 leading-relaxed">
               {salon?.description || t('salon:public_page.about.default_description')}
             </p>
           </div>
@@ -346,14 +357,14 @@ const PublicSalonPage = () => {
 
         {/* Services Section */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">{t('salon:public_page.services.title')}</h2>
-          <p className="text-lg text-gray-700 mb-8">{t('salon:public_page.services.subtitle')}</p>
+          <h2 className="text-3xl font-bold text-primary-300 mb-6">{t('salon:public_page.services.title')}</h2>
+          <p className="text-lg text-gray-300 mb-8">{t('salon:public_page.services.subtitle')}</p>
           {loading ? (
-            <div className="text-center py-8">{t('salon:public_page.services.loading')}</div>
+            <div className="text-center py-8 text-gray-300">{t('salon:public_page.services.loading')}</div>
           ) : error ? (
-            <div className="text-center py-8 text-red-500">{error}</div>
+            <div className="text-center py-8 text-red-400">{error}</div>
           ) : services.length === 0 ? (
-            <div className="text-center py-8">{t('salon:public_page.services.no_services')}</div>
+            <div className="text-center py-8 text-gray-300">{t('salon:public_page.services.no_services')}</div>
           ) : (
             <ServiceCategories 
               services={services} 
@@ -366,24 +377,24 @@ const PublicSalonPage = () => {
 
         {/* Staff Section */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">{t('salon:public_page.team.title')}</h2>
-          <p className="text-lg text-gray-700 mb-8">{t('salon:public_page.team.subtitle')}</p>
+          <h2 className="text-3xl font-bold text-primary-300 mb-6">{t('salon:public_page.team.title')}</h2>
+          <p className="text-lg text-gray-300 mb-8">{t('salon:public_page.team.subtitle')}</p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {staff.map((member) => (
-              <div key={member.id} className="bg-white rounded-lg shadow-card p-6 text-center">
-                <div className="w-32 h-32 mx-auto mb-4 rounded-full bg-gray-200 flex items-center justify-center">
-                  {member.imageUrl ? (
+              <div key={member.id} className="bg-gray-800 rounded-lg shadow-lg p-6 text-center border border-gray-700 hover:border-primary-500 transition-colors duration-300">
+                <div className="w-32 h-32 mx-auto mb-4 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden">
+                  {member.image ? (
                     <img 
-                      src={member.imageUrl} 
+                      src={process.env.REACT_APP_API_URL.replace('/api', '') + member.image} 
                       alt={member.name} 
-                      className="w-full h-full object-cover rounded-full"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <span className="text-4xl text-gray-400">👤</span>
                   )}
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">{member.fullName}</h3>
-                <p className="text-gray-600">{member.role}</p>
+                <h3 className="text-xl font-semibold text-primary-300 mb-2">{member.fullName}</h3>
+                <p className="text-gray-300">{member.role}</p>
               </div>
             ))}
           </div>
@@ -391,42 +402,42 @@ const PublicSalonPage = () => {
 
         {/* Contact Section */}
         <section>
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">{t('salon:public_page.contact.title')}</h2>
-          <p className="text-lg text-gray-700 mb-8">{t('salon:public_page.contact.subtitle')}</p>
+          <h2 className="text-3xl font-bold text-primary-300 mb-6">{t('salon:public_page.contact.title')}</h2>
+          <p className="text-lg text-gray-300 mb-8">{t('salon:public_page.contact.subtitle')}</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white rounded-lg shadow-card p-6">
-              <h3 className="text-2xl font-semibold text-gray-800 mb-4">{t('salon:public_page.contact.business_hours')}</h3>
+            <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+              <h3 className="text-2xl font-semibold text-primary-300 mb-4">{t('salon:public_page.contact.business_hours')}</h3>
               <div className="space-y-2">
                 {salon.businessHours?.map((hours, index) => (
-                  <div key={index} className="flex justify-between text-gray-600">
+                  <div key={index} className="flex justify-between text-gray-300">
                     <span>{hours.day}</span>
                     <span>{hours.hours}</span>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="bg-white rounded-lg shadow-card p-6">
-              <h3 className="text-2xl font-semibold text-gray-800 mb-4">{t('salon:public_page.contact.contact_us')}</h3>
+            <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+              <h3 className="text-2xl font-semibold text-primary-300 mb-4">{t('salon:public_page.contact.contact_us')}</h3>
               <div className="space-y-4">
-                <p className="flex items-center text-gray-600">
+                <p className="flex items-center text-gray-300">
                   <FaPhone className="mr-2" />
-                  <a href={`tel:${salon.contactNumber}`} className="underline hover:text-primary-600">
+                  <a href={`tel:${salon.contactNumber}`} className="underline hover:text-primary-400">
                     {salon.contactNumber}
                   </a>
                 </p>
-                <p className="flex items-center text-gray-600">
+                <p className="flex items-center text-gray-300">
                   <FaMapMarkerAlt className="mr-2" />
                   {salon.address}
                 </p>
                 {salon.socialMedia && (
                   <div className="flex space-x-4 mt-4">
                     {salon.socialMedia.instagram && (
-                      <a href={salon.socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-primary-600">
+                      <a href={salon.socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-primary-400">
                         <FaInstagram size={24} />
                       </a>
                     )}
                     {salon.socialMedia.facebook && (
-                      <a href={salon.socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-primary-600">
+                      <a href={salon.socialMedia.facebook} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-primary-400">
                         <FaFacebook size={24} />
                       </a>
                     )}

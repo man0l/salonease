@@ -3,7 +3,6 @@ import { FaChevronDown, FaChevronRight } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import { formatCurrency } from '../../utils/currencyFormatter';
 import CategoryNav from './CategoryNav';
-import './ServiceCategories.css';
 import UnauthorizedBookingModal from '../Modals/UnauthorizedBookingModal';
 
 const ServiceCategories = ({ services, salonId, staff = [] }) => {
@@ -49,13 +48,13 @@ const ServiceCategories = ({ services, salonId, staff = [] }) => {
   };
 
   const ServiceCard = ({ service }) => (
-    <div className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow duration-200">
-      <div className="text-xs text-gray-500 mb-2">
+    <div className="bg-gray-800 rounded-lg shadow-lg p-4 hover:bg-gray-700 transition-all duration-200 border border-gray-700">
+      <div className="text-xs text-gray-400 mb-2">
         {service.categoryHierarchy.map((category, index) => (
           <span key={category.id}>
             {category.name}
             {index < service.categoryHierarchy.length - 1 && (
-              <span className="mx-1">›</span>
+              <span className="mx-1 text-gray-500">›</span>
             )}
           </span>
         ))}
@@ -63,14 +62,14 @@ const ServiceCategories = ({ services, salonId, staff = [] }) => {
 
       <div className="flex justify-between items-start">
         <div>
-          <h4 className="font-semibold text-gray-800">{service.name}</h4>
+          <h4 className="font-semibold text-gray-100">{service.name}</h4>
           {service.description && (
-            <p className="text-sm text-gray-600 mt-1">{service.description}</p>
+            <p className="text-sm text-gray-400 mt-1">{service.description}</p>
           )}
         </div>
         <div className="text-right">
-          <p className="font-bold text-primary-600">{formatCurrency(service.price)}</p>
-          <p className="text-sm text-gray-500">{t('service:duration.minutes', { duration: service.duration })}</p>
+          <p className="font-bold text-primary-300">{formatCurrency(service.price)}</p>
+          <p className="text-sm text-gray-400">{t('service:duration.minutes', { duration: service.duration })}</p>
           <button
             onClick={() => {
               setSelectedService(service);
@@ -94,30 +93,28 @@ const ServiceCategories = ({ services, salonId, staff = [] }) => {
       <div className={`${isRoot ? 'mb-8' : 'ml-4 mb-4'}`}>
         <button
           onClick={() => toggleCategory(category.id)}
-          className="flex items-center w-full text-left py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+          className="flex items-center w-full text-left py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors duration-200"
         >
           {hasSubcategories || hasServices ? (
             isExpanded ? (
-              <FaChevronDown className="w-4 h-4 text-gray-500 mr-2" />
+              <FaChevronDown className="w-4 h-4 text-gray-400 mr-2" />
             ) : (
-              <FaChevronRight className="w-4 h-4 text-gray-500 mr-2" />
+              <FaChevronRight className="w-4 h-4 text-gray-400 mr-2" />
             )
           ) : (
             <span className="w-4 mr-2" />
           )}
-          <span className={`font-semibold ${isRoot ? 'text-xl text-primary-700' : 'text-lg text-gray-700'}`}>
+          <span className={`font-semibold ${isRoot ? 'text-xl text-primary-300' : 'text-lg text-gray-300'}`}>
             {category.name}
           </span>
         </button>
 
         {isExpanded && (
           <div className="mt-2 space-y-3">
-            {/* Render subcategories */}
             {Object.values(category.subcategories || {}).map(subcategory => (
               <CategorySection key={subcategory.id} category={subcategory} />
             ))}
             
-            {/* Render services */}
             {category.services?.map(service => (
               <ServiceCard key={service.id} service={service} />
             ))}
@@ -128,7 +125,7 @@ const ServiceCategories = ({ services, salonId, staff = [] }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-gray-900 rounded-lg p-6 border border-gray-700">
       <CategoryNav 
         categories={rootCategories}
         onCategorySelect={setSelectedRootCategory}
