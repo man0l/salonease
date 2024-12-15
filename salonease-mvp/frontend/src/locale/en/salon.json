@@ -162,5 +162,32 @@
   },
   "error": {
     "failed_to_restore_salon": "Failed to restore salon"
+  },
+  "image": {
+    "title": "Salon Images",
+    "action": {
+      "choose_images": "Choose Images",
+      "remove_image": "Remove Image",
+      "add_caption": "Add caption for this image"
+    },
+    "error": {
+      "file_too_large": "Image {{filename}} is too large (max 5MB)",
+      "invalid_file_type": "File {{filename}} is not a valid image type",
+      "upload_failed": "Failed to upload images"
+    },
+    "caption": {
+      "placeholder": "Enter image caption..."
+    },
+    "validation": {
+      "max_images": "Maximum 10 images allowed"
+    }
+  },
+  "label": {
+    "salon_images": "Salon Images"
+  },
+  "action": {
+    "choose_images": "Choose Images",
+    "remove_image": "Remove Image",
+    "add_caption": "Add caption for this image"
   }
 }

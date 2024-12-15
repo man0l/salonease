@@ -11,7 +11,7 @@ router.use(roleMiddleware([ROLES.SUPER_ADMIN, ROLES.SALON_OWNER]));
 
 router.post('/', uploadMultiple, salonController.createSalon);
 router.get('/', salonController.getSalons);
-router.put('/:id', uploadMultiple, salonController.updateSalon);
+router.post('/:id', uploadMultiple, salonController.updateSalon);
 router.delete('/:id', salonController.deleteSalon);
 router.post('/:id/restore', salonController.restoreSalon);
 

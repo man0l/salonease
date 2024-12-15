@@ -164,5 +164,32 @@
   },
   "error": {
     "failed_to_restore_salon": "Неуспешно възстановяване на салона. Моля, опитайте отново."
+  },
+  "image": {
+    "title": "Снимки на салона",
+    "action": {
+      "choose_images": "Изберете снимки",
+      "remove_image": "Премахни снимка",
+      "add_caption": "Добавете описание на тази снимка"
+    },
+    "error": {
+      "file_too_large": "Снимката {{filename}} е твърде голяма (макс. 5MB)",
+      "invalid_file_type": "Файлът {{filename}} не е валиден тип изображение",
+      "upload_failed": "Неуспешно качване на снимки"
+    },
+    "caption": {
+      "placeholder": "Въведете описание на снимката..."
+    },
+    "validation": {
+      "max_images": "Максимум 10 снимки са разрешени"
+    }
+  },
+  "label": {
+    "salon_images": "Снимки на салона"
+  },
+  "action": {
+    "choose_images": "Изберете снимки",
+    "remove_image": "Премахни снимка",
+    "add_caption": "Добави надпис към снимката"
   }
 }

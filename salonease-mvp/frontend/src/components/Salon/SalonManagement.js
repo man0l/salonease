@@ -39,6 +39,11 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [salonToDelete, setSalonToDelete] = useState(null);
   const [showForm, setShowForm] = useState(isOnboarding);
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState([]);
+  const [imageCaptions, setImageCaptions] = useState([]);
+  const [imagesToDelete, setImagesToDelete] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
@@ -50,8 +55,8 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
     }
   }, [error]);
 
-  const handleSalonUpdate = async (salonId, data) => {
-    const updatedSalon = await updateSalon(salonId, data);
+  const handleSalonUpdate = async (salonId, formData) => {
+    const updatedSalon = await updateSalon(salonId, formData);
     if (!updatedSalon) {
       throw new Error(t('error.failed_to_update_salon'));
     }
@@ -85,10 +90,30 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
 
   const onSubmit = async (data) => {
     try {
+      const formData = new FormData();
+      
+      // Append basic salon data
+      Object.keys(data).forEach(key => {
+        formData.append(key, data[key]);
+      });
+      
+      // Append images and captions
+      selectedImages.forEach((file, index) => {
+        formData.append('salonImages', file);
+        if (imageCaptions[index]) {
+          formData.append('captions', imageCaptions[index]);
+        }
+      });
+
+      // Append images to delete
+      if (imagesToDelete.length > 0) {
+        formData.append('imagesToDelete', JSON.stringify(imagesToDelete));
+      }
+
       if (editingSalon) {
-        await handleSalonUpdate(editingSalon.id, data);
+        await handleSalonUpdate(editingSalon.id, formData);
       } else {
-        await handleSalonCreate(data);
+        await handleSalonCreate(formData);
       }
     } catch (err) {
       toast.error(t('error.failed_to_save_salon'));
@@ -98,11 +123,31 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
   const handleEdit = (salon) => {
     setEditingSalon(salon);
     reset(salon);
+    setImagesToDelete([]);
+    
+    if (salon.images && salon.images.length > 0) {
+      const urls = salon.images.map(img => ({
+        id: img.id,
+        url: process.env.REACT_APP_API_URL.replace('/api', '') + img.imageUrl,
+        caption: img.caption || ''
+      }));
+      setImagePreviewUrls(urls.map(img => img.url));
+      setImageCaptions(urls.map(img => img.caption));
+      setSelectedImages([]); 
+    } else {
+      setImagePreviewUrls([]);
+      setImageCaptions([]);
+      setSelectedImages([]);
+    }
+    
     setShowForm(true);
   };
 
   const handleAddNewSalon = () => {
     setEditingSalon(null);
+    setSelectedImages([]);
+    setImagePreviewUrls([]);
+    setImageCaptions([]);
     reset({
       name: '',
       address: '',
@@ -187,7 +232,7 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
         key={salon.id} 
         className="flex justify-between items-center p-4 border border-gray-800 rounded-lg bg-gray-900 hover:bg-gray-800 transition duration-300"
       >
-        <div className="flex justify-between items-start">
+        <div className="flex justify-between items-start w-full">
           <div className="flex-grow">
             <h3 className="text-xl font-semibold text-primary-600">
               {salon.name}
@@ -200,46 +245,139 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
             <p className="text-gray-600">{salon.address}</p>
             <p className="text-gray-600">{salon.contactNumber}</p>
             <p className="text-gray-600 mt-2">{salon.description}</p>
+            
+            {/* Display salon images if available */}
+            {salon.images && salon.images.length > 0 && (
+              <div className="mt-4 flex space-x-2 overflow-x-auto">
+                {salon.images.map((image, index) => (
+                  <div key={image.id} className="relative flex-shrink-0">
+                    <img
+                      src={process.env.REACT_APP_API_URL.replace('/api', '') + image.imageUrl}
+                      alt={image.caption || `Salon image ${index + 1}`}
+                      className="w-20 h-20 object-cover rounded-lg"
+                    />
+                    {image.caption && (
+                      <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 truncate">
+                        {image.caption}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          {isDeleted && (
-            <span className="text-sm text-gray-500">
-              {t('salon:deleted_at', { 
-                date: new Date(salon.deletedAt).toLocaleDateString() 
-              })}
-            </span>
-          )}
-        </div>
-        
-        <div className="mt-4 flex space-x-2">
-          {!isDeleted && (
-            <>
+          
+          <div className="mt-4 flex space-x-2">
+            {!isDeleted && (
+              <>
+                <button 
+                  onClick={() => handleEdit(salon)} 
+                  className="bg-secondary-500 hover:bg-secondary-600 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" 
+                  aria-label={`${t('common:action.edit')} ${salon.name}`}
+                >
+                  <FaEdit className="mr-1" /> {t('common:action.edit')}
+                </button>
+                <button 
+                  onClick={() => handleDelete(salon.id)} 
+                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" 
+                  aria-label={`${t('common:action.delete')} ${salon.name}`}
+                >
+                  <FaTrash className="mr-1" /> {t('common:action.delete')}
+                </button>
+              </>
+            )}
+            {isDeleted && (
               <button 
-                onClick={() => handleEdit(salon)} 
-                className="bg-secondary-500 hover:bg-secondary-600 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" 
-                aria-label={`${t('common:action.edit')} ${salon.name}`}
+                onClick={() => handleRestore(salon.id)} 
+                className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" 
+                aria-label={`${t('common:action.restore')} ${salon.name}`}
               >
-                <FaEdit className="mr-1" /> {t('common:action.edit')}
+                <FaUndo className="mr-1" /> {t('common:action.restore')}
               </button>
-              <button 
-                onClick={() => handleDelete(salon.id)} 
-                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" 
-                aria-label={`${t('common:action.delete')} ${salon.name}`}
-              >
-                <FaTrash className="mr-1" /> {t('common:action.delete')}
-              </button>
-            </>
-          )}
-          {isDeleted && (
-            <button 
-              onClick={() => handleRestore(salon.id)} 
-              className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" 
-              aria-label={`${t('common:action.restore')} ${salon.name}`}
-            >
-              <FaUndo className="mr-1" /> {t('common:action.restore')}
-            </button>
-          )}
+            )}
+          </div>
         </div>
       </li>
+    );
+  };
+
+  const handleImageChange = (event) => {
+    const files = Array.from(event.target.files);
+    
+    // Validate files
+    const validFiles = files.filter(file => {
+      const isValidSize = file.size <= 5 * 1024 * 1024; // 5MB limit
+      const isValidType = /^image\/(jpeg|jpg|png|gif)$/.test(file.type);
+      
+      if (!isValidSize) {
+        toast.error(t('error.file_too_large', { filename: file.name }));
+      }
+      if (!isValidType) {
+        toast.error(t('error.invalid_file_type', { filename: file.name }));
+      }
+      
+      return isValidSize && isValidType;
+    });
+
+    setSelectedImages(prevImages => [...prevImages, ...validFiles]);
+    
+    // Generate preview URLs
+    validFiles.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreviewUrls(prev => [...prev, reader.result]);
+        setImageCaptions(prev => [...prev, '']); // Add empty caption
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleImageDelete = (index, imageId = null) => {
+    if (imageId) {
+      // This is an existing image
+      setImagesToDelete(prev => [...prev, imageId]);
+    }
+    
+    setImagePreviewUrls(prev => prev.filter((_, i) => i !== index));
+    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+    setImageCaptions(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const ImageModal = ({ image, onClose }) => {
+    if (!image) return null;
+
+    return (
+      <div 
+        className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50 p-4 sm:p-6 md:p-8"
+        onClick={onClose}
+      >
+        <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-4xl">
+          <div className="bg-gray-900 rounded-lg overflow-hidden">
+            <img
+              src={image.url}
+              alt={image.caption || 'Salon image'}
+              className="w-full h-auto max-h-[50vh] sm:max-h-[60vh] md:max-h-[70vh] lg:max-h-[80vh] object-contain"
+              onClick={e => e.stopPropagation()}
+            />
+            {image.caption && (
+              <div className="p-4 bg-gray-900">
+                <p className="text-center text-gray-100 text-sm sm:text-base">
+                  {image.caption}
+                </p>
+              </div>
+            )}
+            <button
+              onClick={onClose}
+              className="absolute top-2 right-2 text-white bg-gray-900 bg-opacity-50 hover:bg-opacity-75 rounded-full p-2 transition-all duration-300"
+              aria-label="Close modal"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
     );
   };
 
@@ -314,6 +452,50 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
                 className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-md text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-400" 
                 rows="3" 
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-200 mb-1">
+                {t('label.salon_images')}
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageChange}
+                className="hidden"
+                id="salon-images"
+              />
+              <label
+                htmlFor="salon-images"
+                className="cursor-pointer inline-block px-4 py-2 bg-gray-800 text-gray-200 rounded-md hover:bg-gray-700 transition duration-300"
+              >
+                {t('action.choose_images')}
+              </label>
+              
+              {imagePreviewUrls.length > 0 && (
+                <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {imagePreviewUrls.map((url, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={url}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                        onClick={() => setSelectedImage({ 
+                          url: url,
+                          caption: imageCaptions[index]
+                        })}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleImageDelete(index, editingSalon?.images?.[index]?.id)}
+                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition duration-300"
+                      >
+                        <FaTrash size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <button 
               type="submit" 
@@ -409,6 +591,11 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={confirmDelete}
+      />
+
+      <ImageModal 
+        image={selectedImage}
+        onClose={() => setSelectedImage(null)}
       />
     </div>
   );

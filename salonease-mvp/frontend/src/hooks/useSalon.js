@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { api, staffApi } from '../utils/api';
+import { staffApi, salonApi } from '../utils/api';
 import { useAuth } from './useAuth';
 import ROLES from '../utils/roles';
 
@@ -23,7 +23,7 @@ export const useSalon = () => {
         response = await staffApi.getAssociatedSalon();
         setSalons(response.data ? [response.data] : []);
       } else {
-        response = await api.get(`/salons?page=${currentPageRef.current}&limit=10`);
+        response = await salonApi.getSalons(`?page=${currentPageRef.current}&limit=10`);
         setSalons(response.data.salons);
         setTotalPages(response.data.totalPages);
       }
@@ -52,10 +52,10 @@ export const useSalon = () => {
     }
   };
 
-  const addSalon = async (salonData) => {
+  const addSalon = async (formData) => {
     try {
-      const response = await api.post('/salons', salonData);
-      await fetchSalons(); // Refetch salons after adding a new one
+      const response = await salonApi.createSalon(formData);
+      await fetchSalons();
       return response.data;
     } catch (err) {
       handleError(err);
@@ -63,9 +63,9 @@ export const useSalon = () => {
     }
   };
 
-  const updateSalon = async (salonId, salonData) => {
+  const updateSalon = async (salonId, formData) => {
     try {
-      const response = await api.put(`/salons/${salonId}`, salonData);
+      const response = await salonApi.updateSalon(salonId, formData);
       setSalons(salons.map(salon => salon.id === salonId ? response.data : salon));
       return response.data;
     } catch (err) {
@@ -76,7 +76,7 @@ export const useSalon = () => {
 
   const deleteSalon = async (salonId) => {
     try {
-      await api.delete(`/salons/${salonId}`);
+      await salonApi.deleteSalon(salonId);
       setSalons(prevSalons => prevSalons.filter(salon => salon.id !== salonId));
       if (salons.length === 1 && currentPageRef.current > 1) {
         currentPageRef.current -= 1;
@@ -93,7 +93,7 @@ export const useSalon = () => {
 
   const restoreSalon = async (salonId) => {
     try {
-      const response = await api.post(`/salons/${salonId}/restore`);
+      const response = await salonApi.restoreSalon(salonId);
       await fetchSalons();
       return response.data;
     } catch (err) {

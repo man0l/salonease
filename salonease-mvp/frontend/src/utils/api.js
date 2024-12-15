@@ -242,6 +242,22 @@ const billingApi = {
   }
 };
 
+const salonApi = {
+  getSalons: (params = '') => api.get(`/salons${params}`),
+  createSalon: (formData) => api.post('/salons', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
+  updateSalon: (salonId, formData) => api.post(`/salons/${salonId}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
+  deleteSalon: (salonId) => api.delete(`/salons/${salonId}`),
+  restoreSalon: (salonId) => api.post(`/salons/${salonId}/restore`),
+};
+
 export { 
   api, 
   authApi, 
@@ -253,5 +269,6 @@ export {
   dashboardApi,
   reportsApi,
   subscriptionApi,
-  billingApi
+  billingApi,
+  salonApi
 };

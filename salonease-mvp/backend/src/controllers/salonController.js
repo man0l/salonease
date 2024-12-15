@@ -44,6 +44,11 @@ exports.getSalons = async (req, res) => {
 
     const { count, rows: salons } = await Salon.findAndCountAll({
       where: { ownerId: req.user.id },
+      include: [{
+        model: SalonImage,
+        as: 'images',
+        attributes: ['id', 'imageUrl', 'caption', 'displayOrder']
+      }],
       limit,
       offset,
       order: [['createdAt', 'DESC']]
@@ -61,7 +66,6 @@ exports.getSalons = async (req, res) => {
 };
 
 exports.updateSalon = async (req, res) => {
-
   const { error, value } = validateUpdateSalon(req.body);
   if (error) {
     const errorMessages = error.details.map(detail => detail.message);
@@ -77,6 +81,10 @@ exports.updateSalon = async (req, res) => {
         id: req.params.id, 
         ownerId: req.user.id 
       },
+      include: [{
+        model: SalonImage,
+        as: 'images'
+      }],
       transaction
     });
     
@@ -87,13 +95,23 @@ exports.updateSalon = async (req, res) => {
 
     await salon.update(value, { transaction });
 
+    // Handle specific image deletions if any
+    if (req.body.imagesToDelete) {
+      const imagesToDelete = JSON.parse(req.body.imagesToDelete);
+      if (Array.isArray(imagesToDelete) && imagesToDelete.length > 0) {
+        await SalonImage.destroy({
+          where: {
+            id: imagesToDelete,
+            salonId: salon.id // Ensure images belong to this salon
+          },
+          transaction
+        });
+      }
+    }
+
+    // Handle new image uploads if any
     if (req.files && req.files.length > 0) {
-      await SalonImage.destroy({ 
-        where: { salonId: salon.id },
-        transaction 
-      });
-      
-      const salonImages = await Promise.all(req.files.map((file, index) => {
+      const newImages = await Promise.all(req.files.map((file, index) => {
         return SalonImage.create({
           salonId: salon.id,
           imageUrl: getImageUrl(file.filename, 'salons'),
@@ -101,13 +119,25 @@ exports.updateSalon = async (req, res) => {
           displayOrder: index
         }, { transaction });
       }));
-      salon.dataValues.images = salonImages;
     }
 
     await transaction.commit();
-    res.status(200).json(salon);
+    
+    // Fetch updated salon with current images
+    const updatedSalon = await Salon.findOne({
+      where: { id: salon.id },
+      include: [{
+        model: SalonImage,
+        as: 'images',
+        attributes: ['id', 'imageUrl', 'caption', 'displayOrder'],
+        order: [['displayOrder', 'ASC']]
+      }]
+    });
+
+    res.status(200).json(updatedSalon);
   } catch (error) {
     if (transaction) await transaction.rollback();
+    console.error('Error updating salon:', error);
     res.status(500).json({ message: 'Error updating salon', error: error.message });
   }
 };
