@@ -6,6 +6,7 @@ import { FaEdit, FaTrash, FaPlus, FaMinus, FaUserPlus } from 'react-icons/fa';
 import useStaff from '../../hooks/useStaff';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
+import { UserCircleIcon } from '@heroicons/react/24/outline';
 
 const StaffManagement = () => {
   const { t } = useTranslation(['staff', 'common']);
@@ -13,6 +14,8 @@ const StaffManagement = () => {
   const [editingStaff, setEditingStaff] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [staffToDelete, setStaffToDelete] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   const {
     staff,
@@ -38,32 +41,36 @@ const StaffManagement = () => {
 
   const onSubmit = async (data) => {
     try {
-      if (editingStaff) {
-        await updateStaff(editingStaff.id, {
-          ...data,
-          id: editingStaff.id
-        });
-        toast.success(t('staff:success.staff_updated'));
-        reset();
-        setEditingStaff(null);
-        setShowForm(false);
-      } else {
-        const result = await inviteStaff(data);
-        if (result) {
-          toast.success(t('staff:success.staff_added'));
-          reset();
-          setEditingStaff(null);
-          setShowForm(false);
-        }
+      const formData = new FormData();
+      formData.append('email', data.email);
+      formData.append('fullName', data.fullName);
+      
+      if (selectedFile) {
+        formData.append('image', selectedFile);
       }
+
+      if (editingStaff) {
+        await updateStaff(editingStaff.id, formData);
+        
+      } else {
+        const result = await inviteStaff(formData);        
+      }
+      
+      reset();
+      setEditingStaff(null);
+      setShowForm(false);
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      await fetchStaff();
     } catch (err) {
-      console.error('Staff operation failed:', err);
+      toast.error(err.response?.data?.message || t('staff:error.operation_failed'));
     }
   };
 
   const handleEdit = (member) => {
     setEditingStaff(member);
     reset(member);
+    setPreviewUrl(member.image ? process.env.REACT_APP_API_URL.replace('/api', '') + member.image : null);
     setShowForm(true);
   };
 
@@ -85,6 +92,29 @@ const StaffManagement = () => {
     }
   };
 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) { // 2MB limit
+        toast.error(t('staff:error.file_too_large'));
+        return;
+      }
+      
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error(t('staff:error.invalid_file_type'));
+        return;
+      }
+      
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const DeleteConfirmationDialog = ({ isOpen, onClose, onConfirm }) => {
     const { t } = useTranslation('staff');
     
@@ -92,22 +122,24 @@ const StaffManagement = () => {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h3 className="text-lg font-medium mb-4">{t('staff:action.confirm_deletion')}</h3>
-          <p className="mb-4">{t('staff:message.confirm_delete')}</p>
+        <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-800">
+          <h3 className="text-lg font-medium mb-4 text-gray-100">
+            {t('staff:action.confirm_deletion')}
+          </h3>
+          <p className="mb-4 text-gray-300">{t('staff:message.confirm_delete')}</p>
           <div className="flex justify-end">
             <button
               onClick={() => {
                 onConfirm();
                 onClose();
               }}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mr-2 transition duration-300"
+              className="bg-red-600 hover:bg-red-700 text-gray-100 px-4 py-2 rounded mr-2 transition duration-300"
             >
               {t('staff:action.delete')}
             </button>
             <button
               onClick={onClose}
-              className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded transition duration-300"
+              className="bg-gray-700 hover:bg-gray-600 text-gray-300 px-4 py-2 rounded transition duration-300"
             >
               {t('staff:action.cancel')}
             </button>
@@ -141,6 +173,39 @@ const StaffManagement = () => {
             {editingStaff ? t('staff:title.edit_staff') : t('staff:title.add_staff')}
           </h3>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="flex flex-col items-center space-y-4 mb-6">
+              <div className="relative w-32 h-32">
+                {previewUrl ? (
+                  <img
+                    src={previewUrl}
+                    alt={t('staff:label.profile_image')}
+                    className="w-full h-full rounded-full object-cover border-4 border-gray-700"
+                  />
+                ) : (
+                  <UserCircleIcon className="w-full h-full text-gray-400" />
+                )}
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <label
+                  htmlFor="staff-image"
+                  className="cursor-pointer px-4 py-2 bg-gray-800 text-gray-200 rounded-md hover:bg-gray-700 transition duration-300"
+                >
+                  {t('staff:action.change_image')}
+                </label>
+                <input
+                  id="staff-image"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                <span className="text-sm text-gray-400 mt-2">
+                  {t('staff:action.choose_file')}
+                </span>
+              </div>
+            </div>
+
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-200 mb-1">
                 {t('staff:label.email')}
@@ -193,9 +258,22 @@ const StaffManagement = () => {
           <ul className="space-y-4">
             {staff.map((member) => (
               <li key={member.id} className="flex justify-between items-center p-4 border border-gray-800 rounded-lg bg-gray-900 hover:bg-gray-800 transition duration-300">
-                <div>
-                  <span className="font-semibold text-primary-400">{member.fullName}</span>
-                  <span className="ml-2 text-sm text-gray-400">({member.email})</span>
+                <div className="flex items-center">
+                  <div className="w-10 h-10 mr-3">
+                    {member.image ? (
+                      <img
+                        src={process.env.REACT_APP_API_URL.replace('/api', '') + member.image}
+                        alt={member.fullName}
+                        className="w-full h-full rounded-full object-cover"
+                      />
+                    ) : (
+                      <UserCircleIcon className="w-full h-full text-gray-400" />
+                    )}
+                  </div>
+                  <div>
+                    <span className="font-semibold text-primary-400">{member.fullName}</span>
+                    <span className="ml-2 text-sm text-gray-400">({member.email})</span>
+                  </div>
                 </div>
                 <div className="flex space-x-2">
                   <button

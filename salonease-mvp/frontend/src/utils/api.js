@@ -131,8 +131,16 @@ const authApi = {
 
 const staffApi = {
   getStaff: (salonId) => api.get(`/staff/${salonId}`),
-  inviteStaff: (salonId, staffData) => api.post(`/staff/${salonId}/invite`, staffData),
-  updateStaff: (salonId, staffId, staffData) => api.put(`/staff/${salonId}/${staffId}`, staffData),
+  inviteStaff: (salonId, formData) => api.post(`/staff/${salonId}/invite`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
+  updateStaff: (salonId, staffId, formData) => api.post(`/staff/${salonId}/${staffId}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
   deleteStaff: (salonId, staffId) => api.delete(`/staff/${salonId}/staff/${staffId}`),
   acceptInvitation: (data) => axios.post(`${api.defaults.baseURL}/auth/accept-invitation`, data),
   getAssociatedSalon: () => api.get('/staff/my-salon'),

@@ -2,8 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { staffApi } from '../utils/api';
 import { toast } from 'react-toastify';
 import { useSalonContext } from '../contexts/SalonContext';
+import { useTranslation } from 'react-i18next';
 
 const useStaff = () => {
+  const { t } = useTranslation(['staff']);
   const [staff, setStaff] = useState([]);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,11 +20,11 @@ const useStaff = () => {
       setStaff(response.data);
       setLoading(false);
     } catch (err) {
-      setError('Failed to fetch staff');
-      toast.error('Failed to fetch staff');
+      setError(t('error.no_staff'));
+      toast.error(t('error.no_staff'));
       setLoading(false);
     }
-  }, [selectedSalon]);
+  }, [selectedSalon, t]);
 
   const fetchStaffAndAvailability = useCallback(async () => {
     if (!selectedSalon) return;
@@ -37,11 +39,11 @@ const useStaff = () => {
       setEvents(formattedEvents);
       setLoading(false);
     } catch (error) {
-      setError('Failed to fetch staff and availability');
-      toast.error('Failed to fetch staff and availability');
+      setError(t('error.no_staff'));
+      toast.error(t('error.no_staff'));
       setLoading(false);
     }
-  }, [selectedSalon]);
+  }, [selectedSalon, t]);
 
   useEffect(() => {
     fetchStaffAndAvailability();
@@ -77,11 +79,14 @@ const useStaff = () => {
     });
   };
 
-  const inviteStaff = async (staffData) => {
+  const inviteStaff = async (formData) => {
     try {
-      await staffApi.inviteStaff(selectedSalon.id, staffData);
-      toast.success('Staff invited successfully');
-      await fetchStaff();
+      const response = await staffApi.inviteStaff(selectedSalon.id, formData);
+      if (response.data) {
+        await fetchStaff();
+        toast.success(t('success.staff_added'));
+        return response.data;
+      }
     } catch (err) {
       handleApiError(err);
     }
@@ -90,7 +95,7 @@ const useStaff = () => {
   const updateStaff = async (staffId, updateData) => {
     try {
       await staffApi.updateStaff(selectedSalon.id, staffId, updateData);
-      toast.success('Staff updated successfully');
+      toast.success(t('success.staff_updated'));
       await fetchStaff();
     } catch (err) {
       handleApiError(err);
@@ -100,7 +105,7 @@ const useStaff = () => {
   const deleteStaff = async (staffId) => {
     try {
       await staffApi.deleteStaff(selectedSalon.id, staffId);
-      toast.success('Staff and associated user deleted successfully');
+      toast.success(t('success.staff_deleted'));
       await fetchStaff();
     } catch (err) {
       handleApiError(err);
@@ -110,7 +115,7 @@ const useStaff = () => {
   const createStaffAvailability = async (availabilityData) => {
     try {
       await staffApi.createStaffAvailability(selectedSalon.id, availabilityData);
-      toast.success('Availability saved successfully');
+      toast.success(t('success.availability_saved'));
       await fetchStaffAndAvailability();
     } catch (err) {
       handleApiError(err);
@@ -120,7 +125,7 @@ const useStaff = () => {
   const updateStaffAvailability = async (availabilityId, availabilityData) => {
     try {
       await staffApi.updateStaffAvailability(selectedSalon.id, availabilityId, availabilityData);
-      toast.success('Availability updated successfully');
+      toast.success(t('success.availability_saved'));
       await fetchStaffAndAvailability();
     } catch (err) {
       handleApiError(err);
@@ -130,7 +135,7 @@ const useStaff = () => {
   const deleteStaffAvailability = async (availabilityId) => {
     try {
       await staffApi.deleteStaffAvailability(selectedSalon.id, availabilityId);
-      toast.success('Availability deleted successfully');
+      toast.success(t('success.availability_deleted'));
       await fetchStaffAndAvailability();
     } catch (err) {
       handleApiError(err);
@@ -141,12 +146,12 @@ const useStaff = () => {
     if (err.response && err.response.data) {
       const { message, errors } = err.response.data;
       if (errors && errors.length > 0) {
-        errors.forEach(errorMsg => toast.error(errorMsg));
+        errors.forEach(errorMsg => toast.error(t(`error.${errorMsg}`)));
       } else if (message) {
-        toast.error(message);
+        toast.error(t(`error.${message}`));
       }
     } else {
-      toast.error('An error occurred. Please try again.');
+      toast.error(t('error.failed_to_update'));
     }
   };
 

@@ -13,8 +13,8 @@ router.get('/my-salon', roleMiddleware([ROLES.STAFF]), staffController.getAssoci
 
 // Protected routes for staff management
 router.get('/:salonId', roleMiddleware([ROLES.SUPER_ADMIN, ROLES.SALON_OWNER, ROLES.STAFF]), staffController.getStaff);
-router.post('/:salonId/invite', roleMiddleware([ROLES.SUPER_ADMIN, ROLES.SALON_OWNER]), staffController.inviteStaff);
-router.put('/:salonId/staff/:staffId', roleMiddleware([ROLES.SALON_OWNER]), uploadSingle, staffController.updateStaff);
+router.post('/:salonId/invite', roleMiddleware([ROLES.SUPER_ADMIN, ROLES.SALON_OWNER]), uploadSingle, staffController.inviteStaff);
+router.post('/:salonId/:staffId', roleMiddleware([ROLES.SALON_OWNER]), uploadSingle, staffController.updateStaff);
 
 // Only salon owners can delete staff
 router.delete('/:salonId/staff/:staffId', roleMiddleware([ROLES.SALON_OWNER]), staffController.deleteStaff);

@@ -1,5 +1,6 @@
 const { Staff, Salon, User } = require('../config/db');
 const { sendInvitationEmail, sendWelcomeEmail } = require("../utils/helpers/emailHelper");
+const { validateInviteStaff } = require('../validators/staffValidator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const ROLES = require('../config/roles');
@@ -13,7 +14,7 @@ exports.getStaff = async (req, res) => {
   try {
     const staff = await Staff.findAll({
       where: whereClause,
-      attributes: ['id', 'email', 'fullName', 'isActive'] // Explicitly specify the columns
+      attributes: ['id', 'email', 'fullName', 'isActive', 'image'] // Explicitly specify the columns
     });
     res.json(staff);
   } catch (error) {
@@ -24,37 +25,42 @@ exports.getStaff = async (req, res) => {
 exports.inviteStaff = async (req, res) => {
   try {
     const { salonId } = req.params;
-    const { email, fullName, image } = req.body;
-
-    // Validate email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: 'Validation error', errors: ['Invalid email format'] });
+    const { error, value } = validateInviteStaff(req.body);
+    
+    if (error) {
+      return res.status(400).json({ 
+        message: 'Validation error', 
+        errors: error.details.map(err => err.message) 
+      });
     }
 
-    // Validate fullName
-    if (!fullName || fullName.trim() === '') {
-      return res.status(400).json({ message: 'Validation error', errors: ['Full name is required'] });
-    }
+    const { email, fullName, image } = value;
 
     // Check if the inviter is trying to invite themselves
     if (req.user.email === email) {
-      return res.status(400).json({ message: 'Validation error', errors: ['You cannot invite yourself'] });
+      return res.status(400).json({ 
+        message: 'Validation error', 
+        errors: ['You cannot invite yourself'] 
+      });
     }
 
     // Check if a user with that email already exists
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({ message: 'Validation error', errors: ['A user with this email already exists'] });
+      return res.status(400).json({ 
+        message: 'Validation error', 
+        errors: ['A user with this email already exists'] 
+      });
     }
 
     // Check if a staff with that email already exists
     const existingStaff = await Staff.findOne({ where: { email } });
     if (existingStaff) {
-      return res.status(400).json({ message: 'Validation error', errors: ['A staff member with this email already exists'] });
+      return res.status(400).json({ 
+        message: 'Validation error', 
+        errors: ['A staff member with this email already exists'] 
+      });
     }
-
-
 
     const salon = await Salon.findByPk(salonId);
     if (!salon) {
@@ -74,7 +80,7 @@ exports.inviteStaff = async (req, res) => {
       fullName,
       image,
       invitationToken,
-      isActive: false 
+      isActive: false
     });
 
     // Send invitation email with the token

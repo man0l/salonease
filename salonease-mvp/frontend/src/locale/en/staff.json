@@ -62,5 +62,9 @@
       "horizontal": "Scroll horizontally to see all days"
     },
     "confirm_delete": "Do you want to delete this availability?"
+  },
+  "action": {
+    "change_image": "Change Image",
+    "choose_file": "Choose File (max. 2MB)"
   }
 }
