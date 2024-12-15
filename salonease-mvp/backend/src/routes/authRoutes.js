@@ -30,7 +30,7 @@ router.post('/logout', authController.logout);
 router.post('/accept-invitation', staffController.acceptInvitation);
 
 // Add this new route
-router.put('/update', authMiddleware, uploadSingle, authController.updateUser);
+router.post('/update', authMiddleware, uploadSingle, authController.updateUser);
 
 // Add this new route
 router.post('/complete-onboarding', 

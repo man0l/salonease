@@ -35,6 +35,7 @@ import SubscriptionComplete from './components/Subscription/SubscriptionComplete
 import StripeWrapper from './components/Subscription/StripeWrapper';
 import PublicRoute from './components/Routes/PublicRoute';
 import InvoiceDashboard from './components/Billing/InvoiceDashboard';
+import Profile from './components/Profile/Profile'
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -114,6 +115,14 @@ function AppContent() {
                     <h2 className="text-4xl font-bold mb-4">Welcome to SalonEase</h2>
                     <p className="text-xl">Your comprehensive salon management solution.</p>
                   </div>
+                } 
+              />
+              <Route 
+                path="/profile" 
+                element={
+                  <PrivateRoute allowedRoles={[ROLES.SALON_OWNER, ROLES.STAFF, ROLES.SUPER_ADMIN]}>
+                    <Profile />
+                  </PrivateRoute>
                 } 
               />
               <Route 

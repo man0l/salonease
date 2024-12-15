@@ -106,7 +106,8 @@ exports.login = async (req, res) => {
         id: user.id, 
         fullName: user.fullName, 
         role: user.role,
-        onboardingCompleted: user.onboardingCompleted 
+        onboardingCompleted: user.onboardingCompleted,
+        image: user.image
       }
     });
   } catch (error) {
@@ -130,6 +131,7 @@ exports.me = async (req, res) => {
       role: user.role,
       isEmailVerified: user.isEmailVerified,
       onboardingCompleted: user.onboardingCompleted,
+      image: user.image
     });
   } catch (error) {
     console.error('Error fetching user information:', error);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { HomeIcon, CalendarDaysIcon, ClipboardDocumentListIcon, UserGroupIcon, CreditCardIcon, ChartBarIcon, Cog6ToothIcon, Bars3Icon, BuildingStorefrontIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
+import { HomeIcon, CalendarDaysIcon, ClipboardDocumentListIcon, UserGroupIcon, CreditCardIcon, ChartBarIcon, Cog6ToothIcon, Bars3Icon, BuildingStorefrontIcon, DocumentTextIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../hooks/useAuth';
 import { useSalonContext } from '../contexts/SalonContext';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +23,7 @@ const Sidebar = () => {
     { name: t('navigation:sidebar.billing'), icon: CreditCardIcon, route: '/salons/:salonId/billing', roles: ['SalonOwner'] },
     { name: t('navigation:sidebar.financial_reports'), icon: ChartBarIcon, route: '/salons/:salonId/reports/financial', roles: ['SalonOwner'] },
     { name: t('navigation:sidebar.settings'), icon: Cog6ToothIcon, route: '/settings', roles: ['SalonOwner', 'SuperAdmin', 'Staff'] },
-    { name: t('navigation:sidebar.admin_dashboard'), icon: HomeIcon, route: '/admin-dashboard', roles: ['SuperAdmin'] },
+    { name: t('navigation:sidebar.admin_dashboard'), icon: HomeIcon, route: '/admin-dashboard', roles: ['SuperAdmin'] }
   ];
 
   const filteredNavigation = navigation.filter(item => 

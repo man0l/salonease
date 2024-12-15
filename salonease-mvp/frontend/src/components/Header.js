@@ -14,6 +14,7 @@ function Header() {
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const langDropdownRef = useRef(null);
+  
 
   const languages = [
     { code: 'en', name: 'English' },
@@ -55,7 +56,7 @@ function Header() {
         >
           <img
             className="h-8 w-8 rounded-full object-cover"
-            src={user.avatar || "https://via.placeholder.com/150"}
+            src={user.image ? process.env.REACT_APP_API_URL.replace('/api', '') + user.image : "https://via.placeholder.com/150"}
             alt={`${user.name}'s avatar`}
           />
           <span className="font-medium hidden lg:inline">{user.name}</span>

@@ -1,0 +1,19 @@
+{
+  "title": "Profile",
+  "label": {
+    "full_name": "Full Name",
+    "email": "Email",
+    "profile_image": "Profile Image"
+  },
+  "action": {
+    "change_image": "Change Image",
+    "choose_file": "Choose a file (max 2MB)"
+  },
+  "error": {
+    "file_too_large": "Image file must be less than 2MB",
+    "update_failed": "Failed to update profile"
+  },
+  "success": {
+    "profile_updated": "Profile updated successfully"
+  }
+} 

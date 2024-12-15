@@ -80,7 +80,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateUser = async (userData) => {
-    const response = await api.put('/auth/update', userData);
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    };
+    const response = await api.post('/auth/update', userData, config);
     setUser(response.data);
     return response.data;
   };
