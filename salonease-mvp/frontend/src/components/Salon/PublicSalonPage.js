@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaPhone, FaMapMarkerAlt, FaClock, FaInstagram, FaFacebook } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,72 @@ const PublicSalonPage = () => {
   const { salonId } = useParams();
   const { salon, services, categories, staff, loading, error } = usePublicSalon(salonId);
   const { t } = useTranslation(['salon', 'common']);
+
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const ImageGallery = () => {
+    if (!salon?.images || salon.images.length === 0) return null;
+
+    return (
+      <div className="bg-gray-100 py-12">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-gray-800 mb-8">{t('salon:public_page.gallery.title')}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {salon.images.map((image, index) => (
+              <div 
+                key={image.id} 
+                className="relative group cursor-pointer overflow-hidden rounded-lg shadow-lg aspect-w-3 aspect-h-2"
+                onClick={() => setSelectedImage(image)}
+              >
+                <img
+                  src={process.env.REACT_APP_API_URL.replace('/api', '') + image.imageUrl}
+                  alt={image.caption || `Salon image ${index + 1}`}
+                  className="w-full h-full object-cover transform transition-transform duration-300 group-hover:scale-110"
+                />
+                {image.caption && (
+                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 transform translate-y-full transition-transform duration-300 group-hover:translate-y-0">
+                    <p className="text-sm">{image.caption}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const ImageModal = ({ image, onClose }) => {
+    if (!image) return null;
+
+    return (
+      <div 
+        className="fixed inset-0 bg-black bg-opacity-90 flex justify-center items-center z-50 p-4"
+        onClick={onClose}
+      >
+        <div className="relative max-w-4xl w-full" onClick={e => e.stopPropagation()}>
+          <img
+            src={process.env.REACT_APP_API_URL.replace('/api', '') + image.imageUrl}
+            alt={image.caption || 'Salon image'}
+            className="w-full h-auto rounded-lg"
+          />
+          {image.caption && (
+            <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4 rounded-b-lg">
+              <p className="text-center">{image.caption}</p>
+            </div>
+          )}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   if (loading) {
     return (
@@ -59,6 +125,9 @@ const PublicSalonPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Image Gallery */}
+      <ImageGallery />
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-12">
@@ -165,6 +234,12 @@ const PublicSalonPage = () => {
           </div>
         </section>
       </div>
+
+      {/* Add Modal at the end of the component */}
+      <ImageModal 
+        image={selectedImage}
+        onClose={() => setSelectedImage(null)}
+      />
     </div>
   );
 };

@@ -1,5 +1,5 @@
 const { validateCreateBooking } = require('../validators/bookingValidator');
-const { Salon, Service, Staff, Category, Booking, Client } = require('../config/db');
+const { Salon, Service, Staff, Category, Booking, Client, SalonImage } = require('../config/db');
 const { Op } = require('sequelize');
 const BOOKING_STATUSES = require('../config/bookingStatuses');
 const sequelize = require('../config/db').sequelize;
@@ -7,7 +7,13 @@ const sequelize = require('../config/db').sequelize;
 exports.getSalonPublicProfile = async (req, res) => {
   try {
     const salon = await Salon.findByPk(req.params.salonId, {
-      attributes: ['id', 'name', 'address', 'contactNumber', 'description']
+      attributes: ['id', 'name', 'address', 'contactNumber', 'description'],
+      include: [{
+        model: SalonImage,
+        as: 'images',
+        attributes: ['id', 'imageUrl', 'caption', 'displayOrder'],
+        order: [['displayOrder', 'ASC']]
+      }]
     });
     
     if (!salon) {
