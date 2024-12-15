@@ -76,6 +76,136 @@ const PublicSalonPage = () => {
     );
   };
 
+  const ImageCarousel = () => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+
+    if (!salon?.images || salon.images.length === 0) {
+      return (
+        <div className="bg-primary-900 h-96 flex items-center justify-center">
+          <div className="text-center text-white">
+            <h1 className="text-5xl font-bold mb-4">{salon?.name}</h1>
+            <p className="text-xl">{t('salon:public_page.hero.tagline')}</p>
+          </div>
+        </div>
+      );
+    }
+
+    const nextSlide = () => {
+      if (isTransitioning) return;
+      setIsTransitioning(true);
+      setCurrentIndex((prevIndex) => 
+        prevIndex === salon.images.length - 1 ? 0 : prevIndex + 1
+      );
+      setTimeout(() => setIsTransitioning(false), 300);
+    };
+
+    const prevSlide = () => {
+      if (isTransitioning) return;
+      setIsTransitioning(true);
+      setCurrentIndex((prevIndex) => 
+        prevIndex === 0 ? salon.images.length - 1 : prevIndex - 1
+      );
+      setTimeout(() => setIsTransitioning(false), 300);
+    };
+
+    return (
+      <div className="relative h-96 overflow-hidden bg-primary-900">
+        {/* Image Container */}
+        <div 
+          className="flex transition-transform duration-300 ease-in-out h-full"
+          style={{ 
+            transform: `translateX(-${currentIndex * 100}%)`,
+            width: `${salon.images.length * 100}%`
+          }}
+        >
+          {salon.images.map((image, index) => (
+            <div 
+              key={image.id}
+              className="relative w-full h-full flex-shrink-0"
+              onClick={() => setSelectedImage(image)}
+            >
+              <img
+                src={process.env.REACT_APP_API_URL.replace('/api', '') + image.imageUrl}
+                alt={image.caption || `Salon image ${index + 1}`}
+                className="w-full h-full object-cover cursor-pointer"
+                style={{ imageRendering: 'crisp-edges' }}
+              />
+              {/* Dark Overlay */}
+              <div className="absolute inset-0 bg-black bg-opacity-30" />
+              {/* Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-primary-900 via-transparent to-transparent" />
+            </div>
+          ))}
+        </div>
+
+        {/* Content Overlay */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center text-white z-10 px-4">
+            <h1 className="text-5xl font-bold mb-4 drop-shadow-lg">{salon?.name}</h1>
+            <p className="text-xl mb-6 drop-shadow-md">{t('salon:public_page.hero.tagline')}</p>
+            <div className="flex flex-wrap items-center justify-center gap-6 text-lg">
+              <div className="flex items-center">
+                <FaMapMarkerAlt className="w-5 h-5 mr-2" />
+                <span className="drop-shadow-md">{salon?.address}</span>
+              </div>
+              <div className="flex items-center">
+                <FaPhone className="w-5 h-5 mr-2" />
+                <span className="drop-shadow-md">{salon?.contactNumber}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation Buttons */}
+        {salon.images.length > 1 && (
+          <>
+            <button
+              onClick={prevSlide}
+              disabled={isTransitioning}
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-20"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={nextSlide}
+              disabled={isTransitioning}
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-20"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </>
+        )}
+
+        {/* Dots Indicator */}
+        {salon.images.length > 1 && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
+            {salon.images.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  if (!isTransitioning) {
+                    setIsTransitioning(true);
+                    setCurrentIndex(index);
+                    setTimeout(() => setIsTransitioning(false), 300);
+                  }
+                }}
+                disabled={isTransitioning}
+                className={`w-2 h-2 rounded-full transition-all duration-300 disabled:cursor-not-allowed ${
+                  index === currentIndex ? 'bg-white w-4' : 'bg-white/50'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -108,23 +238,8 @@ const PublicSalonPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="bg-primary-900 text-white">
-        <div className="container mx-auto px-4 py-16">
-          <h1 className="text-5xl font-bold mb-4">{salon?.name}</h1>
-          <p className="text-xl mb-6">{t('salon:public_page.hero.tagline')}</p>
-          <div className="flex items-center space-x-6 text-lg">
-            <div className="flex items-center">
-              <FaMapMarkerAlt className="w-5 h-5 mr-2" />
-              <span>{salon?.address}</span>
-            </div>
-            <div className="flex items-center">
-              <FaPhone className="w-5 h-5 mr-2" />
-              <span>{salon?.contactNumber}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Hero Carousel */}
+      <ImageCarousel />
 
       {/* Image Gallery */}
       <ImageGallery />
