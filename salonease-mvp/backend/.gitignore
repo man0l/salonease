@@ -12,3 +12,4 @@ npm-debug.log*
 # Miscellaneous
 .DS_Store
 Thumbs.db
+uploads/
