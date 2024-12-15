@@ -253,7 +253,7 @@ const StaffManagement = () => {
         ) : error ? (
           <div className="text-red-400 text-center py-4">{error}</div>
         ) : staff.length === 0 ? (
-          <p className="text-gray-400">{t('message.no_staff')}</p>
+          <p className="text-gray-400">{t('error.no_staff')}</p>
         ) : (
           <ul className="space-y-4">
             {staff.map((member) => (
