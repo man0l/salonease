@@ -7,6 +7,8 @@ const moment = require('moment');
 const ROLES = require('../config/roles');
 const SubscriptionService = require('../services/subscriptionService');
 const subscriptionService = new SubscriptionService();
+const twilioService = require('../services/twilioService');
+const scheduleJob = require('node-schedule').scheduleJob;
 
 exports.getBookings = async (req, res) => {
   try {
@@ -80,11 +82,11 @@ exports.createBooking = async (req, res) => {
 
     const { staffId, appointmentDateTime, serviceId, clientName, clientEmail, clientPhone } = value;
     const { salonId } = req.params;
-
+    let client;
     // If clientName and clientPhone are provided, create a new client first
     let clientId = value.clientId;
     if (!clientId && clientName && clientPhone) {
-      const [client] = await Client.findOrCreate({
+      [client] = await Client.findOrCreate({
         where: { 
           phone: clientPhone,
           salonId 
@@ -105,21 +107,26 @@ exports.createBooking = async (req, res) => {
       salonId
     };
 
-    // Check if staff belongs to salon
-    const staff = await Staff.findOne({ 
-      where: { id: staffId, salonId }
-    });
-    if (!staff) {
-      return res.status(404).json({ message: 'Staff not found in this salon' });
+    if (!client) {
+      // retrieve client
+      client = await Client.findOne({
+        where: { id: clientId, salonId }
+      });
     }
 
-    // Get service duration
-    const service = await Service.findOne({ 
-      where: { id: serviceId, salonId }
-    });
-    if (!service) {
-      return res.status(404).json({ message: 'Service not found in this salon' });
+    // Validate staff and service
+    const [staff, service, salon] = await Promise.all([
+      Staff.findOne({ where: { id: staffId, salonId } }),
+      Service.findOne({ where: { id: serviceId, salonId } }),
+      Salon.findByPk(salonId)
+    ]);
+
+    if (!staff || !service || !salon) {
+      return res.status(404).json({ 
+        message: 'Staff, service, or salon not found' 
+      });
     }
+
 
     // Calculate appointment end time
     const appointmentDate = new Date(appointmentDateTime);
@@ -131,18 +138,8 @@ exports.createBooking = async (req, res) => {
         staffId,
         status: [BOOKING_STATUSES.PENDING, BOOKING_STATUSES.CONFIRMED],
         [Op.or]: [
-          {
-            appointmentDateTime: {
-              [Op.gte]: appointmentDateTime,
-              [Op.lt]: endTime
-            }
-          },
-          {
-            endTime: {
-              [Op.gt]: appointmentDateTime,
-              [Op.lte]: endTime
-            }
-          }
+          { appointmentDateTime: { [Op.lt]: endTime, [Op.gte]: appointmentDateTime } },
+          { endTime: { [Op.gt]: appointmentDateTime, [Op.lte]: endTime } }
         ]
       }
     });
@@ -156,6 +153,42 @@ exports.createBooking = async (req, res) => {
       endTime,
       status: BOOKING_STATUSES.PENDING
     });
+
+    // Send booking confirmation
+    try {
+      await twilioService.sendBookingConfirmation(client.phone, {
+        salonName: salon.name,
+        appointmentDateTime: appointmentDateTime,
+        serviceName: service.name
+      });
+
+      // Schedule reminders
+      const reminders = await twilioService.scheduleBookingReminders(
+        result,
+        client,
+        staff,
+        salon,
+        service
+      );
+
+      // Schedule the reminders using node-schedule
+      scheduleJob(reminders.clientReminder.date, async () => {
+        await twilioService.sendUpcomingBookingReminder(
+          reminders.clientReminder.phone,
+          reminders.clientReminder.details
+        );
+      });
+
+      scheduleJob(reminders.staffReminder.date, async () => {
+        await twilioService.sendStaffBookingReminder(
+          reminders.staffReminder.phone,
+          reminders.staffReminder.details
+        );
+      });
+    } catch (notificationError) {
+      console.error('Error sending notifications:', notificationError);
+      // Continue even if notifications fail
+    }
 
     // Add subscription charge for the booking
     try {

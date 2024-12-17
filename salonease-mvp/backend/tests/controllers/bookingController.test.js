@@ -322,6 +322,31 @@ describe('Booking Controller', () => {
       expect(mockSubscriptionInstance.getSubscriptionStatus).toHaveBeenCalledWith(owner.id);
       expect(mockSubscriptionInstance.addBookingCharge).toHaveBeenCalledWith(owner.id);
     });
+
+    it('should send notifications when booking is created', async () => {
+      const appointmentDateTime = new Date();
+      appointmentDateTime.setDate(appointmentDateTime.getDate() + 1);
+      appointmentDateTime.setHours(10, 0, 0, 0);
+
+      mockReq.body = {
+        clientId: client.id,
+        staffId: staff.id,
+        serviceId: service.id,
+        appointmentDateTime: appointmentDateTime.toISOString(),
+        status: BOOKING_STATUSES.PENDING
+      };
+      mockReq.params = { salonId: salon.id };
+
+      const twilioService = require('../../src/services/twilioService');
+      jest.spyOn(twilioService, 'sendBookingConfirmation');
+      jest.spyOn(twilioService, 'scheduleBookingReminders');
+
+      await bookingController.createBooking(mockReq, mockRes);
+
+      expect(twilioService.sendBookingConfirmation).toHaveBeenCalled();
+      expect(twilioService.scheduleBookingReminders).toHaveBeenCalled();
+      expect(mockRes.status).toHaveBeenCalledWith(201);
+    });
   });
 
   describe('updateBooking', () => {
