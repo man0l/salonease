@@ -10,8 +10,7 @@ class TwilioService {
         from: process.env.TWILIO_PHONE_NUMBER
       });
       return response;
-    } catch (error) {
-      console.error('Twilio SMS Error:', error);
+    } catch (error) {      
       throw error;
     }
   }
