@@ -75,7 +75,7 @@ const ServiceCategories = ({ services, salonId, staff = [] }) => {
               setSelectedService(service);
               setIsBookingModalOpen(true);
             }}
-            className="mt-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors duration-200"
+            className="mt-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-md transition-colors duration-200"
           >
             {t('service:action.book')}
           </button>
@@ -93,18 +93,18 @@ const ServiceCategories = ({ services, salonId, staff = [] }) => {
       <div className={`${isRoot ? 'mb-8' : 'ml-4 mb-4'}`}>
         <button
           onClick={() => toggleCategory(category.id)}
-          className="flex items-center w-full text-left py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors duration-200"
+          className="flex items-center w-full text-left py-2 px-4 rounded-lg hover:bg-muted transition-colors duration-200"
         >
           {hasSubcategories || hasServices ? (
             isExpanded ? (
-              <FaChevronDown className="w-4 h-4 text-gray-400 mr-2" />
+              <FaChevronDown className="w-4 h-4 text-muted-foreground mr-2" />
             ) : (
-              <FaChevronRight className="w-4 h-4 text-gray-400 mr-2" />
+              <FaChevronRight className="w-4 h-4 text-muted-foreground mr-2" />
             )
           ) : (
             <span className="w-4 mr-2" />
           )}
-          <span className={`font-semibold ${isRoot ? 'text-xl text-primary-300' : 'text-lg text-gray-300'}`}>
+          <span className={`font-semibold ${isRoot ? 'text-xl text-primary-400' : 'text-lg text-foreground'}`}>
             {category.name}
           </span>
         </button>
@@ -125,7 +125,7 @@ const ServiceCategories = ({ services, salonId, staff = [] }) => {
   };
 
   return (
-    <div className="space-y-6 bg-gray-900 rounded-lg p-6 border border-gray-700">
+    <div className="space-y-6 bg-card rounded-lg p-6 border border-accent/10">
       <CategoryNav 
         categories={rootCategories}
         onCategorySelect={setSelectedRootCategory}

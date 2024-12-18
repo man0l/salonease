@@ -86,7 +86,7 @@ const CategoryNav = ({ categories, onCategorySelect }) => {
             className={`${
               selectedCategory === category.id 
                 ? 'bg-primary-600 text-white hover:bg-primary-700' 
-                : 'text-foreground bg-muted hover:bg-muted/80'
+                : 'bg-muted text-foreground hover:bg-muted/80'
             } rounded-lg py-3 px-6 transition duration-200 opacity-80 hover:opacity-100 text-sm whitespace-nowrap`}
             onClick={() => handleCategorySelect(category.id)}
             onTouchStart={handleTouchStart}
@@ -102,18 +102,18 @@ const CategoryNav = ({ categories, onCategorySelect }) => {
         <div className="flex items-center ml-auto">
           <button
             onClick={() => scroll('prev')}
-            className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition duration-200 ml-2"
+            className="p-2 rounded-full bg-muted hover:bg-muted/80 transition duration-200 ml-2"
             aria-label="Previous categories"
           >
-            <FaChevronLeft className="w-4 h-4 text-gray-600" />
+            <FaChevronLeft className="w-4 h-4 text-foreground" />
           </button>
 
           <button
             onClick={() => scroll('next')}
-            className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition duration-200 ml-2"
+            className="p-2 rounded-full bg-muted hover:bg-muted/80 transition duration-200 ml-2"
             aria-label="Next categories"
           >
-            <FaChevronRight className="w-4 h-4 text-gray-600" />
+            <FaChevronRight className="w-4 h-4 text-foreground" />
           </button>
         </div>
       )}
