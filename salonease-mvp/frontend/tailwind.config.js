@@ -9,48 +9,36 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          50: '#F5F3F7',
-          100: '#E8E2ED',
-          200: '#D1C5DB',
-          300: '#B9A8C9',
-          400: '#8B6BA5',
-          500: '#341146',
-          600: '#2D0F3E',
-          700: '#260C35',
-          800: '#1E092B',
-          900: '#170722',
+          50: '#fdf4ff',
+          100: '#fae8ff',
+          200: '#f5d0fe',
+          300: '#e879f9',
+          400: '#d946ef',
+          500: '#c026d3',
+          600: '#a21caf',
+          700: '#86198f',
+          800: '#701a75',
+          900: '#4a044e',
         },
-        secondary: {
-          50: '#F7F5F9',
-          100: '#EFEAF2',
-          200: '#DFD5E6',
-          300: '#CFB8D9',
-          400: '#8E71A3',
-          500: '#6D4F86',
-          600: '#5D4372',
-          700: '#4E385F',
-          800: '#3E2C4C',
-          900: '#2F2139',
+        background: 'white',
+        foreground: '#1e1b4b',
+        card: {
+          DEFAULT: 'white',
+          foreground: '#1e1b4b'
+        },
+        muted: {
+          DEFAULT: '#f8fafc',
+          foreground: '#64748b'
         },
         accent: {
-          50: '#FEF2F7',
-          100: '#FDE6F0',
-          200: '#FBCCE1',
-          300: '#F8B3D2',
-          400: '#F386BC',
-          500: '#ED5DA7',
-          600: '#EA086A',
-          700: '#D1075F',
-          800: '#B8064F',
-          900: '#9F0540',
-        },
-        background: '#F9FAFB',
-        text: '#1F2937',
-        gray: {
-          800: '#1f2937',
-          900: '#111827',
-          950: '#030712',
-        },
+          DEFAULT: '#fdf4ff',
+          foreground: '#c026d3'
+        }
+      },
+      backgroundImage: {
+        'gradient-primary': 'linear-gradient(135deg, #fae8ff 0%, #f5d0fe 100%)',
+        'gradient-accent': 'linear-gradient(135deg, #e879f9 0%, #c026d3 100%)',
+        'gradient-light': 'linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%)'
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
