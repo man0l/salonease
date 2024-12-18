@@ -8,8 +8,8 @@ const RevenueChart = ({ data, loading }) => {
 
   if (loading) {
     return (
-      <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 h-80 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-400"></div>
+      <div className="bg-card p-6 rounded-lg border border-accent/10 h-80 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500"></div>
       </div>
     );
   }
@@ -43,34 +43,63 @@ const RevenueChart = ({ data, loading }) => {
     };
   });
 
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-background border border-accent/20 rounded-lg shadow-lg p-4">
+          <p className="text-sm text-muted-foreground mb-1">{label}</p>
+          <p className="text-base font-medium text-foreground">
+            {formatCurrency(payload[0].value)}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
-    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-      <h2 className="text-xl font-semibold mb-4 text-white">{t('reports:revenue.title')}</h2>
+    <div className="bg-card p-6 rounded-lg border border-accent/10">
+      <h2 className="text-xl font-semibold mb-4 text-foreground">{t('reports:revenue.title')}</h2>
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={formattedData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey="date" stroke="#9CA3AF" />
-            <YAxis tickFormatter={(value) => formatCurrency(value)} stroke="#9CA3AF" />
+          <LineChart 
+            data={formattedData}
+            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+          >
+            <CartesianGrid 
+              strokeDasharray="3 3" 
+              stroke="var(--accent-background)"
+              opacity={0.2}
+            />
+            <XAxis 
+              dataKey="date" 
+              stroke="var(--muted-foreground)"
+              fontSize={12}
+              tickMargin={10}
+            />
+            <YAxis 
+              tickFormatter={(value) => formatCurrency(value)} 
+              stroke="var(--muted-foreground)"
+              fontSize={12}
+              tickMargin={10}
+            />
             <Tooltip 
-              contentStyle={{ 
-                backgroundColor: '#1F2937', 
-                border: '2px solid #341146',
-                borderRadius: '6px',
-                padding: '8px',
-                color: '#fff',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.2)'
-              }}
-              itemStyle={{ color: '#fff' }}
-              labelStyle={{ color: '#9CA3AF', marginBottom: '4px' }}
+              content={<CustomTooltip />}
+              cursor={{ stroke: 'var(--primary-200)', strokeWidth: 1 }}
             />
             <Line 
               type="monotone" 
               dataKey="revenue" 
               name={t('reports:revenue.tooltip')}
-              stroke="#341146" 
-              strokeWidth={2}
-              dot={{ fill: '#341146' }}
+              stroke="var(--primary-500)"
+              strokeWidth={2.5}
+              dot={false}
+              activeDot={{ 
+                r: 6, 
+                fill: 'var(--primary-500)',
+                stroke: 'var(--background)',
+                strokeWidth: 2
+              }}
             />
           </LineChart>
         </ResponsiveContainer>

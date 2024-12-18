@@ -60,15 +60,15 @@ const FinancialReports = () => {
   };
 
   return (
-    <div className="space-y-6 bg-gray-900 p-6 rounded-lg">
+    <div className="space-y-6 bg-background p-6 rounded-lg">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-white">
+        <h1 className="text-2xl font-bold text-foreground">
           {t('reports:title')}
         </h1>
         <div className="flex space-x-4">
           <button
             onClick={() => handleExport('csv')}
-            className="flex items-center px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition duration-200"
+            className="flex items-center px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition-colors duration-200"
           >
             <FaFileDownload className="mr-2" /> {t('reports:export.csv')}
           </button>
@@ -76,7 +76,7 @@ const FinancialReports = () => {
       </div>
 
       {error && (
-        <div className="text-accent-500 bg-gray-800 p-4 rounded-lg">
+        <div className="text-primary-600 bg-primary-100 p-4 rounded-lg border border-primary-200">
           {t('reports:error.loading', { message: error })}
         </div>
       )}
