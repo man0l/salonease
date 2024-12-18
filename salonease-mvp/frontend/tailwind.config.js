@@ -9,36 +9,36 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          50: '#fdf4ff',
-          100: '#fae8ff',
-          200: '#f5d0fe',
-          300: '#e879f9',
-          400: '#d946ef',
-          500: '#c026d3',
-          600: '#a21caf',
-          700: '#86198f',
-          800: '#701a75',
-          900: '#4a044e',
+          50: 'var(--primary-50)',
+          100: 'var(--primary-100)',
+          200: 'var(--primary-200)',
+          300: 'var(--primary-300)',
+          400: 'var(--primary-400)',
+          500: 'var(--primary-500)',
+          600: 'var(--primary-600)',
+          700: 'var(--primary-700)',
+          800: 'var(--primary-800)',
+          900: 'var(--primary-900)',
         },
-        background: 'white',
-        foreground: '#1e1b4b',
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
         card: {
-          DEFAULT: 'white',
-          foreground: '#1e1b4b'
+          DEFAULT: 'var(--card-background)',
+          foreground: 'var(--card-foreground)'
         },
         muted: {
-          DEFAULT: '#f8fafc',
-          foreground: '#64748b'
+          DEFAULT: 'var(--muted-background)',
+          foreground: 'var(--muted-foreground)'
         },
         accent: {
-          DEFAULT: '#fdf4ff',
-          foreground: '#c026d3'
+          DEFAULT: 'var(--accent-background)',
+          foreground: 'var(--accent-foreground)'
         }
       },
       backgroundImage: {
-        'gradient-primary': 'linear-gradient(135deg, #fae8ff 0%, #f5d0fe 100%)',
-        'gradient-accent': 'linear-gradient(135deg, #e879f9 0%, #c026d3 100%)',
-        'gradient-light': 'linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%)'
+        'gradient-primary': 'var(--gradient-primary)',
+        'gradient-accent': 'var(--gradient-accent)',
+        'gradient-light': 'var(--gradient-light)'
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

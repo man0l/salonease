@@ -164,15 +164,20 @@ const ChatBooking = ({ isOpen, onClose, salonId, services, selectedService, staf
   const settings = {
     general: {
       embedded: false,
-      primaryColor: '#42b0c5',
-      fontFamily: 'Arial, sans-serif'
+      primaryColor: 'var(--primary-500)',
+      backgroundColor: 'var(--background)',
+      textColor: 'var(--foreground)',
+      fontFamily: 'Inter, sans-serif'
     },
     chatWindow: {
       defaultOpen: true,
       autoJumpToBottom: true,
+      backgroundColor: 'var(--card-background)',
       tooltip: {
         mode: "CLOSE",
-        text: "Book your appointment! 💇‍♀️"
+        text: "Book your appointment! 💇‍♀️",
+        backgroundColor: 'var(--accent-background)',
+        textColor: 'var(--accent-foreground)'
       }
     },
     chatHistory: {
@@ -180,7 +185,10 @@ const ChatBooking = ({ isOpen, onClose, salonId, services, selectedService, staf
     },
     chatInput: {
       disabled: false,
-      blockSpam: true
+      blockSpam: true,
+      backgroundColor: 'var(--muted-background)',
+      textColor: 'var(--foreground)',
+      placeholderColor: 'var(--muted-foreground)'
     }
   };
 

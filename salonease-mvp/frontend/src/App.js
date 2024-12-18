@@ -55,19 +55,28 @@ const PrivateRoute = ({ children, allowedRoles }) => {
   return children;
 };
 
+const setTheme = (theme) => {
+  document.documentElement.setAttribute('data-theme', theme);  
+};
+
 function AppContent() {
   const { user } = useAuth();
+  
+  React.useEffect(() => {
+    const savedTheme = 'light';
+    setTheme(savedTheme);
+  }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-950">
+    <div className="flex flex-col min-h-screen bg-background text-foreground">
       <Header />
       <div className="flex-grow flex">
         {user && (
           <PrivateRoute allowedRoles={[ROLES.SALON_OWNER, ROLES.STAFF, ROLES.SUPER_ADMIN]}>
-            <Sidebar className="w-64 flex-shrink-0 bg-gray-900 border-r border-gray-800" />
+            <Sidebar className="w-64 flex-shrink-0 bg-card border-r border-muted" />
           </PrivateRoute>
         )}
-        <main className="flex-grow bg-gray-950 text-gray-100 overflow-x-hidden overflow-y-auto">
+        <main className="flex-grow overflow-x-hidden overflow-y-auto">
           <div className="container mx-auto px-6 py-8">
             <ToastContainer theme="dark" />
             <Routes>
@@ -226,7 +235,7 @@ function AppContent() {
           </div>
         </main>
       </div>
-      <Footer className="bg-gray-900 border-t border-gray-800" />
+      <Footer className="bg-card border-t border-muted" />
     </div>
   );
 }

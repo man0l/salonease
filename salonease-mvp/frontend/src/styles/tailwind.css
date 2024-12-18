@@ -1,3 +1,58 @@
 @tailwind base;
+
+@layer base {
+  :root[data-theme="light"] {
+    --primary-50: #fdf4ff;
+    --primary-100: #fae8ff;
+    --primary-200: #f5d0fe;
+    --primary-300: #e879f9;
+    --primary-400: #d946ef;
+    --primary-500: #c026d3;
+    --primary-600: #a21caf;
+    --primary-700: #86198f;
+    --primary-800: #701a75;
+    --primary-900: #4a044e;
+    
+    --background: #ffffff;
+    --foreground: #1e1b4b;
+    --card-background: #ffffff;
+    --card-foreground: #1e1b4b;
+    --muted-background: #f8fafc;
+    --muted-foreground: #64748b;
+    --accent-background: #fdf4ff;
+    --accent-foreground: #c026d3;
+    
+    --gradient-primary: linear-gradient(135deg, #fae8ff 0%, #f5d0fe 100%);
+    --gradient-accent: linear-gradient(135deg, #e879f9 0%, #c026d3 100%);
+    --gradient-light: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%);
+  }
+
+  :root[data-theme="dark"] {
+    --primary-50: #fdf4ff;
+    --primary-100: #fae8ff;
+    --primary-200: #f5d0fe;
+    --primary-300: #e879f9;
+    --primary-400: #d946ef;
+    --primary-500: #c026d3;
+    --primary-600: #a21caf;
+    --primary-700: #86198f;
+    --primary-800: #701a75;
+    --primary-900: #4a044e;
+    
+    --background: #030712;
+    --foreground: #f8fafc;
+    --card-background: #111827;
+    --card-foreground: #f8fafc;
+    --muted-background: #1f2937;
+    --muted-foreground: #94a3b8;
+    --accent-background: #4a044e;
+    --accent-foreground: #e879f9;
+    
+    --gradient-primary: linear-gradient(135deg, #701a75 0%, #86198f 100%);
+    --gradient-accent: linear-gradient(135deg, #a21caf 0%, #c026d3 100%);
+    --gradient-light: linear-gradient(135deg, #4a044e 0%, #701a75 100%);
+  }
+}
+
 @tailwind components;
 @tailwind utilities;
