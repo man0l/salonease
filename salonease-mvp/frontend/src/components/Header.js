@@ -121,7 +121,7 @@ function Header() {
         <div className="flex justify-between items-center py-4">
           <div className="flex-shrink-0 hidden sm:block">
             <Link to="/" className="text-2xl font-bold text-primary-400">
-              {t('common:header.brand')}
+             🌱 {t('common:header.brand')}
             </Link>
           </div>
           {user && user.role === 'SalonOwner' && (
