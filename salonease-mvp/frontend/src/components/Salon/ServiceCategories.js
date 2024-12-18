@@ -48,13 +48,13 @@ const ServiceCategories = ({ services, salonId, staff = [] }) => {
   };
 
   const ServiceCard = ({ service }) => (
-    <div className="bg-gray-800 rounded-lg shadow-lg p-4 hover:bg-gray-700 transition-all duration-200 border border-gray-700">
-      <div className="text-xs text-gray-400 mb-2">
+    <div className="bg-card text-card-foreground rounded-lg shadow-card p-4 hover:bg-muted transition-all duration-200 border border-accent/10">
+      <div className="text-xs text-muted-foreground mb-2">
         {service.categoryHierarchy.map((category, index) => (
           <span key={category.id}>
             {category.name}
             {index < service.categoryHierarchy.length - 1 && (
-              <span className="mx-1 text-gray-500">›</span>
+              <span className="mx-1 text-muted-foreground/60">›</span>
             )}
           </span>
         ))}
@@ -62,14 +62,14 @@ const ServiceCategories = ({ services, salonId, staff = [] }) => {
 
       <div className="flex justify-between items-start">
         <div>
-          <h4 className="font-semibold text-gray-100">{service.name}</h4>
+          <h4 className="font-semibold text-foreground">{service.name}</h4>
           {service.description && (
-            <p className="text-sm text-gray-400 mt-1">{service.description}</p>
+            <p className="text-sm text-muted-foreground mt-1">{service.description}</p>
           )}
         </div>
         <div className="text-right">
-          <p className="font-bold text-primary-300">{formatCurrency(service.price)}</p>
-          <p className="text-sm text-gray-400">{t('service:duration.minutes', { duration: service.duration })}</p>
+          <p className="font-bold text-primary-500">{formatCurrency(service.price)}</p>
+          <p className="text-sm text-muted-foreground">{t('service:duration.minutes', { duration: service.duration })}</p>
           <button
             onClick={() => {
               setSelectedService(service);

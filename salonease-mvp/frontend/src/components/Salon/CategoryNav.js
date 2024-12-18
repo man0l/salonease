@@ -86,7 +86,7 @@ const CategoryNav = ({ categories, onCategorySelect }) => {
             className={`${
               selectedCategory === category.id 
                 ? 'bg-primary-600 text-white hover:bg-primary-700' 
-                : 'text-gray-700 bg-gray-100 hover:bg-gray-200'
+                : 'text-foreground bg-muted hover:bg-muted/80'
             } rounded-lg py-3 px-6 transition duration-200 opacity-80 hover:opacity-100 text-sm whitespace-nowrap`}
             onClick={() => handleCategorySelect(category.id)}
             onTouchStart={handleTouchStart}

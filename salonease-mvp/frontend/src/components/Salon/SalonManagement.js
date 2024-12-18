@@ -194,12 +194,12 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
     if (!isOpen) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-        <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-800">
-          <h3 className="text-lg font-medium mb-4 text-gray-100">
+      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex justify-center items-center z-50">
+        <div className="bg-card text-card-foreground p-6 rounded-lg shadow-card border border-accent/10 max-w-md w-full">
+          <h3 className="text-lg font-medium mb-4">
             {t('action.confirm_deletion')}
           </h3>
-          <p className="mb-4 text-gray-300">
+          <p className="mb-4 text-muted-foreground">
             {t('action.are_you_sure_you_want_to_delete_this_salon')}
           </p>
           <div className="flex justify-end space-x-2">
@@ -208,7 +208,7 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
                 onConfirm();
                 onClose();
               }}
-              className="bg-red-600 hover:bg-red-700 text-gray-100 px-4 py-2 rounded-md transition duration-300"
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition duration-300"
             >
               {t('action.delete')}
             </button>
@@ -230,34 +230,36 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
     return (
       <li 
         key={salon.id} 
-        className="flex justify-between items-center p-4 border border-gray-800 rounded-lg bg-gray-900 hover:bg-gray-800 transition duration-300"
+        className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-3 sm:p-4 border border-accent/10 rounded-lg bg-card hover:bg-muted transition duration-300"
       >
-        <div className="flex justify-between items-start w-full">
+        <div className="flex items-center mb-2 sm:mb-0">
           <div className="flex-grow">
-            <h3 className="text-xl font-semibold text-primary-600">
+            <h3 className="text-xl font-semibold text-foreground">
               {salon.name}
-              {isDeleted && (
+              {salon.deletedAt && (
                 <span className="ml-2 text-sm text-red-500 font-normal">
                   {t('salon:status.deleted')}
                 </span>
               )}
             </h3>
-            <p className="text-gray-600">{salon.address}</p>
-            <p className="text-gray-600">{salon.contactNumber}</p>
-            <p className="text-gray-600 mt-2">{salon.description}</p>
+            <p className="text-sm text-muted-foreground">{salon.address}</p>
+            <p className="text-sm text-muted-foreground">{salon.contactNumber}</p>
+            {salon.description && (
+              <p className="text-sm text-muted-foreground mt-1">{salon.description}</p>
+            )}
             
             {/* Display salon images if available */}
             {salon.images && salon.images.length > 0 && (
-              <div className="mt-4 flex space-x-2 overflow-x-auto">
+              <div className="mt-2 flex space-x-2 overflow-x-auto">
                 {salon.images.map((image, index) => (
                   <div key={image.id} className="relative flex-shrink-0">
                     <img
                       src={process.env.REACT_APP_API_URL.replace('/api', '') + image.imageUrl}
                       alt={image.caption || `Salon image ${index + 1}`}
-                      className="w-20 h-20 object-cover rounded-lg"
+                      className="w-16 h-16 object-cover rounded-lg border border-accent/10"
                     />
                     {image.caption && (
-                      <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 truncate">
+                      <span className="absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-sm text-foreground text-xs p-1 truncate">
                         {image.caption}
                       </span>
                     )}
@@ -266,36 +268,39 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
               </div>
             )}
           </div>
-          
-          <div className="mt-4 flex space-x-2">
-            {!isDeleted && (
-              <>
-                <button 
-                  onClick={() => handleEdit(salon)} 
-                  className="bg-secondary-500 hover:bg-secondary-600 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" 
-                  aria-label={`${t('common:action.edit')} ${salon.name}`}
-                >
-                  <FaEdit className="mr-1" /> {t('common:action.edit')}
-                </button>
-                <button 
-                  onClick={() => handleDelete(salon.id)} 
-                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" 
-                  aria-label={`${t('common:action.delete')} ${salon.name}`}
-                >
-                  <FaTrash className="mr-1" /> {t('common:action.delete')}
-                </button>
-              </>
-            )}
-            {isDeleted && (
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 mt-2 sm:mt-0">
+          {!salon.deletedAt && (
+            <>
               <button 
-                onClick={() => handleRestore(salon.id)} 
-                className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" 
-                aria-label={`${t('common:action.restore')} ${salon.name}`}
+                onClick={() => handleEdit(salon)} 
+                className="w-full sm:w-auto bg-primary-600 hover:bg-primary-700 text-white py-2 sm:py-1 px-3 rounded-md text-xs sm:text-sm transition duration-300 flex items-center justify-center" 
+                aria-label={`${t('common:action.edit')} ${salon.name}`}
               >
-                <FaUndo className="mr-1" /> {t('common:action.restore')}
+                <FaEdit className="mr-2 sm:mr-0" />
+                <span className="sm:hidden">{t('common:action.edit')}</span>
               </button>
-            )}
-          </div>
+              <button 
+                onClick={() => handleDelete(salon.id)} 
+                className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white py-2 sm:py-1 px-3 rounded-md text-xs sm:text-sm transition duration-300 flex items-center justify-center" 
+                aria-label={`${t('common:action.delete')} ${salon.name}`}
+              >
+                <FaTrash className="mr-2 sm:mr-0" />
+                <span className="sm:hidden">{t('common:action.delete')}</span>
+              </button>
+            </>
+          )}
+          {salon.deletedAt && (
+            <button 
+              onClick={() => handleRestore(salon.id)} 
+              className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white py-2 sm:py-1 px-3 rounded-md text-xs sm:text-sm transition duration-300 flex items-center justify-center" 
+              aria-label={`${t('common:action.restore')} ${salon.name}`}
+            >
+              <FaUndo className="mr-2 sm:mr-0" />
+              <span className="sm:hidden">{t('common:action.restore')}</span>
+            </button>
+          )}
         </div>
       </li>
     );
@@ -389,14 +394,14 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-6 text-gray-100">
+      <h1 className="text-2xl font-semibold mb-6 text-foreground">
         {isOnboarding ? t('action.set_up_your_first_salon') : t('action.salon_management')}
       </h1>
       
       {!isOnboarding && (
         <button
           onClick={showForm ? () => setShowForm(false) : handleAddNewSalon}
-          className="mb-6 bg-primary-600 hover:bg-primary-700 text-gray-100 px-4 py-2 rounded-full transition duration-300 flex items-center"
+          className="mb-6 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-full transition duration-300 flex items-center"
         >
           {showForm ? <FaMinus className="mr-2" /> : <FaPlus className="mr-2" />}
           {showForm ? t('action.hide_form') : t('action.add_new_salon')}
@@ -508,84 +513,121 @@ const SalonManagement = ({ isOnboarding = false, onComplete }) => {
         </div>
       )}
 
-      {!isOnboarding && (
-        <div className="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800">
-          <h3 className="text-xl font-semibold mb-4 text-primary-300">
-            {t('label.your_salons')}
-          </h3>
-          <ul className="space-y-4" aria-label={t('salon:title.list_of_salons')}>
-            {salons.map(salon => (
-              <li 
-                key={salon.id} 
-                className="flex justify-between items-center p-4 border border-gray-800 rounded-lg bg-gray-900 hover:bg-gray-800 transition duration-300"
-              >
-                <div className="flex justify-between items-start">
-                  <div className="flex-grow">
-                    <h3 className="text-xl font-semibold text-primary-400">
-                      {salon.name}
-                      {salon.deletedAt && (
-                        <span className="ml-2 text-sm text-red-500 font-normal">
-                          {t('salon:status.deleted')}
-                        </span>
-                      )}
-                    </h3>
-                    <p className="text-gray-600">{salon.address}</p>
-                    <p className="text-gray-600">{salon.contactNumber}</p>
-                    <p className="text-gray-600 mt-2">{salon.description}</p>
-                  </div>
-                </div>
-
-                <div className="mt-4 flex space-x-2">
-                  {!salon.deletedAt && (
-                    <>
-                      <button 
-                        onClick={() => handleEdit(salon)} 
-                        className="bg-primary-600 hover:bg-primary-700 text-gray-100 py-1 px-3 rounded-md text-sm transition duration-300 flex items-center" 
-                      >
-                        <FaEdit className="mr-1" title={t('common:action.edit')} />
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(salon.id)} 
-                        className="bg-red-600 hover:bg-red-700 text-gray-100 py-1 px-3 rounded-md text-sm transition duration-300 flex items-center" 
-                      >
-                        <FaTrash className="mr-1" title={t('common:action.delete')} />
-                      </button>
-                    </>
-                  )}
-                  {salon.deletedAt && (
-                    <button 
-                      onClick={() => handleRestore(salon.id)} 
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-md transition duration-300 flex items-center" 
-                    >
-                      <FaUndo className="mr-1" title={t('common:action.restore')} />
-                    </button>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-
-          <div className="mt-6 flex justify-between items-center">
-            <button 
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
-              disabled={currentPage === 1}
-              className="bg-primary-600 hover:bg-primary-700 text-gray-100 px-4 py-2 rounded-md transition duration-300 disabled:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
-            >
-              {t('common:action.previous')}
-            </button>
-            <span className="text-gray-400">
-              {t('common:action.page')} {currentPage} {t('common:action.of')} {totalPages}
-            </span>
-            <button 
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
-              disabled={currentPage === totalPages}
-              className="bg-primary-600 hover:bg-primary-700 text-gray-100 px-4 py-2 rounded-md transition duration-300 disabled:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
-            >
-              {t('common:action.next')}
-            </button>
-          </div>
+      {loading ? (
+        <div className="flex justify-center py-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500"></div>
         </div>
+      ) : error ? (
+        <div className="text-red-500 text-center py-4 text-sm sm:text-base">{error}</div>
+      ) : salons.length === 0 ? (
+        <p className="text-muted-foreground text-sm sm:text-base">{t('salon:error.no_salons')}</p>
+      ) : (
+        <ul className="space-y-3 sm:space-y-4">
+          {salons.map((salon) => (
+            <li 
+              key={salon.id} 
+              className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-3 sm:p-4 border border-accent/10 rounded-lg bg-background hover:bg-muted-background transition duration-300"
+            >
+              <div className="flex items-center mb-2 sm:mb-0">
+                <div className="flex-grow">
+                  <h3 className="text-xl font-semibold text-foreground">
+                    {salon.name}
+                    {salon.deletedAt && (
+                      <span className="ml-2 text-sm text-red-500 font-normal">
+                        {t('salon:status.deleted')}
+                      </span>
+                    )}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">{salon.address}</p>
+                  <p className="text-sm text-muted-foreground">{salon.contactNumber}</p>
+                  {salon.description && (
+                    <p className="text-sm text-muted-foreground mt-1">{salon.description}</p>
+                  )}
+                  
+                  {salon.images && salon.images.length > 0 && (
+                    <div className="mt-2 flex space-x-2 overflow-x-auto">
+                      {salon.images.map((image, index) => (
+                        <div key={image.id} className="relative flex-shrink-0">
+                          <img
+                            src={process.env.REACT_APP_API_URL.replace('/api', '') + image.imageUrl}
+                            alt={image.caption || `Salon image ${index + 1}`}
+                            className="w-16 h-16 object-cover rounded-lg border border-accent/10"
+                            onClick={() => setSelectedImage({ 
+                              url: process.env.REACT_APP_API_URL.replace('/api', '') + image.imageUrl,
+                              caption: image.caption
+                            })}
+                          />
+                          {image.caption && (
+                            <span className="absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-sm text-foreground text-xs p-1 truncate">
+                              {image.caption}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 mt-2 sm:mt-0">
+                {!salon.deletedAt && (
+                  <>
+                    <button 
+                      onClick={() => handleEdit(salon)} 
+                      className="w-full sm:w-auto bg-primary-600 hover:bg-primary-700 text-white py-2 sm:py-1 px-3 rounded-md text-xs sm:text-sm transition duration-300 flex items-center justify-center" 
+                      aria-label={`${t('common:action.edit')} ${salon.name}`}
+                    >
+                      <FaEdit className="mr-2 sm:mr-0" />
+                      <span className="sm:hidden">{t('common:action.edit')}</span>
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(salon.id)} 
+                      className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white py-2 sm:py-1 px-3 rounded-md text-xs sm:text-sm transition duration-300 flex items-center justify-center" 
+                      aria-label={`${t('common:action.delete')} ${salon.name}`}
+                    >
+                      <FaTrash className="mr-2 sm:mr-0" />
+                      <span className="sm:hidden">{t('common:action.delete')}</span>
+                    </button>
+                  </>
+                )}
+                {salon.deletedAt && (
+                  <button 
+                    onClick={() => handleRestore(salon.id)} 
+                    className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white py-2 sm:py-1 px-3 rounded-md text-xs sm:text-sm transition duration-300 flex items-center justify-center" 
+                    aria-label={`${t('common:action.restore')} ${salon.name}`}
+                  >
+                    <FaUndo className="mr-2 sm:mr-0" />
+                    <span className="sm:hidden">{t('common:action.restore')}</span>
+                  </button>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
+
+      {/* Pagination controls */}
+      <div className="mt-6 flex justify-between items-center">
+        <button 
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+          disabled={currentPage === 1}
+          className="bg-accent-background hover:bg-accent-background/80 text-accent-foreground w-10 h-10 rounded-md transition duration-300 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span className="hidden sm:inline">{t('common:action.previous')}</span>
+          <span className="sm:hidden">&lt;</span>
+        </button>
+        <span className="text-muted-foreground">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button 
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+          disabled={currentPage === totalPages}
+          className="bg-accent-background hover:bg-accent-background/80 text-accent-foreground w-10 h-10 rounded-md transition duration-300 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span className="hidden sm:inline">{t('common:action.next')}</span>
+          <span className="sm:hidden">&gt;</span>
+        </button>
+      </div>
 
       <DeleteConfirmationDialog
         isOpen={isDeleteDialogOpen}
