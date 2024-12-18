@@ -110,6 +110,9 @@ beforeEach(async () => {
   }
 });
 
+// Add after line 7
+process.env.STRIPE_SECRET_KEY = 'sk_test_mock';
+
 module.exports = { 
   sequelize, 
   User, 

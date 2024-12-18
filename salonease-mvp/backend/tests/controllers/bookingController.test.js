@@ -9,10 +9,79 @@ const {
   Category,
   StaffAvailability
 } = require('../setupTests');
-const bookingController = require('../../src/controllers/bookingController')
 const BOOKING_STATUSES = require('../../src/config/bookingStatuses');
 const { Op } = require('sequelize');
 const STAFF_AVAILABILITY_TYPES = require('../../src/config/staffAvailabilityTypes');
+
+// Create mock services before any imports or jest.mock calls
+const mockSubscriptionService = {
+  getSubscriptionStatus: jest.fn().mockResolvedValue({
+    usage: 0,
+    limit: 100,
+    isActive: true
+  }),
+  addBookingCharge: jest.fn().mockResolvedValue(true),
+  startTrialSubscription: jest.fn().mockResolvedValue(true)
+};
+
+const mockTwilioService = {
+  sendBookingConfirmation: jest.fn().mockImplementation((phone, details) => {
+    return Promise.resolve({
+      sid: 'MGXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+      status: 'queued',
+      details: {
+        ...details,
+        appointmentDateTime: details.appointmentDateTime.toISOString()
+      }
+    });
+  }),
+  scheduleBookingReminders: jest.fn().mockImplementation((booking, client, staff, salon, service) => {
+    const appointmentDateTime = new Date(booking.appointmentDateTime);
+    const clientReminderDate = new Date(appointmentDateTime);
+    clientReminderDate.setHours(clientReminderDate.getHours() - 1);
+    const staffReminderDate = new Date(appointmentDateTime);
+    staffReminderDate.setMinutes(staffReminderDate.getMinutes() - 15);
+
+    return Promise.resolve({
+      clientReminder: {
+        date: clientReminderDate,
+        phone: client.phone,
+        details: {
+          salonName: salon.name,
+          appointmentDateTime: booking.appointmentDateTime,
+          serviceName: service.name
+        }
+      },
+      staffReminder: {
+        date: staffReminderDate,
+        phone: staff.phone,
+        details: {
+          salonName: salon.name,
+          appointmentDateTime: booking.appointmentDateTime,
+          serviceName: service.name,
+          clientName: client.name
+        }
+      }
+    });
+  }),
+  sendUpcomingBookingReminder: jest.fn().mockResolvedValue({
+    sid: 'MGXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    status: 'queued'
+  }),
+  sendStaffBookingReminder: jest.fn().mockResolvedValue({
+    sid: 'MGXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    status: 'queued'
+  })
+};
+
+// Mock services
+jest.mock('../../src/services/subscriptionService', () => ({
+  getInstance: jest.fn(() => mockSubscriptionService)
+}));
+
+jest.mock('../../src/services/twilioService', () => ({
+  getInstance: jest.fn(() => mockTwilioService)
+}));
 
 // Mock stripe
 jest.mock('stripe', () => {
@@ -32,19 +101,20 @@ jest.mock('stripe', () => {
   }));
 });
 
-// Add this after the stripe mock
-jest.mock('../../src/services/subscriptionService', () => {
-  const mockInstance = {
-    getSubscriptionStatus: jest.fn().mockResolvedValue({
-      usage: 0,
-      limit: 100,
-      isActive: true
-    }),
-    addBookingCharge: jest.fn().mockResolvedValue(true),
-    startTrialSubscription: jest.fn().mockResolvedValue(true)
-  };
-  return jest.fn(() => mockInstance);
+// Mock twilio
+jest.mock('twilio', () => {
+  return jest.fn(() => ({
+    messages: {
+      create: jest.fn().mockResolvedValue({
+        sid: 'test-sid',
+        status: 'sent'
+      })
+    }
+  }));
 });
+
+// Require the controller after all mocks are set up
+const bookingController = require('../../src/controllers/bookingController');
 
 describe('Booking Controller', () => {
   let salon, staff, service, client, mockReq, mockRes, owner;
@@ -312,15 +382,12 @@ describe('Booking Controller', () => {
           salonId: salon.id,
           clientId: client.id,
           staffId: staff.id,
-          serviceId: service.id
+          status: BOOKING_STATUSES.PENDING
         })
       );
 
-      // Add these expectations to verify subscription service calls
-      const SubscriptionService = require('../../src/services/subscriptionService');
-      const mockSubscriptionInstance = new SubscriptionService();
-      expect(mockSubscriptionInstance.getSubscriptionStatus).toHaveBeenCalledWith(owner.id);
-      expect(mockSubscriptionInstance.addBookingCharge).toHaveBeenCalledWith(owner.id);
+      expect(mockSubscriptionService.getSubscriptionStatus).toHaveBeenCalled();
+      expect(mockSubscriptionService.addBookingCharge).toHaveBeenCalled();
     });
 
     it('should send notifications when booking is created', async () => {
@@ -337,14 +404,51 @@ describe('Booking Controller', () => {
       };
       mockReq.params = { salonId: salon.id };
 
-      const twilioService = require('../../src/services/twilioService');
-      jest.spyOn(twilioService, 'sendBookingConfirmation');
-      jest.spyOn(twilioService, 'scheduleBookingReminders');
+      // Clear previous mock calls
+      mockTwilioService.sendBookingConfirmation.mockClear();
+      mockTwilioService.scheduleBookingReminders.mockClear();
 
       await bookingController.createBooking(mockReq, mockRes);
 
-      expect(twilioService.sendBookingConfirmation).toHaveBeenCalled();
-      expect(twilioService.scheduleBookingReminders).toHaveBeenCalled();
+      expect(mockTwilioService.sendBookingConfirmation).toHaveBeenCalledWith(
+        client.phone,
+        {
+          salonName: salon.name,
+          appointmentDateTime: new Date(appointmentDateTime),
+          serviceName: service.name
+        }
+      );
+
+      expect(mockTwilioService.scheduleBookingReminders).toHaveBeenCalledWith(
+        expect.objectContaining({ 
+          appointmentDateTime: expect.any(Date),
+          clientId: expect.any(String),
+          salonId: expect.any(String),
+          serviceId: expect.any(String),
+          staffId: expect.any(String)
+        }), // booking
+        expect.objectContaining({ 
+          id: expect.any(String),
+          phone: client.phone,
+          name: client.name 
+        }), // client
+        expect.objectContaining({ 
+          id: expect.any(String),
+          fullName: staff.fullName,
+          email: staff.email
+        }), // staff
+        expect.objectContaining({ 
+          id: expect.any(String),
+          name: salon.name,
+          address: salon.address
+        }), // salon
+        expect.objectContaining({ 
+          id: expect.any(String),
+          name: service.name,
+          duration: service.duration
+        }) // service
+      );
+
       expect(mockRes.status).toHaveBeenCalledWith(201);
     });
   });

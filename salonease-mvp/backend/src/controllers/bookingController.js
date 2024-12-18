@@ -6,8 +6,9 @@ const sequelize = require('../config/db').sequelize;
 const moment = require('moment');
 const ROLES = require('../config/roles');
 const SubscriptionService = require('../services/subscriptionService');
-const subscriptionService = new SubscriptionService();
-const twilioService = require('../services/twilioService');
+const subscriptionService = SubscriptionService.getInstance();
+const TwilioService = require('../services/twilioService');
+const twilioService = TwilioService.getInstance();
 const scheduleJob = require('node-schedule').scheduleJob;
 
 exports.getBookings = async (req, res) => {

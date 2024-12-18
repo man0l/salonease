@@ -4,7 +4,8 @@ const httpMocks = require('node-mocks-http');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
-const subscriptionService = require('../../src/services/subscriptionService');
+const SubscriptionService = require('../../src/services/subscriptionService');
+const subscriptionService = SubscriptionService.getInstance();
 
 // Mock the services
 jest.mock('../../src/services/subscriptionService', () => {

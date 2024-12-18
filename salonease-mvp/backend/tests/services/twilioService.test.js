@@ -1,20 +1,23 @@
-const twilioService = require('../../src/services/twilioService');
+const twilio = require('twilio');
+const TwilioService = require('../../src/services/twilioService');
 
-// Mock the entire twilio module
+// Create a mock create function that we can control
+const mockCreate = jest.fn().mockResolvedValue({
+  sid: 'test-sid',
+  status: 'sent'
+});
+
+// Mock the twilio module
 jest.mock('twilio', () => {
-  const mockMessagesCreate = jest.fn().mockResolvedValue({
-    sid: 'test-sid',
-    status: 'sent'
-  });
-
   return jest.fn(() => ({
     messages: {
-      create: mockMessagesCreate
+      create: mockCreate
     }
   }));
 });
 
 describe('TwilioService', () => {
+  let twilioService;
   const mockBookingDetails = {
     salonName: 'Test Salon',
     appointmentDateTime: '2024-03-20T10:00:00Z',
@@ -23,7 +26,6 @@ describe('TwilioService', () => {
   };
 
   beforeAll(() => {
-    // Set up environment variables for tests
     process.env.TWILIO_ACCOUNT_SID = 'test_account_sid';
     process.env.TWILIO_AUTH_TOKEN = 'test_auth_token';
     process.env.TWILIO_PHONE_NUMBER = '+15555555555';
@@ -31,6 +33,7 @@ describe('TwilioService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    twilioService = new TwilioService();
   });
 
   describe('SMS Sending', () => {
@@ -38,8 +41,7 @@ describe('TwilioService', () => {
       const phone = '+1234567890';
       await twilioService.sendBookingConfirmation(phone, mockBookingDetails);
       
-      const twilioClient = require('twilio')();
-      expect(twilioClient.messages.create).toHaveBeenCalledWith({
+      expect(mockCreate).toHaveBeenCalledWith({
         body: expect.stringContaining(mockBookingDetails.salonName),
         to: phone,
         from: process.env.TWILIO_PHONE_NUMBER
@@ -50,8 +52,7 @@ describe('TwilioService', () => {
       const phone = '+1234567890';
       await twilioService.sendUpcomingBookingReminder(phone, mockBookingDetails);
       
-      const twilioClient = require('twilio')();
-      expect(twilioClient.messages.create).toHaveBeenCalledWith({
+      expect(mockCreate).toHaveBeenCalledWith({
         body: expect.stringContaining('1 hour'),
         to: phone,
         from: process.env.TWILIO_PHONE_NUMBER
@@ -62,8 +63,7 @@ describe('TwilioService', () => {
       const phone = '+1234567890';
       await twilioService.sendStaffBookingReminder(phone, mockBookingDetails);
       
-      const twilioClient = require('twilio')();
-      expect(twilioClient.messages.create).toHaveBeenCalledWith({
+      expect(mockCreate).toHaveBeenCalledWith({
         body: expect.stringContaining('15 minutes'),
         to: phone,
         from: process.env.TWILIO_PHONE_NUMBER
@@ -74,11 +74,12 @@ describe('TwilioService', () => {
       const phone = '+1234567890';
       const mockError = new Error('Failed to send SMS');
       
-      const twilioClient = require('twilio')();
-      twilioClient.messages.create.mockRejectedValueOnce(mockError);
+      // Mock the create function to reject for this test
+      mockCreate.mockRejectedValueOnce(mockError);
 
-      await expect(twilioService.sendSMS(phone, 'test message'))
-        .rejects.toThrow('Failed to send SMS');
+      await expect(async () => {
+        await twilioService.sendSMS(phone, 'test message');
+      }).rejects.toThrow('Failed to send SMS');
     });
   });
 
@@ -91,7 +92,7 @@ describe('TwilioService', () => {
       const salon = { name: 'Test Salon' };
       const service = { name: 'Haircut' };
 
-      const reminders = await twilioService.scheduleBookingReminders(
+      const reminders = twilioService.scheduleBookingReminders(
         booking,
         client,
         staff,

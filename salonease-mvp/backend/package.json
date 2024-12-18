@@ -3,17 +3,11 @@
   "version": "1.0.0",
   "description": "Backend for SalonEase MVP",
   "main": "src/server.js",
+  "type": "commonjs",
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "test": "NODE_ENV=test sequelize-cli db:migrate && NODE_ENV=test jest --forceExit --detectOpenHandles"
-  },
-  "jest": {
-    "setupFilesAfterEnv": [
-      "<rootDir>/tests/setupTests.js"
-    ],
-    "globalTeardown": "<rootDir>/tests/globalTeardown.js",
-    "testTimeout": 10000
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -37,6 +31,10 @@
     "twilio": "^5.4.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.26.3",
+    "@babel/preset-env": "^7.26.0",
+    "babel-jest": "^29.7.0",
     "jest": "^27.2.5",
     "nodemon": "^2.0.12",
     "sequelize-cli": "^6.2.0"

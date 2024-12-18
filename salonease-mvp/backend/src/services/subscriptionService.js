@@ -1,6 +1,11 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { User, Salon } = require('../config/db');
 const ROLES = require('../config/roles');
+const SubscriptionService = require('../services/subscriptionService');
+const subscriptionService = SubscriptionService.getInstance();
+const TwilioService = require('../services/twilioService');
+const twilioService = TwilioService.getInstance();
+const scheduleJob = require('node-schedule').scheduleJob;
 
 class SubscriptionService {
   constructor() {
@@ -240,6 +245,13 @@ class SubscriptionService {
     } catch (error) {
       throw new Error('Failed to attach payment method');
     }
+  }
+
+  static getInstance() {
+    if (!SubscriptionService.instance) {
+      SubscriptionService.instance = new SubscriptionService();
+    }
+    return SubscriptionService.instance;
   }
 }
 
