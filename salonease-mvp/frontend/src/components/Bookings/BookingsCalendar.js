@@ -152,134 +152,132 @@ const BookingsCalendar = () => {
     setView(newView);
   };
 
+  // Add a function to determine step size based on screen width
+  const getStepSize = () => {
+    return window.innerWidth < 640 ? 60 : 15;
+  };
+
+  // Add state for step size
+  const [stepSize, setStepSize] = useState(getStepSize());
+
+  // Add effect to update step size on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setStepSize(getStepSize());
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <div className="h-full flex flex-col">
-      <div className="mb-4 flex justify-between items-center">
-        <div>
-          <button
-            className={`px-4 py-2 rounded-l-lg ${
-              view === 'day' 
-                ? 'bg-slate-700 text-white' 
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-            }`}
-            onClick={() => setView('day')}
-          >
-            {t('staff:availability.calendar.dayView')}
-          </button>
-          <button
-            className={`px-4 py-2 rounded-r-lg ${
-              view === 'week' 
-                ? 'bg-slate-700 text-white' 
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-            }`}
-            onClick={() => setView('week')}
-          >
-            {t('staff:availability.calendar.weekView')}
-          </button>
+    <div className="flex flex-col h-full gap-2 p-2 sm:gap-4 sm:p-4">
+      {/* Staff Filter - Made more compact on mobile */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:gap-4 sm:items-center">
+        <div className="flex flex-wrap gap-1 sm:gap-2">
+          {staff.map((member, index) => {
+            const colorStyle = colorStyles[index % colorStyles.length];
+            return (
+              <button
+                key={member.id}
+                onClick={() => handleStaffToggle(member.id)}
+                className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm transition-all ${
+                  selectedStaffIds.includes(member.id)
+                    ? 'bg-primary-600 text-white'
+                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                }`}
+              >
+                {member.fullName}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      <div className="mb-4 flex flex-wrap gap-2">
-        {staff.map((member, index) => {
-          const colorStyle = colorStyles[index % colorStyles.length];
-          return (
-            <button
-              key={member.id}
-              onClick={() => handleStaffToggle(member.id)}
-              style={{
-                backgroundColor: selectedStaffIds.includes(member.id) ? colorStyle.bg : '#1e293b',
-                color: selectedStaffIds.includes(member.id) ? '#ffffff' : '#94a3b8',
-              }}
-              className={`px-3 py-1 rounded-full text-sm hover:opacity-80 transition-all`}
-            >
-              {member.fullName}
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="flex-grow bg-slate-900 rounded-lg shadow-lg p-4 overflow-x-auto border border-slate-700">
-        <Calendar
-          ref={calendarRef}
-          localizer={localizer}
-          events={filteredEvents}
-          startAccessor="start"
-          endAccessor="end"
-          defaultView={Views.WEEK}
-          view={view}
-          onView={handleViewChange}
-          views={[Views.DAY, Views.WEEK]}
-          step={15}
-          timeslots={1}
-          min={moment().set({ hour: 8, minute: 0 }).toDate()}
-          max={moment().set({ hour: 20, minute: 0 }).toDate()}
-          onSelectSlot={handleSelectSlot}
-          onSelectEvent={handleSelectEvent}
-          onRangeChange={handleRangeChange}
-          selectable={true}
-          resources={view === 'day' ? staff : null}
-          resourceIdAccessor="id"
-          resourceTitleAccessor="fullName"
-          eventPropGetter={eventStyleGetter}
-          className="h-full min-w-[800px] text-slate-200 calendar-custom"
-          messages={{
-            next: t('bookings:action.next'),
-            previous: t('bookings:action.prev'),
-            today: t('bookings:action.today'),
-            noEventsInRange: t('common:status.noData')
-          }}
-          formats={{
-            dayFormat: 'ddd D/M',
-            timeGutterFormat: 'HH:mm',
-            eventTimeRangeFormat: ({ start, end, event }) => {
-              if (!start || !end) return '';
-              const timeStr = `${moment(start).format('HH:mm')} - ${moment(end).format('HH:mm')}`;
-              if (view === 'week' && event?.resourceId) {
-                const staffMember = staff.find(s => s.id === event.resourceId);
-                return staffMember ? `${timeStr} - ${staffMember.fullName}` : timeStr;
+      {/* Calendar Container - Adjusted for mobile */}
+      <div className="flex-grow bg-slate-900 rounded-lg shadow-lg border border-slate-800 overflow-hidden">
+        <div className="h-[calc(100vh-12rem)]"> {/* Adjusted height calculation */}
+          <Calendar
+            ref={calendarRef}
+            localizer={localizer}
+            events={filteredEvents}
+            startAccessor="start"
+            endAccessor="end"
+            defaultView={Views.WEEK}
+            view={view}
+            onView={handleViewChange}
+            views={[Views.DAY, Views.WEEK]}
+            step={stepSize}
+            timeslots={1}
+            min={moment().set({ hour: 8, minute: 0 }).toDate()}
+            max={moment().set({ hour: 20, minute: 0 }).toDate()}
+            onSelectSlot={handleSelectSlot}
+            onSelectEvent={handleSelectEvent}
+            onRangeChange={handleRangeChange}
+            selectable={true}
+            resources={view === 'day' ? staff : null}
+            resourceIdAccessor="id"
+            resourceTitleAccessor="fullName"
+            eventPropGetter={eventStyleGetter}
+            className="h-full calendar-custom"
+            messages={{
+              next: "→",
+              previous: "←",
+              today: t('bookings:action.today'),
+              noEventsInRange: t('common:status.noData')
+            }}
+            formats={{
+              dayFormat: (date) => moment(date).format('dd D'), // Shorter day format for mobile
+              timeGutterFormat: (date) => moment(date).format('HH:mm'), // 24h format
+              eventTimeRangeFormat: ({ start, end, event }) => {
+                if (!start || !end) return '';
+                const timeStr = `${moment(start).format('HH:mm')}`;
+                if (view === 'week' && event?.resourceId) {
+                  const staffMember = staff.find(s => s.id === event.resourceId);
+                  return staffMember ? `${timeStr} - ${staffMember.fullName.split(' ')[0]}` : timeStr;
+                }
+                return timeStr;
+              },
+              monthHeaderFormat: (date) => t('common:date.monthYear', { date: moment(date) }),
+              dayRangeHeaderFormat: ({ start, end }) => {
+                moment.locale(i18next.language);
+                
+                const startStr = moment(start).format('MMMM DD');
+                const endStr = moment(end).format('DD');
+                const year = moment(start).format('YYYY');
+                return `${startStr} – ${endStr}, ${year}`;
               }
-              return timeStr;
-            },
-            monthHeaderFormat: (date) => t('common:date.monthYear', { date: moment(date) }),
-            dayRangeHeaderFormat: ({ start, end }) => {
-              moment.locale(i18next.language);
-              
-              const startStr = moment(start).format('MMMM DD');
-              const endStr = moment(end).format('DD');
-              const year = moment(start).format('YYYY');
-              return `${startStr} – ${endStr}, ${year}`;
-            }
-          }}
-          components={{
-            event: (props) => (
-              <div className="text-xs h-full">
-                <div className="p-1 h-full flex flex-col justify-between">
-                  <div>
-                    <div className="font-bold truncate text-white">{props.event.booking.client.name}</div>
-                    <div className="text-xs text-slate-300 truncate">{props.event.booking.service.name}</div>
-                    {view === 'week' && props.event.resourceId && (
-                      <div className="truncate text-xs text-slate-300">
-                        {staff.find(s => s.id === props.event.resourceId)?.fullName}
+            }}
+            components={{
+              event: (props) => (
+                <div className="text-[10px] sm:text-xs h-full">
+                  <div className="p-0.5 sm:p-1 h-full flex flex-col justify-between">
+                    <div>
+                      <div className="font-bold truncate text-white">
+                        {props.event.booking.client.name}
                       </div>
-                    )}
-                  </div>
-                  <div className="text-xs text-slate-300">
-                    {t('bookings:status.' + props.event.status.toLowerCase())}
+                      <div className="truncate text-slate-300">
+                        {props.event.booking.service.name}
+                      </div>
+                      {view === 'week' && props.event.resourceId && (
+                        <div className="truncate text-slate-300 hidden sm:block">
+                          {staff.find(s => s.id === props.event.resourceId)?.fullName}
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-slate-300 hidden sm:block">
+                      {t('bookings:status.' + props.event.status.toLowerCase())}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )
-          }}
-          style={{
-            backgroundColor: 'rgb(17, 24, 39)',
-            '& .rbc-time-column': {
-              borderRight: '1px solid rgb(30, 41, 59)'
-            },
-            '& .rbc-timeslot-group': {
-              borderBottom: '1px solid rgb(30, 41, 59)'
-            }
-          }}
-        />
+              )
+            }}
+            style={{
+              height: '100%',
+              backgroundColor: 'transparent'
+            }}
+          />
+        </div>
       </div>
 
       <RescheduleModal

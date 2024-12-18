@@ -77,7 +77,7 @@ function AppContent() {
           </PrivateRoute>
         )}
         <main className="flex-grow overflow-x-hidden overflow-y-auto">
-          <div className="container mx-auto px-6 py-8">
+          <div className="container mx-auto px-2 sm:px-6 py-8 w-full">
             <ToastContainer theme="dark" />
             <Routes>
               <Route path="/login" element={

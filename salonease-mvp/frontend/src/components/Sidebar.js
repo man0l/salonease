@@ -48,18 +48,18 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="bg-card shadow-md lg:h-full relative z-30 border-r border-muted">
+    <>
       <button 
-        className="lg:hidden p-4 text-muted-foreground hover:text-primary-500 transition-colors" 
+        className="fixed top-4 left-4 z-40 p-2 rounded-lg bg-card shadow-md text-muted-foreground hover:text-primary-500 transition-colors" 
         onClick={() => setIsOpen(!isOpen)}
       >
         <Bars3Icon className="h-6 w-6" />
       </button>
+
       <div 
         className={`
-          transform top-0 left-0 w-64 bg-card fixed h-full overflow-auto ease-in-out transition-all duration-300 z-40
+          fixed top-0 left-0 w-64 bg-card h-screen overflow-auto ease-in-out transition-all duration-300 z-50
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-          lg:relative lg:translate-x-0 lg:flex lg:flex-col
         `}
       >
         <div className="p-6 border-b border-muted">
@@ -89,13 +89,14 @@ const Sidebar = () => {
           ))}
         </nav>
       </div>
+
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-background/50 z-35 lg:hidden"
+          className="fixed inset-0 bg-background/50 z-45"
           onClick={() => setIsOpen(false)}
         ></div>
       )}
-    </div>
+    </>
   );
 };
 

@@ -191,26 +191,28 @@ const BookingsManagement = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="w-full max-w-6xl mx-auto p-4">
       <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
-        <h1 className="text-2xl font-semibold text-gray-100">{t('title.bookings_management')}</h1>
+        <h1 className="text-xl sm:text-2xl font-semibold text-foreground">
+          {t('title.bookings_management')}
+        </h1>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="bg-primary-600 hover:bg-primary-700 text-gray-100 px-3 sm:px-4 py-2 rounded-full transition duration-300 flex items-center whitespace-nowrap"
+          className="bg-primary-600 hover:bg-primary-700 text-white px-3 sm:px-4 py-2 rounded-md transition duration-300 flex items-center whitespace-nowrap"
         >
           <FaPlus className="mr-1 sm:mr-2" />
           <span className="hidden sm:inline">{t('common:action.add_booking')}</span>
-          <span className="sm:hidden">{t('common:action.add')}</span>
+          <span className="sm:hidden">{t('common:action.add_booking')}</span>
         </button>
       </div>
       
       {/* Filters */}
       <div className="mb-4">
         <div className="flex justify-between items-center mb-2">
-          <h2 className="text-lg font-semibold text-gray-100">{t('title.filters')}</h2>
+          <h2 className="text-lg font-semibold text-foreground">{t('title.filters')}</h2>
           <button
             onClick={handleResetFilters}
-            className="flex items-center gap-2 text-gray-400 hover:text-primary-500 transition-colors duration-200"
+            className="flex items-center gap-2 text-muted-foreground hover:text-primary-500 transition-colors duration-200"
             title={t('action.reset_filters')}
           >
             <FaUndo className="w-4 h-4" />
@@ -222,7 +224,7 @@ const BookingsManagement = () => {
         <div className="md:hidden mb-2">
           <button
             onClick={() => setShowMobileFilters(prev => !prev)}
-            className="w-full flex justify-between items-center px-4 py-2 bg-white border border-gray-300 rounded-md"
+            className="w-full flex justify-between items-center px-4 py-2 bg-card border border-accent/10 rounded-md text-foreground"
           >
             <span>{t('action.show_filters')}</span>
             <FaChevronDown className={`transform transition-transform ${showMobileFilters ? 'rotate-180' : ''}`} />
@@ -234,7 +236,7 @@ const BookingsManagement = () => {
           {/* Date Range Group */}
           <div className="space-y-4 sm:space-y-0 sm:flex sm:gap-2 md:block md:space-y-4 col-span-2">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 {t('label.start_date')}
               </label>
               <DatePicker
@@ -245,12 +247,12 @@ const BookingsManagement = () => {
                 endDate={filters.endDate}
                 maxDate={filters.endDate}
                 placeholderText={t('placeholder.select_start_date')}
-                className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-md text-gray-100 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-3 py-2 bg-background border border-accent/10 rounded-md text-foreground focus:ring-primary-500 focus:border-primary-500"
                 dateFormat="MM/dd/yyyy"
               />
             </div>
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 {t('label.end_date')}
               </label>
               <DatePicker
@@ -261,7 +263,7 @@ const BookingsManagement = () => {
                 endDate={filters.endDate}
                 minDate={filters.startDate}
                 placeholderText={t('placeholder.select_end_date')}
-                className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-md text-gray-100 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-3 py-2 bg-background border border-accent/10 rounded-md text-foreground focus:ring-primary-500 focus:border-primary-500"
                 dateFormat="MM/dd/yyyy"
               />
             </div>
@@ -270,13 +272,13 @@ const BookingsManagement = () => {
           {/* Staff and Service Selects */}
           <div className="space-y-4 col-span-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 {t('label.staff_member')}
               </label>
               <select
                 value={filters.staffId}
                 onChange={e => setFilters(prev => ({ ...prev, staffId: e.target.value }))}
-                className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-md text-gray-100 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-3 py-2 bg-background border border-accent/10 rounded-md text-foreground focus:ring-primary-500 focus:border-primary-500"
                 disabled={staffLoading}
               >
                 <option value="">{t('label.all_staff')}</option>
@@ -288,13 +290,13 @@ const BookingsManagement = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 {t('label.service')}
               </label>
               <select
                 value={filters.serviceId}
                 onChange={e => setFilters(prev => ({ ...prev, serviceId: e.target.value }))}
-                className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-md text-gray-100 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-3 py-2 bg-background border border-accent/10 rounded-md text-foreground focus:ring-primary-500 focus:border-primary-500"
                 disabled={servicesLoading}
               >
                 <option value="">{t('label.all_services')}</option>
@@ -313,18 +315,18 @@ const BookingsManagement = () => {
       {loading ? (
         <div className="flex justify-center items-center p-8">
           <div 
-            className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"
+            className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500"
             role="status"
             aria-label={t('loading.bookings')}
           />
         </div>
       ) : (
-        <div className="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800">
+        <div className="bg-card rounded-lg shadow-card p-4 border border-accent/10">
           {Array.isArray(bookings) && bookings.length > 0 ? (
             bookings.map(booking => (
               <div 
                 key={booking.id}
-                className="mb-4 p-4 border border-gray-800 rounded-lg bg-gray-900 hover:bg-gray-800 transition duration-300"
+                className="mb-4 p-4 border border-accent/10 rounded-lg bg-card hover:bg-muted transition duration-300"
               >
                 {/* Main Content */}
                 <div className="flex flex-col lg:flex-row gap-4">
@@ -458,7 +460,7 @@ const BookingsManagement = () => {
               </div>
             ))
           ) : (
-            <div className="text-center py-8 text-gray-400">
+            <div className="text-center py-8 text-muted-foreground">
               {t('error.no_bookings')}
             </div>
           )}
