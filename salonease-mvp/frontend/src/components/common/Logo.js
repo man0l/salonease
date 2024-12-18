@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const Logo = ({ className }) => {
   return (
     <Link to="/" className={`font-bold text-xl ${className}`}>
-      SalonEase
+      🌱 ZenManager
     </Link>
   );
 };

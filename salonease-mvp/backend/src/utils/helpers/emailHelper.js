@@ -37,29 +37,29 @@ exports.sendVerificationEmail = async (email, token) => {
     <html>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
         <h2>Dear User,</h2>
-        <p>Thank you for registering with SalonEase. To complete your registration, please verify your email address by clicking on the following button:</p>
+        <p>Thank you for registering with ZenManager. To complete your registration, please verify your email address by clicking on the following button:</p>
         <p>
           <a href="${verificationLink}" style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>
         </p>
         <p>This verification link will expire in 1 hour.</p>
-        <p>If you did not create an account with SalonEase, please ignore this email.</p>
-        <p>Best regards,<br>The SalonEase Team</p>
+        <p>If you did not create an account with ZenManager, please ignore this email.</p>
+        <p>Best regards,<br>The ZenManager Team</p>
       </body>
     </html>
   `;
 
   const textContent = `Dear User,
 
-Thank you for registering with SalonEase. To complete your registration, please verify your email address by clicking on the following link:
+Thank you for registering with ZenManager. To complete your registration, please verify your email address by clicking on the following link:
 
 ${verificationLink}
 
 This verification link will expire in 1 hour.
 
-If you did not create an account with SalonEase, please ignore this email.
+If you did not create an account with ZenManager, please ignore this email.
 
 Best regards,
-The SalonEase Team`;
+The ZenManager Team`;
 
   await sendEmail(email, subject, htmlContent, textContent);
 };
@@ -72,21 +72,21 @@ exports.sendInvitationEmail = async (email, fullName, salonName, invitationToken
     <html>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
         <h2>Dear ${fullName},</h2>
-        <p>You have been invited to join the staff of <strong>${salonName}</strong> on SalonEase.</p>
+        <p>You have been invited to join the staff of <strong>${salonName}</strong> on ZenManager.</p>
         <p>To accept this invitation, please click on the following button:</p>
         <p>
           <a href="${invitationLink}" style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Accept Invitation</a>
         </p>
         <p>This invitation link will expire in 7 days.</p>
         <p>If you did not expect this invitation, please ignore this email.</p>
-        <p>Best regards,<br>The SalonEase Team</p>
+        <p>Best regards,<br>The ZenManager Team</p>
       </body>
     </html>
   `;
 
   const textContent = `Dear ${fullName},
 
-You have been invited to join the staff of ${salonName} on SalonEase.
+You have been invited to join the staff of ${salonName} on ZenManager.
 
 To accept this invitation, please click on the following link:
 ${invitationLink}
@@ -96,7 +96,7 @@ This invitation link will expire in 7 days.
 If you did not expect this invitation, please ignore this email.
 
 Best regards,
-The SalonEase Team`;
+The ZenManager Team`;
 
   await sendEmail(email, subject, htmlContent, textContent);
 };
@@ -109,9 +109,9 @@ exports.sendWelcomeEmail = async (email, fullName, salonName) => {
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
         <h2>Dear ${fullName},</h2>
         <p>Welcome to the <strong>${salonName}</strong> team! Your account has been successfully created.</p>
-        <p>You can now log in to the SalonEase platform using your email address and the password you set.</p>
+        <p>You can now log in to the ZenManager platform using your email address and the password you set.</p>
         <p>If you have any questions, please don't hesitate to contact your salon manager.</p>
-        <p>Best regards,<br>The SalonEase Team</p>
+        <p>Best regards,<br>The ZenManager Team</p>
       </body>
     </html>
   `;
@@ -120,25 +120,25 @@ exports.sendWelcomeEmail = async (email, fullName, salonName) => {
 
 Welcome to the ${salonName} team! Your account has been successfully created.
 
-You can now log in to the SalonEase platform using your email address and the password you set.
+You can now log in to the ZenManager platform using your email address and the password you set.
 
 If you have any questions, please don't hesitate to contact your salon manager.
 
 Best regards,
-The SalonEase Team`;
+The ZenManager Team`;
 
   await sendEmail(email, subject, htmlContent, textContent);
 };
 
 exports.sendTrialEndingEmail = async (email, daysRemaining) => {
-  const subject = 'Your SalonEase Trial is Ending Soon';
+  const subject = 'Your ZenManager Trial is Ending Soon';
   
   const htmlContent = `
     <html>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
         <h2>Your Trial is Ending Soon</h2>
-        <p>Your SalonEase trial period will end in ${daysRemaining} days.</p>
-        <p>To continue using all features of SalonEase, please update your subscription:</p>
+        <p>Your ZenManager trial period will end in ${daysRemaining} days.</p>
+        <p>To continue using all features of ZenManager, please update your subscription:</p>
         <p>
           <a href="${process.env.FRONTEND_URL}/settings/subscription" 
              style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">
@@ -146,22 +146,22 @@ exports.sendTrialEndingEmail = async (email, daysRemaining) => {
           </a>
         </p>
         <p>If you have any questions about our subscription plans, please don't hesitate to contact our support team.</p>
-        <p>Best regards,<br>The SalonEase Team</p>
+        <p>Best regards,<br>The ZenManager Team</p>
       </body>
     </html>
   `;
 
   const textContent = `Your Trial is Ending Soon
 
-Your SalonEase trial period will end in ${daysRemaining} days.
+Your ZenManager trial period will end in ${daysRemaining} days.
 
-To continue using all features of SalonEase, please update your subscription:
+To continue using all features of ZenManager, please update your subscription:
 ${process.env.FRONTEND_URL}/settings/subscription
 
 If you have any questions about our subscription plans, please don't hesitate to contact our support team.
 
 Best regards,
-The SalonEase Team`;
+The ZenManager Team`;
 
   await sendEmail(email, subject, htmlContent, textContent);
 };
@@ -173,7 +173,7 @@ exports.sendSubscriptionFailedEmail = async (email, reason) => {
     <html>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
         <h2>Subscription Payment Failed</h2>
-        <p>We were unable to process your subscription payment for SalonEase.</p>
+        <p>We were unable to process your subscription payment for ZenManager.</p>
         <p>Reason: ${reason}</p>
         <p>To avoid any interruption in service, please update your payment method:</p>
         <p>
@@ -183,14 +183,14 @@ exports.sendSubscriptionFailedEmail = async (email, reason) => {
           </a>
         </p>
         <p>If you need assistance, please contact our support team.</p>
-        <p>Best regards,<br>The SalonEase Team</p>
+        <p>Best regards,<br>The ZenManager Team</p>
       </body>
     </html>
   `;
 
   const textContent = `Subscription Payment Failed
 
-We were unable to process your subscription payment for SalonEase.
+We were unable to process your subscription payment for ZenManager.
 
 Reason: ${reason}
 
@@ -200,7 +200,7 @@ ${process.env.FRONTEND_URL}/settings/billing
 If you need assistance, please contact our support team.
 
 Best regards,
-The SalonEase Team`;
+The ZenManager Team`;
 
   await sendEmail(email, subject, htmlContent, textContent);
 };
@@ -212,7 +212,7 @@ exports.sendSubscriptionCanceledEmail = async (email) => {
     <html>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
         <h2>Subscription Canceled</h2>
-        <p>Your SalonEase subscription has been canceled.</p>
+        <p>Your ZenManager subscription has been canceled.</p>
         <p>You will continue to have access to your account until the end of your current billing period.</p>
         <p>If you'd like to reactivate your subscription:</p>
         <p>
@@ -222,14 +222,14 @@ exports.sendSubscriptionCanceledEmail = async (email) => {
           </a>
         </p>
         <p>We're sorry to see you go. If you have any feedback about how we can improve our service, please let us know.</p>
-        <p>Best regards,<br>The SalonEase Team</p>
+        <p>Best regards,<br>The ZenManager Team</p>
       </body>
     </html>
   `;
 
   const textContent = `Subscription Canceled
 
-Your SalonEase subscription has been canceled.
+Your ZenManager subscription has been canceled.
 
 You will continue to have access to your account until the end of your current billing period.
 
@@ -239,7 +239,7 @@ ${process.env.FRONTEND_URL}/settings/subscription
 We're sorry to see you go. If you have any feedback about how we can improve our service, please let us know.
 
 Best regards,
-The SalonEase Team`;
+The ZenManager Team`;
 
   await sendEmail(email, subject, htmlContent, textContent);
 };

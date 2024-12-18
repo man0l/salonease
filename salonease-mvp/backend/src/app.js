@@ -42,7 +42,7 @@ app.use('/api/billing', invoiceRoutes);
 
 // Basic route
 app.get('/', (req, res) => {
-  res.send('Welcome to SalonEase API');
+  res.send('Welcome to ZenManager API');
 });
 
 // Error handling middleware

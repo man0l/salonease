@@ -43,14 +43,14 @@
     "minutes": "минути"
   },
   "footer": {
-    "copyright": "© 2024 SalonEase. Всички права запазени.",
+    "copyright": "© 2024 ZenManager. Всички права запазени.",
     "links": {
       "terms": "Общи условия",
       "privacy": "Поверителност"
     }
   },
   "header": {
-    "brand": "SalonEase",
+    "brand": "ZenManager",
     "notifications": "Известия",
     "profile": "Профил",
     "logout": "Изход",
@@ -58,7 +58,7 @@
     "signup": "Регистрация"
   },
   "nav": {
-    "brand": "SalonEase",
+    "brand": "ZenManager",
     "features": "Функции",
     "pricing": "Цени",
     "contact": "Контакти",

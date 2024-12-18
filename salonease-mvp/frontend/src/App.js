@@ -121,7 +121,7 @@ function AppContent() {
                 path="/" 
                 element={
                   <div className="text-center">
-                    <h2 className="text-4xl font-bold mb-4">Welcome to SalonEase</h2>
+                    <h2 className="text-4xl font-bold mb-4">Welcome to ZenManager</h2>
                     <p className="text-xl">Your comprehensive salon management solution.</p>
                   </div>
                 } 

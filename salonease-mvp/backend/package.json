@@ -1,7 +1,7 @@
 {
   "name": "salonease-backend",
   "version": "1.0.0",
-  "description": "Backend for SalonEase MVP",
+  "description": "Backend for ZenManager MVP",
   "main": "src/server.js",
   "type": "commonjs",
   "scripts": {

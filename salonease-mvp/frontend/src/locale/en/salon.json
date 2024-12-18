@@ -96,7 +96,7 @@
   "success.salon_deleted": "Salon deleted successfully",
   "error.failed_to_delete_salon": "Failed to delete salon. Please try again.",
   "onboarding": {
-    "welcome": "Welcome to SalonEase!",
+    "welcome": "Welcome to ZenManager!",
     "setup_message": "Let's set up your first salon. Click next to begin.",
     "action": {
       "next": "Next"

@@ -98,7 +98,7 @@
   "success.salon_restored": "Салонът е възстановено успешно",
   "error.failed_to_restore_salon": "Неуспешно възстановяване на салона. Моля, опитайте отново.",
   "onboarding": {
-    "welcome": "Добре дошли в SalonEase!",
+    "welcome": "Добре дошли в ZenManager!",
     "setup_message": "Нека настроим първия ви салон. Кликнете напред, за да започнете.",
     "action": {
       "next": "Напред"

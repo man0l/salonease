@@ -1,7 +1,7 @@
 {
     "Servers": {
         "1": {
-            "Name": "SalonEase DB",
+            "Name": "ZenManager DB",
             "Group": "Servers",
             "Host": "db",
             "Port": 5432,

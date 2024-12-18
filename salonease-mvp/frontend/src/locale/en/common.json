@@ -41,14 +41,14 @@
     "minutes": "minutes"
   },
   "footer": {
-    "copyright": "© 2024 SalonEase. All rights reserved.",
+    "copyright": "© 2024 ZenManager. All rights reserved.",
     "links": {
       "terms": "Terms",
       "privacy": "Privacy Policy"
     }
   },
   "header": {
-    "brand": "SalonEase",
+    "brand": "ZenManager",
     "notifications": "Notifications",
     "profile": "Profile",
     "logout": "Logout",
@@ -56,7 +56,7 @@
     "signup": "Sign Up"
   },
   "nav": {
-    "brand": "SalonEase",
+    "brand": "ZenManager",
     "features": "Features",
     "pricing": "Pricing",
     "contact": "Contact",
