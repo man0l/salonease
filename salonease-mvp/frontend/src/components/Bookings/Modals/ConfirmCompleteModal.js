@@ -7,7 +7,7 @@ const ConfirmCompleteModal = ({ show, onClose, booking, onComplete }) => {
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-white/40 flex justify-center items-center z-50">
       <div className="bg-card p-6 rounded-lg shadow-lg max-w-md w-full border border-accent/10">
         <h2 className="text-2xl font-bold mb-4 text-foreground">
           {t('bookings:action.confirm_complete')}

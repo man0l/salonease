@@ -1,110 +1,104 @@
 .calendar-custom {
     .rbc-time-header {
-      background-color: rgb(15, 23, 42);
+      background-color: var(--card-background);
     }
     
     .rbc-time-slot {
-      background-color: rgb(17, 24, 39);
+      background-color: var(--card-background);
     }
   
     .rbc-time-gutter {
-      color: rgb(148, 163, 184);
+      color: var(--muted-foreground);
     }
     
     .rbc-header {
-      border-bottom: 1px solid rgb(30, 41, 59);
-      color: rgb(203, 213, 225);
+      border-bottom: 1px solid var(--accent-background);
+      color: var(--foreground);
     }
 
     .rbc-event {
-      color: rgb(226, 232, 240) !important;
+      color: var(--foreground) !important;
     }
 
     .rbc-today {
-      background-color: rgba(51, 65, 85, 0.4);
+      background-color: var(--muted-background);
     }
 
     .rbc-current-time-indicator {
-      background-color: rgb(99, 102, 241);
+      background-color: var(--primary-500);
     }
 
     .rbc-time-content {
-      border-top: 1px solid rgb(30, 41, 59);
+      border-top: 1px solid var(--accent-background);
     }
 
     .rbc-time-view {
-      border: 1px solid rgb(30, 41, 59);
+      border: 1px solid var(--accent-background);
     }
 
     .rbc-time-content > * + * > * {
-        border-left: 1px solid rgb(30, 41, 59);
+        border-left: 1px solid var(--accent-background);
     }
 
     .rbc-timeslot-group {
-        border-bottom: 1px solid rgb(30, 41, 59);
+        border-bottom: 1px solid var(--accent-background);
         min-height: 40px;
         display: flex;
         flex-flow: column nowrap;
     }
 
     .rbc-day-slot .rbc-time-slot {
-        border-top: 1px solid rgb(30, 41, 59);
+        border-top: 1px solid var(--accent-background);
     }
 
-    /* Fix white background in time slots and overall calendar */
-    background-color: rgb(17, 24, 39);
+    /* Calendar background */
+    background-color: var(--card-background);
     
     .rbc-time-view, 
     .rbc-time-content,
     .rbc-day-slot,
     .rbc-events-container,
     .rbc-day-bg {
-        background-color: rgb(17, 24, 39);
+        background-color: var(--card-background);
     }
 
     .rbc-time-content > .rbc-day-slot {
-        background-color: rgb(17, 24, 39);
+        background-color: var(--card-background);
     }
 
-    /* Fix any remaining white spaces in the header */
     .rbc-allday-cell {
-        background-color: rgb(17, 24, 39);
+        background-color: var(--card-background);
     }
 
     .rbc-row {
-        background-color: rgb(15, 23, 42);
-    }
-
-    /* Remove leftmost vertical line */
-    .rbc-time-content > .rbc-time-gutter {
-        border-right: none;
+        background-color: var(--card-background);
     }
 
     /* Navigation buttons and toolbar styling */
     .rbc-btn-group {
         button {
-            background-color: rgb(30, 41, 59);
-            border: 1px solid rgb(51, 65, 85);
-            color: rgb(148, 163, 184);
+            background-color: var(--muted-background);
+            border: 1px solid var(--accent-background);
+            color: var(--muted-foreground);
             padding: 6px 12px;
             border-radius: 6px;
             margin: 0 2px;
             
             &:hover {
-                background-color: rgb(51, 65, 85);
-                color: rgb(226, 232, 240);
+                background-color: var(--accent-background);
+                color: var(--accent-foreground);
             }
             
             &.rbc-active {
-                background-color: rgb(51, 65, 85);
-                color: rgb(226, 232, 240);
+                background-color: var(--accent-background);
+                color: var(--accent-foreground);
             }
         }
     }
 
     /* Date range label styling */
     .rbc-toolbar-label {
-        color: rgb(226, 232, 240);
+        color: var(--foreground);
         font-size: 1.1rem;
         padding: 0 10px;
     }
@@ -113,6 +107,6 @@
     .rbc-toolbar {
         padding: 10px;
         margin-bottom: 10px;
-        border-bottom: 1px solid rgb(30, 41, 59);
+        border-bottom: 1px solid var(--accent-background);
     }
 }

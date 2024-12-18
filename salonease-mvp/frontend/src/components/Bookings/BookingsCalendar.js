@@ -172,7 +172,7 @@ const BookingsCalendar = () => {
 
   return (
     <div className="flex flex-col h-full gap-2 p-2 sm:gap-4 sm:p-4">
-      {/* Staff Filter - Made more compact on mobile */}
+      {/* Staff Filter */}
       <div className="flex flex-col gap-2 sm:flex-row sm:gap-4 sm:items-center">
         <div className="flex flex-wrap gap-1 sm:gap-2">
           {staff.map((member, index) => {
@@ -184,7 +184,7 @@ const BookingsCalendar = () => {
                 className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm transition-all ${
                   selectedStaffIds.includes(member.id)
                     ? 'bg-primary-600 text-white'
-                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 }`}
               >
                 {member.fullName}
@@ -194,9 +194,9 @@ const BookingsCalendar = () => {
         </div>
       </div>
 
-      {/* Calendar Container - Adjusted for mobile */}
-      <div className="flex-grow bg-slate-900 rounded-lg shadow-lg border border-slate-800 overflow-hidden">
-        <div className="h-[calc(100vh-12rem)]"> {/* Adjusted height calculation */}
+      {/* Calendar Container */}
+      <div className="flex-grow bg-card rounded-lg shadow-lg border border-accent/10 overflow-hidden">
+        <div className="h-[calc(100vh-12rem)]">
           <Calendar
             ref={calendarRef}
             localizer={localizer}
@@ -274,7 +274,7 @@ const BookingsCalendar = () => {
             }}
             style={{
               height: '100%',
-              backgroundColor: 'transparent'
+              backgroundColor: 'var(--card-background)'
             }}
           />
         </div>

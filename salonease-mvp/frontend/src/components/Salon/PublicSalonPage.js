@@ -82,7 +82,7 @@ const PublicSalonPage = () => {
 
     return (
       <div 
-        className="fixed inset-0 bg-background/90 flex justify-center items-center z-50"
+        className="fixed inset-0 bg-background/60 backdrop-blur-sm flex justify-center items-center z-50"
         onClick={onClose}
         onKeyDown={handleKeyDown}
         tabIndex={0}
