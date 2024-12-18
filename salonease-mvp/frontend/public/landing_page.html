@@ -40,22 +40,12 @@
                             foreground: '#c026d3'
                         }
                     },
-                    borderRadius: {
-                        '[--radius]': '1rem'
-                    },
                     backgroundImage: {
                         'gradient-primary': 'linear-gradient(135deg, #fae8ff 0%, #f5d0fe 100%)',
                         'gradient-accent': 'linear-gradient(135deg, #e879f9 0%, #c026d3 100%)',
                         'gradient-light': 'linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%)'
-                    },
-                    boxShadow: {
-                        'soft': '0 4px 24px rgba(30, 27, 75, 0.06)',
-                        'hover': '0 8px 32px rgba(30, 27, 75, 0.08)'
                     }
-                },
-                fontFamily: {
-                    sans: ['Inter', 'sans-serif'],
-                },
+                }
             }
         }
     </script>
@@ -66,13 +56,6 @@
             -moz-osx-font-smoothing: grayscale;
             background: linear-gradient(135deg, #fae8ff 0%, #f5d0fe 100%);
         }
-
-        .gradient-text {
-            background: linear-gradient(135deg, #e879f9 0%, #c026d3 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
     </style>
 </head>
 <body class="min-h-screen bg-gradient-light">
@@ -81,12 +64,12 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <a href="/" class="text-2xl font-bold gradient-text">SalonEase</a>
+                    <a href="/" class="text-2xl font-bold text-primary-500">SalonEase</a>
                 </div>
                 <div class="flex items-center space-x-8">
                     <a href="#" class="text-muted-foreground hover:text-foreground">Features</a>
                     <a href="#" class="text-muted-foreground hover:text-foreground">Pricing</a>
-                    <a href="#" class="bg-primary-500 text-white px-4 py-2 rounded-[--radius] hover:bg-primary-600 transition">
+                    <a href="#" class="bg-gradient-accent hover:opacity-90 text-white px-6 py-2 rounded-full text-sm font-semibold transition duration-300">
                         Get Free Trial
                     </a>
                 </div>
@@ -95,51 +78,108 @@
     </nav>
 
     <!-- Hero Section -->
-    <div class="relative pt-16">
+    <div class="relative pt-16 overflow-hidden">
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
-            <div class="text-center max-w-4xl mx-auto">
-                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
-                    Simplify Your Salon in Bulgaria<br/>
-                    <span class="inline-block mt-2">Thrive with SalonEase</span>
-                </h1>
-                <p class="text-xl text-muted-foreground mb-12 max-w-3xl mx-auto">
-                    Take control of your salon with clarity, confidence, and efficiency—<br/>
-                    <span class="inline-block mt-1">so you can focus on what matters: growing your business.</span>
-                </p>
-                
-                <!-- CTA Buttons -->
-                <div class="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-                    <a href="#" class="inline-flex flex-col items-center justify-center bg-gradient-accent hover:opacity-90 text-white px-8 py-3 rounded-[--radius] text-lg font-semibold transition duration-300">
-                        <span class="font-bold">START FREE TRIAL NOW</span>
-                        <span class="text-sm font-normal opacity-90">Limited Time: 30-day Free Trial</span>
-                    </a>
-                    <a href="#" class="inline-flex items-center justify-center bg-white/90 text-foreground hover:bg-white px-8 py-4 rounded-[--radius] text-lg font-semibold transition duration-300">
-                        GET A DEMO
-                    </a>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <!-- Left Content -->
+                <div class="text-left relative">
+                    <!-- Decorative curved line -->
+                    <div class="absolute -bottom-16 right-0 w-64 h-24">
+                        <svg viewBox="0 0 400 100" class="w-full h-full fill-primary-200/30">
+                            <path d="M0,50 Q100,100 200,50 T400,50" stroke="none"/>
+                        </svg>
+                    </div>
+
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
+                        Simplify Your Salon in Bulgaria<br/>
+                        <span class="inline-block mt-2">Thrive with SalonEase</span>
+                    </h1>
+                    <p class="text-xl text-muted-foreground mb-8">
+                        Take control of your salon with clarity, confidence, and efficiency—so
+                        you can focus on what matters: growing your business.
+                    </p>
+                    
+                    <!-- CTA Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 mb-8 relative z-10">
+                        <a href="#" class="inline-flex flex-col items-center justify-center bg-gradient-accent hover:opacity-90 text-white px-8 py-3 rounded-full text-lg font-semibold transition duration-300">
+                            <span class="font-bold">START FREE TRIAL NOW</span>
+                            <span class="text-sm font-normal opacity-90">Limited Time: 30-day Free Trial</span>
+                        </a>
+                        <a href="#" class="inline-flex items-center justify-center bg-white/90 text-foreground hover:bg-white px-8 py-4 rounded-full text-lg font-semibold transition duration-300">
+                            GET A DEMO
+                        </a>
+                    </div>
+
+                    <!-- Trust Indicators -->
+                    <div class="flex items-center space-x-8 text-sm text-foreground/70 relative z-10">
+                        <span class="flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            No credit card required
+                        </span>
+                        <span class="flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Cancel anytime
+                        </span>
+                        <span class="flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            24/7 support
+                        </span>
+                    </div>
                 </div>
 
-                <!-- Trust Indicators -->
-                <div class="flex justify-center items-center space-x-8 text-sm text-foreground/70">
-                    <span class="flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                <!-- Right Image with Customer Card -->
+                <div class="relative">
+                    <!-- Background blur effect -->
+                    <div class="absolute inset-0 bg-gradient-to-r from-primary-100/50 to-primary-200/50 rounded-full blur-3xl"></div>
+                    
+                    <!-- Decorative curved line -->
+                    <div class="absolute -left-16 top-1/2 w-32 h-full transform -translate-y-1/2">
+                        <svg viewBox="0 0 100 400" class="w-full h-full fill-primary-300/20">
+                            <path d="M50,0 Q0,100 50,200 T50,400" stroke="none"/>
                         </svg>
-                        No credit card required
-                    </span>
-                    <span class="flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        Cancel anytime
-                    </span>
-                    <span class="flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        24/7 support
-                    </span>
+                    </div>
+
+                    <div class="relative">
+                        <!-- Customer Card -->
+                        <div class="absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-lg p-3 z-10 flex items-center gap-3">
+                            <div class="w-10 h-10 bg-primary-100 rounded-full overflow-hidden">
+                                <img src="https://placehold.co/100x100" alt="Client avatar" class="w-full h-full object-cover"/>
+                            </div>
+                            <div>
+                                <p class="font-semibold">Maria Ivanova</p>
+                                <p class="text-sm text-gray-500">Client since 2023</p>
+                            </div>
+                            <div class="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center ml-2">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Main Image -->
+                        <div class="rounded-full overflow-hidden aspect-square relative z-0">
+                            <img 
+                                src="./images/pexels-cottonbro-3997389.jpg" 
+                                alt="Salon professional"
+                                class="w-full h-full object-cover"
+                            >
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Bottom curved decoration -->
+        <div class="absolute bottom-0 left-0 right-0 w-full">
+            <svg viewBox="0 0 1440 100" class="w-full h-24 fill-primary-200/20 transform translate-y-1/2">
+                <path d="M0,0 Q720,100 1440,0 L1440,100 L0,100 Z" stroke="none"/>
+            </svg>
         </div>
     </div>
 
