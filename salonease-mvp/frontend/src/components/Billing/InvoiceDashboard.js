@@ -65,29 +65,29 @@ const InvoiceDashboard = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gray-950">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-background">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-semibold text-gray-100">
+        <h1 className="text-2xl font-semibold text-foreground">
           {t('billing:title.billing')}
         </h1>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-8">
-        <div className="bg-gray-900 rounded-lg shadow-lg border border-gray-800">
+        <div className="bg-card rounded-lg shadow-card border border-muted">
           <SubscriptionDetails 
             subscription={subscription}
             onCancelClick={() => setShowCancelModal(true)}
           />
         </div>
 
-        <div className="bg-gray-900 rounded-lg shadow-lg border border-gray-800">
+        <div className="bg-card rounded-lg shadow-card border border-muted">
           <UsageMetrics           
             subscription={subscription}
           />
         </div>
       </div>
 
-      <div className="bg-gray-900 rounded-lg shadow-lg border border-gray-800">
+      <div className="bg-card rounded-lg shadow-card border border-muted">
         <InvoiceList salonId={selectedSalon.id} />
       </div>
 

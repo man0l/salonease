@@ -65,7 +65,7 @@ const SubscriptionDetails = ({ subscription, onCancelClick }) => {
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-medium text-gray-100">
+        <h2 className="text-lg font-medium text-foreground">
           {t('billing:subscription.title')}
         </h2>
         <FaCreditCard className="text-primary-400 h-6 w-6" />
@@ -73,10 +73,10 @@ const SubscriptionDetails = ({ subscription, onCancelClick }) => {
 
       <div className="space-y-4">
         <div>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-muted-foreground">
             {t('billing:subscription.status_label')}
           </p>
-          <p className="font-medium text-gray-100">
+          <p className="font-medium text-foreground">
             {t(`billing:subscription.status.${status || 'unknown'}`)}
             <span className={`ml-2 ${
               status === 'active' ? 'text-emerald-400' :
@@ -109,10 +109,10 @@ const SubscriptionDetails = ({ subscription, onCancelClick }) => {
           </p>
         </div>
 
-        <div className="pt-4 border-t border-gray-800">
+        <div className="pt-4 border-t border-muted">
           <button
             onClick={onCancelClick}
-            className="text-red-400 hover:text-red-300 text-sm font-medium transition-colors duration-200"
+            className="text-primary-400 hover:text-primary-300 text-sm font-medium transition-colors duration-200"
           >
             {t('billing:subscription.cancel_button')}
           </button>

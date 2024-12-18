@@ -48,22 +48,22 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="bg-gray-900 shadow-md lg:h-full relative z-30 border-r border-gray-800">
+    <div className="bg-card shadow-md lg:h-full relative z-30 border-r border-muted">
       <button 
-        className="lg:hidden p-4 text-gray-300 hover:text-primary-500 transition-colors" 
+        className="lg:hidden p-4 text-muted-foreground hover:text-primary-500 transition-colors" 
         onClick={() => setIsOpen(!isOpen)}
       >
         <Bars3Icon className="h-6 w-6" />
       </button>
       <div 
         className={`
-          transform top-0 left-0 w-64 bg-gray-900 fixed h-full overflow-auto ease-in-out transition-all duration-300 z-40
+          transform top-0 left-0 w-64 bg-card fixed h-full overflow-auto ease-in-out transition-all duration-300 z-40
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:relative lg:translate-x-0 lg:flex lg:flex-col
         `}
       >
-        <div className="p-6 border-b border-gray-800">
-          <h2 className="text-gray-100 font-bold text-xl">{t('navigation:menu')}</h2>
+        <div className="p-6 border-b border-muted">
+          <h2 className="text-foreground font-bold text-xl">{t('navigation:menu')}</h2>
         </div>
         <nav className="space-y-1 py-4">
           {filteredNavigation.map((item) => (
@@ -73,8 +73,8 @@ const Sidebar = () => {
               className={({ isActive }) =>
                 `flex items-center px-6 py-3 text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-gray-800 text-primary-400 border-l-4 border-primary-400'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-primary-500'
+                    ? 'bg-muted text-primary-400 border-l-4 border-primary-400'
+                    : 'text-muted-foreground hover:bg-muted hover:text-primary-500'
                 } ${
                   shouldDisableNavigation()
                     ? 'opacity-50 pointer-events-none'
@@ -83,7 +83,7 @@ const Sidebar = () => {
               }
               onClick={() => setIsOpen(false)}
             >
-              <item.icon className={`h-5 w-5 mr-3 ${({ isActive }) => isActive ? 'text-primary-500' : 'text-gray-400'}`} />
+              <item.icon className={`h-5 w-5 mr-3 ${({ isActive }) => isActive ? 'text-primary-500' : 'text-muted-foreground'}`} />
               <span>{item.name}</span>
             </NavLink>
           ))}
@@ -91,7 +91,7 @@ const Sidebar = () => {
       </div>
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-35 lg:hidden"
+          className="fixed inset-0 bg-background/50 z-35 lg:hidden"
           onClick={() => setIsOpen(false)}
         ></div>
       )}

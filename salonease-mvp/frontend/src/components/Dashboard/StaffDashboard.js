@@ -13,24 +13,24 @@ const StaffDashboard = () => {
   }, [fetchDashboardData]);
 
   return (
-    <div className="flex h-screen bg-gray-100">      
+    <div className="flex h-screen bg-background">      
       <div className="flex-1 p-10">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-semibold text-gray-900">
+          <h1 className="text-2xl font-semibold text-foreground">
             {t('title.staff_dashboard')}
           </h1>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition">
+          <div className="bg-card p-6 rounded-lg shadow-card hover:shadow-xl transition">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm">{t('today_s_appointments')}</p>
-                <h3 className="text-2xl font-bold text-gray-900">
+                <p className="text-muted-foreground text-sm">{t('today_s_appointments')}</p>
+                <h3 className="text-2xl font-bold text-foreground">
                   {dashboardStats.todayAppointments}
                 </h3>
               </div>
-              <FaCalendar className="text-primary-500 text-2xl" />
+              <FaCalendar className="text-primary-400 text-2xl" />
             </div>
           </div>
           

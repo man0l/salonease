@@ -63,10 +63,10 @@ function Header() {
           <ChevronDownIcon className="h-4 w-4" />
         </button>
         {isDropdownOpen && (
-          <div className="absolute right-0 mt-2 w-48 bg-gray-900 rounded-md shadow-lg py-1 z-50 border border-gray-800">
+          <div className="absolute right-0 mt-2 w-48 bg-card rounded-md shadow-card py-1 z-50 border border-muted">
             <Link
               to="/profile"
-              className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800"
+              className="block px-4 py-2 text-sm text-foreground hover:bg-muted"
               onClick={() => setIsDropdownOpen(false)}
             >
               {t('common:header.profile')}
@@ -76,7 +76,7 @@ function Header() {
                 logout();
                 setIsDropdownOpen(false);
               }}
-              className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800"
+              className="block w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted"
             >
               {t('common:header.logout')}
             </button>
@@ -116,7 +116,7 @@ function Header() {
   );
 
   return (
-    <header className="bg-gray-900 border-b border-gray-800">
+    <header className="bg-card border-b border-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           <div className="flex-shrink-0">
@@ -134,7 +134,7 @@ function Header() {
               renderUserMenu()
             ) : (
               <div className="space-x-4">
-                <Link to="/login" className="text-gray-300 hover:text-primary-400 transition-colors">
+                <Link to="/login" className="text-muted-foreground hover:text-primary-400 transition-colors">
                   {t('common:header.login')}
                 </Link>
                 <Link to="/register" className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition-colors">

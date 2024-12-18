@@ -58,38 +58,38 @@ const InvoiceList = ({ salonId }) => {
   };
 
   return (
-    <div className="bg-gray-900 rounded-lg shadow-lg border border-gray-800">
-      <div className="px-6 py-4 border-b border-gray-800">
-        <h2 className="text-lg font-medium text-gray-100">
+    <div className="bg-card rounded-lg shadow-card border border-muted">
+      <div className="px-6 py-4 border-b border-muted">
+        <h2 className="text-lg font-medium text-foreground">
           {t('billing:invoices.title')}
         </h2>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-800">
-          <thead className="bg-gray-800">
+        <table className="min-w-full divide-y divide-muted">
+          <thead className="bg-muted">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 {t('billing:invoices.date')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 {t('billing:invoices.amount')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 {t('billing:invoices.status')}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 {t('billing:invoices.actions')}
               </th>
             </tr>
           </thead>
-          <tbody className="bg-gray-900 divide-y divide-gray-800">
+          <tbody className="bg-card divide-y divide-muted">
             {invoices.map((invoice) => (
-              <tr key={invoice.id} className="hover:bg-gray-800 transition-colors duration-200">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+              <tr key={invoice.id} className="hover:bg-muted/50 transition-colors duration-200">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                   {formatDate(invoice.created)}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                   {formatCurrency(invoice.amount_due / 100)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
