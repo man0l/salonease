@@ -51,7 +51,7 @@ const InvoiceDashboard = () => {
   if (!selectedSalon) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
-        <p className="text-gray-400">{t('billing:errors.no_salon_selected')}</p>
+        <p className="text-muted-foreground">{t('billing:errors.no_salon_selected')}</p>
       </div>
     );
   }
@@ -73,21 +73,21 @@ const InvoiceDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-8">
-        <div className="bg-card rounded-lg shadow-card border border-muted">
+        <div className="bg-card rounded-lg shadow-card border border-muted/10 hover:border-accent/20 transition-colors duration-200">
           <SubscriptionDetails 
             subscription={subscription}
             onCancelClick={() => setShowCancelModal(true)}
           />
         </div>
 
-        <div className="bg-card rounded-lg shadow-card border border-muted">
+        <div className="bg-card rounded-lg shadow-card border border-muted/10 hover:border-accent/20 transition-colors duration-200">
           <UsageMetrics           
             subscription={subscription}
           />
         </div>
       </div>
 
-      <div className="bg-card rounded-lg shadow-card border border-muted">
+      <div className="bg-card rounded-lg shadow-card border border-muted/10 hover:border-accent/20 transition-colors duration-200">
         <InvoiceList salonId={selectedSalon.id} />
       </div>
 

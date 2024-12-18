@@ -30,21 +30,21 @@ const SubscriptionDetails = ({ subscription, onCancelClick }) => {
     return (
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-medium text-gray-100">
+          <h2 className="text-lg font-medium text-foreground">
             {t('billing:subscription.title')}
           </h2>
-          <FaCreditCard className="text-gray-400 h-6 w-6" />
+          <FaCreditCard className="text-muted-foreground h-6 w-6" />
         </div>
         <div className="space-y-4">
           <div>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-muted-foreground">
               {t('billing:subscription.status_label')}
             </p>
             <p className="font-medium text-red-400">
               {t('billing:subscription.inactive')}
             </p>
           </div>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-muted-foreground">
             {t('billing:subscription.no_active_plan')}
           </p>
         </div>
@@ -88,10 +88,10 @@ const SubscriptionDetails = ({ subscription, onCancelClick }) => {
         </div>
 
         <div>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-muted-foreground">
             {t('billing:subscription.plan')}
           </p>
-          <p className="font-medium text-gray-100">
+          <p className="font-medium text-foreground">
             {t('billing:subscription.base_plan', {
               amount: amount / 100,
               interval: t(`billing:subscription.intervals.${interval}`),
@@ -101,15 +101,15 @@ const SubscriptionDetails = ({ subscription, onCancelClick }) => {
         </div>
 
         <div>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-muted-foreground">
             {t('billing:subscription.current_period')}
           </p>
-          <p className="font-medium text-gray-100">
+          <p className="font-medium text-foreground">
             {formatDate(currentPeriodStart)} - {formatDate(currentPeriodEnd)}
           </p>
         </div>
 
-        <div className="pt-4 border-t border-muted">
+        <div className="pt-4 border-t border-accent/10">
           <button
             onClick={onCancelClick}
             className="text-primary-400 hover:text-primary-300 text-sm font-medium transition-colors duration-200"
