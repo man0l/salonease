@@ -8,7 +8,7 @@ const { v4: uuidv4 } = require('uuid');
 const { validateRegister, validateLogin } = require('../validators/authValidator');
 const ROLES = require('../config/roles');
 const SubscriptionService = require('../services/subscriptionService');
-const subscriptionServiceInstance = new SubscriptionService();
+const subscriptionServiceInstance = SubscriptionService.getInstance();
 const { uploadSingle, getImageUrl } = require('../utils/imageUpload');
 
 if (!process.env.JWT_SECRET) {
