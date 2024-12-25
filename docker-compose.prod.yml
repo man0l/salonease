@@ -3,6 +3,8 @@ version: '3.8'
 services:
   traefik:
     image: traefik:v2.10
+    env_file:
+      - ./salonease-mvp/backend/.env
     command:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
@@ -70,6 +72,10 @@ services:
     image: postgres:13-alpine
     env_file:
       - ./salonease-mvp/backend/.env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
