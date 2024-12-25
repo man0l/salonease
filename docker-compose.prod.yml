@@ -64,7 +64,9 @@ services:
       db:
         condition: service_healthy
     restart: unless-stopped
-    command: node src/server.js
+    command: >
+      sh -c "npm run migrate &&
+             node src/server.js"
 
   db:
     image: postgres:13-alpine
