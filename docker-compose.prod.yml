@@ -25,6 +25,10 @@ services:
 
   frontend:
     image: ghcr.io/man0l/salonease:frontend-latest
+    env_file:
+      - ./frontend/.env
+    environment:
+      - REACT_APP_API_URL=https://zen-manager.eu/api
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`zen-manager.eu`) && !PathPrefix(`/api`)"
@@ -40,17 +44,19 @@ services:
 
   backend:
     image: ghcr.io/man0l/salonease:backend-latest
+    env_file:
+      - ./backend/.env
     environment:
       - NODE_ENV=production
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_NAME=${POSTGRES_DB}
       - DB_HOST=db
-      - JWT_SECRET=${JWT_SECRET}
       - DB_POOL_MAX=5
       - DB_POOL_MIN=0
       - DB_POOL_IDLE=10000
       - DB_POOL_ACQUIRE=30000
+      - FRONTEND_URL=https://zen-manager.eu
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`zen-manager.eu`) && PathPrefix(`/api`)"
