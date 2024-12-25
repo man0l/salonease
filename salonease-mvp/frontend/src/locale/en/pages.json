@@ -2,8 +2,8 @@
   "homepage": {
     "hero": {
       "title": {
-        "part1": "Simplify Your Salon",
-        "part2": "in Bulgaria",
+        "part1": "Boost Revenue and",
+        "part2": "Customer Retention",
         "part3": "Thrive with ZenManager"
       },
       "subtitle": "Take control of your salon with clarity, confidence, and efficiency—so you can focus on what matters: growing your business.",
@@ -11,7 +11,7 @@
         "primary": "START FREE TRIAL NOW",
         "trial_note": "Limited Time: 30-day Free Trial"
       },
-      "features": "All Features • Guided Onboarding • 90-Day Money-Back After Trial"
+      "features": "All Features • 90-Day Money-Back After Trial"
     },
     "revenue_card": {
       "title": "Revenue Today",
@@ -171,7 +171,11 @@
       }
     },
     "testimonials": {
-      "title": "Trusted by salon owners"
+      "title": "Trusted by salon owners",
+      "client": {
+        "name": "Maria Ivanova",
+        "since": "Client since 2023"
+      }
     },
     "faq": {
       "title": "Frequently Asked Questions",
@@ -307,6 +311,11 @@
           "description": "Step-by-step guidance to get your salon running smoothly"
         }
       }
-    }
+    },
+    "client_card": {
+        "avatar_alt": "Client avatar",
+        "name": "Maria Ivanova",
+        "client_since": "Client since {{year}}"
+      }
   }
 } 

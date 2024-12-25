@@ -71,11 +71,13 @@ const Homepage = () => {
 
                 <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-lg p-3 z-10 flex items-center gap-3">
                   <div className="w-10 h-10 bg-primary-100 rounded-full overflow-hidden">
-                    <img src="https://placehold.co/100x100" alt="Client avatar" className="w-full h-full object-cover"/>
+                    <img src="https://placehold.co/100x100" alt={t('pages:homepage.client_card.avatar_alt')} className="w-full h-full object-cover"/>
                   </div>
                   <div>
-                    <p className="font-semibold">Maria Ivanova</p>
-                    <p className="text-sm text-gray-500">Client since 2023</p>
+                    <p className="font-semibold">{t('pages:homepage.client_card.name')}</p>
+                    <p className="text-sm text-gray-500">
+                      {t('pages:homepage.client_card.client_since', { year: '2023' })}
+                    </p>
                   </div>
                   <div className="w-6 h-6 bg-green-400 rounded-full flex items-center justify-center ml-2">
                     <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -329,7 +331,9 @@ const Homepage = () => {
                 {t('pages:homepage.success_path.steps.step1.description')}
               </p>
               <p className="text-primary-600 font-semibold">
-                {t('pages:homepage.success_path.steps.step1.cta')}
+                <Link to="/register">
+                  {t('pages:homepage.success_path.steps.step1.cta')}
+                </Link>
               </p>
             </div>
 
@@ -345,7 +349,9 @@ const Homepage = () => {
                 {t('pages:homepage.success_path.steps.step2.description')}
               </p>
               <p className="text-primary-600 font-semibold">
-                {t('pages:homepage.success_path.steps.step2.cta')}
+                <Link to="/register">
+                  {t('pages:homepage.success_path.steps.step2.cta')}
+                </Link>
               </p>
             </div>
 
@@ -361,7 +367,9 @@ const Homepage = () => {
                 {t('pages:homepage.success_path.steps.step3.description')}
               </p>
               <p className="text-primary-600 font-semibold">
-                {t('pages:homepage.success_path.steps.step3.cta')}
+                <Link to="/register">
+                  {t('pages:homepage.success_path.steps.step3.cta')}
+                </Link>
               </p>
             </div>
           </div>
@@ -560,7 +568,7 @@ const Homepage = () => {
               </div>
 
               {/* Bonus Features */}
-              <div className="bg-primary-50 rounded-xl p-6">
+              {/* <div className="bg-primary-50 rounded-xl p-6">
                 <h4 className="text-xl font-bold text-primary-900 mb-4">
                   {t('pages:homepage.bonuses.title')}
                 </h4>
@@ -578,7 +586,7 @@ const Homepage = () => {
                     <span className="text-gray-700">{t('pages:homepage.bonuses.items.strategy')}</span>
                   </li>
                 </ul>
-              </div>
+              </div> */}
 
               <div className="text-center">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
