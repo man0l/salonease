@@ -65,7 +65,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     command: >
-      sh -c "npm run migrate &&
+      sh -c "npx sequelize-cli db:migrate &&
              node src/server.js"
 
   db:
