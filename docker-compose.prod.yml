@@ -5,6 +5,8 @@ services:
     image: traefik:v2.10
     env_file:
       - ./salonease-mvp/backend/.env
+    environment:
+      - EMAIL=${EMAIL}
     command:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
@@ -73,9 +75,12 @@ services:
     env_file:
       - ./salonease-mvp/backend/.env
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      # Parse DATABASE_URL to set Postgres environment variables
+      - POSTGRES_USER=${DATABASE_URL##*://}
+      - POSTGRES_USER=${POSTGRES_USER%%:*}
+      - POSTGRES_PASSWORD=${DATABASE_URL##*:@}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD%%@*}
+      - POSTGRES_DB=${DATABASE_URL##*/}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
