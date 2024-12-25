@@ -6,7 +6,7 @@ services:
     env_file:
       - ./salonease-mvp/backend/.env
     environment:
-      - EMAIL=${EMAIL}
+      - EMAIL=admin@zenmanager.eu
     command:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
@@ -53,7 +53,6 @@ services:
     environment:
       - NODE_ENV=production
       - FRONTEND_URL=https://zenmanager.eu
-      - DATABASE_URL=${DATABASE_URL}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`zenmanager.eu`) && PathPrefix(`/api`)"
@@ -75,11 +74,6 @@ services:
     image: postgres:13-alpine
     env_file:
       - ./salonease-mvp/backend/.env
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - DATABASE_URL=${DATABASE_URL}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -108,6 +102,9 @@ services:
     depends_on:
       - db
     restart: unless-stopped
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
 
   watchtower:
     image: containrrr/watchtower
