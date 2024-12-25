@@ -1,0 +1,312 @@
+{
+  "homepage": {
+    "hero": {
+      "title": {
+        "part1": "Simplify Your Salon",
+        "part2": "in Bulgaria",
+        "part3": "Thrive with ZenManager"
+      },
+      "subtitle": "Take control of your salon with clarity, confidence, and efficiency—so you can focus on what matters: growing your business.",
+      "cta": {
+        "primary": "START FREE TRIAL NOW",
+        "trial_note": "Limited Time: 30-day Free Trial"
+      },
+      "features": "All Features • Guided Onboarding • 90-Day Money-Back After Trial"
+    },
+    "revenue_card": {
+      "title": "Revenue Today",
+      "amount": "2,450 лв.",
+      "trend": "↑ 12% from yesterday"
+    },
+    "social_proof": {
+      "active_salons": {
+        "number": "1000+",
+        "label": "Active Salons"
+      },
+      "satisfaction": {
+        "number": "98%",
+        "label": "Customer Satisfaction"
+      },
+      "time_saved": {
+        "number": "15hrs",
+        "label": "Saved Weekly"
+      },
+      "revenue": {
+        "number": "30%",
+        "label": "Revenue Increase"
+      }
+    },
+    "pricing": {
+      "title": "Pricing",
+      "salon_pricing": {
+        "intro": "ZenManager offers flexible pricing based on salon size:",
+        "tiers": {
+          "single": "1 Salon – 20 BGN per salon",
+          "small": "2 to 5 Salons – 50 BGN per salon",
+          "medium": "6 to 8 Salons – 100 BGN per salon",
+          "large": "8+ Salons – 120 BGN per salon"
+        }
+      },
+      "booking_pricing": {
+        "intro": "Additional booking-based pricing:",
+        "tiers": {
+          "tier1": "1 to 150 bookings – 0.50 BGN per booking",
+          "tier2": "151 to 450 bookings – 0.35 BGN per booking",
+          "tier3": "451 to 750 bookings – 0.30 BGN per booking",
+          "tier4": "751 to 1200 bookings – 0.25 BGN per booking",
+          "tier5": "1201+ bookings – 0.15 BGN per booking"
+        }
+      }
+    },
+    "guarantee": {
+      "title": "100% Risk-Free Guarantee",
+      "description": "If you don't feel more organized and in control after your trial, cancel with zero risk. No questions asked."
+    },
+    "final_cta": {
+      "button": "Start Your Free Trial Now",
+      "trial_note": "Limited Time: 30-Day Free Trial",
+      "subtitle": "Take the first step toward a smarter, stress-free salon"
+    },
+    "features": {
+      "save_time": {
+        "title": "Save Time",
+        "description": "Simplify scheduling, staff coordination, and client communication."
+      },
+      "grow_business": {
+        "title": "Grow Your Business",
+        "description": "Use powerful analytics to make smarter decisions."
+      }
+    },
+    "bonuses": {
+      "title": "Exclusive Bonuses (€500 Value)",
+      "items": {
+        "guide": "\"10 Steps to Boost Salon Revenue Fast\" Guide",
+        "community": "Access to Private ZenManager Success Community",
+        "strategy": "Free One-on-One Strategy Session"
+      }
+    },
+    "navigation": {
+      "login": "Login",
+      "try_free": "Try Free for 30 Days",
+      "language": "English"
+    },
+    "client_showcase": {
+      "client_since": "Client since",
+      "running_salon_title": "Running a salon shouldn't feel like juggling",
+      "running_salon_description": "Manual scheduling, scattered client records, and inefficient workflows drain your time and energy. Double bookings, missed client preferences, and endless admin work leave you frustrated and stuck."
+    },
+    "transformation": {
+      "title": "Transform Your Salon Management",
+      "section_title": "Three Ways ZenManager Transforms Your Business",
+      "smart_booking": {
+        "title": "Smart Booking",
+        "description": "24/7 online booking system that prevents double-bookings and reduces no-shows by 80%"
+      },
+      "client_management": {
+        "title": "Client Management",
+        "description": "Keep track of client preferences, history, and feedback all in one place"
+      },
+      "business_analytics": {
+        "title": "Business Analytics",
+        "description": "Make data-driven decisions with real-time insights and reporting"
+      }
+    },
+    "comparison": {
+      "title": "See What Changes with ZenManager",
+      "subtitle": "Transform your salon operations from chaos to clarity",
+      "before": {
+        "title": "Before ZenManager",
+        "items": {
+          "booking": {
+            "title": "Manual Booking Chaos",
+            "description": "Double bookings, missed appointments, and scheduling conflicts"
+          },
+          "client_info": {
+            "title": "Lost Client Information",
+            "description": "Scattered records make it impossible to deliver consistent, personalized service"
+          },
+          "revenue": {
+            "title": "Revenue Loss",
+            "description": "Missed appointments and abandoned booking requests drain your profits"
+          }
+        }
+      },
+      "after": {
+        "title": "With ZenManager",
+        "items": {
+          "booking": {
+            "title": "Smart Booking System",
+            "description": "Automated scheduling prevents double bookings and reduces no-shows by 80%"
+          },
+          "client_info": {
+            "title": "Centralized Client Records",
+            "description": "All client information, preferences, and history in one secure place"
+          },
+          "follow_up": {
+            "title": "Automated Follow-ups",
+            "description": "Timely reminders and personalized communication build lasting relationships"
+          }
+        }
+      }
+    },
+    "success_path": {
+      "title": "Your Path to Salon Success",
+      "subtitle": "Transform your salon management in three simple steps",
+      "steps": {
+        "step1": {
+          "title": "Take Control of Operations",
+          "description": "Say goodbye to stress. Automate scheduling, centralize client records, and eliminate double bookings.",
+          "cta": "Feel Relieved →"
+        },
+        "step2": {
+          "title": "Grow with Smart Tools",
+          "description": "Track revenue, manage staff, and engage clients with real-time analytics and smart decision-making tools.",
+          "cta": "Feel Confident →"
+        },
+        "step3": {
+          "title": "Deliver Exceptional Experiences",
+          "description": "Remember client preferences, send automated follow-ups, and build lasting loyalty.",
+          "cta": "Feel Accomplished →"
+        }
+      }
+    },
+    "testimonials": {
+      "title": "Trusted by salon owners"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Everything you need to know about ZenManager",
+      "questions": {
+        "salon_types": {
+          "question": "What types of salons can use ZenManager?",
+          "answer": "ZenManager is designed to support a wide variety of beauty and wellness businesses, including:",
+          "businesses": [
+            "Hair Salons – Cuts, coloring, styling, and hair treatments",
+            "Barbershops – Haircuts, shaves, and beard grooming",
+            "Nail Salons and Nail Artists – Manicures, pedicures, and nail art",
+            "Tattoo Studios – Tattoo parlors and body art",
+            "Beauty Studios – Makeup, lashes, and brow services",
+            "Spa and Wellness Centers – Massage, facials, and relaxation treatments",
+            "Skincare Clinics – Cosmetic dermatology and facial treatments",
+            "Cosmetic Clinics – Botox, fillers, and aesthetic procedures",
+            "Eyelash Extension Studios – Lash and brow treatments",
+            "Tanning Salons – UV and spray tanning",
+            "Piercing Studios – Body piercing and jewelry services",
+            "Bridal Services – Hair and makeup for weddings",
+            "Mobile Beauty Services – On-location services",
+            "Men's Grooming Studios – Tailored grooming services",
+            "Body Contouring Studios – Slimming and toning",
+            "Holistic Wellness – Reiki and aromatherapy",
+            "Hair Removal Studios – Waxing and laser services",
+            "Kids' Salons – Beauty services for children",
+            "Tattoo Removal – Laser removal services",
+            "Boutique Salons – High-end beauty services"
+          ]
+        },
+        "efficiency": {
+          "question": "How can ZenManager help manage my salon more efficiently?",
+          "answer": "ZenManager automates appointment scheduling, tracks client records, and simplifies financial reporting. It reduces administrative tasks, helping salon owners focus on client services and growth."
+        },
+        "independent": {
+          "question": "Is ZenManager suitable for independent beauty professionals?",
+          "answer": "Yes! ZenManager offers cost-effective solutions for freelance stylists, tattoo artists, and beauty professionals who manage their own clients. The platform scales based on individual needs, making it ideal for solo entrepreneurs and growing businesses alike."
+        },
+        "implementation": {
+          "question": "How long does it take to implement ZenManager in my salon?",
+          "answer": "Most salons can start using ZenManager immediately after onboarding. The platform features an intuitive interface, and comprehensive training materials are provided to make the transition smooth and straightforward."
+        },
+        "pricing": {
+          "question": "What is the cost of using ZenManager?",
+          "answer": "ZenManager offers flexible pricing based on salon size and booking volume:",
+          "salon_pricing": {
+            "title": "Base Pricing (per salon):",
+            "tiers": [
+              "1 Salon – 20 BGN per salon",
+              "2 to 5 Salons – 50 BGN per salon",
+              "6 to 8 Salons – 100 BGN per salon",
+              "8+ Salons – 120 BGN per salon"
+            ]
+          },
+          "booking_pricing": {
+            "title": "Additional booking-based pricing:",
+            "tiers": [
+              "1 to 150 bookings – 0.50 BGN per booking",
+              "151 to 450 bookings – 0.35 BGN per booking",
+              "451 to 750 bookings – 0.30 BGN per booking",
+              "751 to 1200 bookings – 0.25 BGN per booking",
+              "1201+ bookings – 0.15 BGN per booking"
+            ]
+          }
+        },
+        "trial": {
+          "question": "Does ZenManager offer a free trial?",
+          "answer": "Yes, ZenManager offers a 30-day free trial with full access to all features. This allows you to thoroughly test the platform before making any commitment."
+        },
+        "support": {
+          "question": "What support does ZenManager provide?",
+          "answer": "ZenManager offers dedicated customer support, regular software updates, and comprehensive training materials. Our support team is available to assist with any technical issues or questions."
+        },
+        "scaling": {
+          "question": "Can I scale ZenManager as my salon grows?",
+          "answer": "Absolutely! ZenManager's pricing and features are designed to scale with your business. Whether you're a solo stylist or managing multiple salons, ZenManager adapts to your needs."
+        },
+        "features": {
+          "question": "What features are included with ZenManager?",
+          "key_features": [
+            "Automated Appointment Scheduling",
+            "Client Management",
+            "Performance Analytics",
+            "Payment Integration",
+            "Marketing Tools",
+            "Staff Management",
+            "Loyalty Programs"
+          ]
+        },
+        "signup": {
+          "question": "How do I sign up for ZenManager?",
+          "answer": "You can sign up directly through our website. Simply create an account, select your preferred plan, and start your free trial."
+        }
+      }
+    },
+    "footer": {
+      "product": {
+        "title": "Product",
+        "features": "Features",
+        "pricing": "Pricing"
+      },
+      "company": {
+        "title": "Company",
+        "about": "About Us",
+        "contact": "Contact"
+      },
+      "legal": {
+        "title": "Legal",
+        "privacy": "Privacy",
+        "terms": "Terms & Conditions"
+      },
+      "connect": {
+        "title": "Connect with us",
+        "twitter": "Twitter",
+        "linkedin": "LinkedIn"
+      },
+      "copyright": "© 2024 ZenManager. All rights reserved."
+    },
+    "offer": {
+      "limited_time": "LIMITED TIME OFFER",
+      "start_transformation": "Start Your Salon Transformation Today",
+      "trial_info": "30-Day Free Trial • Cancel Anytime",
+      "money_back": "90-Day Money-Back Guarantee After Trial",
+      "features_title": "Here's Everything You'll Get:",
+      "core_features": {
+        "all_features": {
+          "title": "Full Access to All Features",
+          "description": "Online booking, client management, analytics, and more"
+        },
+        "onboarding": {
+          "title": "Personalized Onboarding Support",
+          "description": "Step-by-step guidance to get your salon running smoothly"
+        }
+      }
+    }
+  }
+} 

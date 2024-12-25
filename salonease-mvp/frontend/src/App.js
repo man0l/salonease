@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { SalonProvider } from './contexts/SalonContext';
 import Header from './components/Header';
@@ -36,6 +36,7 @@ import StripeWrapper from './components/Subscription/StripeWrapper';
 import PublicRoute from './components/Routes/PublicRoute';
 import InvoiceDashboard from './components/Billing/InvoiceDashboard';
 import Profile from './components/Profile/Profile'
+import Homepage from './components/Pages/Homepage';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -61,11 +62,14 @@ const setTheme = (theme) => {
 
 function AppContent() {
   const { user } = useAuth();
+  const location = useLocation();
   
   React.useEffect(() => {
     const savedTheme = 'light';
     setTheme(savedTheme);
   }, []);
+
+  const isHomepage = location.pathname === '/';
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
@@ -77,7 +81,7 @@ function AppContent() {
           </PrivateRoute>
         )}
         <main className="flex-grow overflow-x-hidden overflow-y-auto">
-          <div className="container mx-auto px-2 sm:px-6 py-8 w-full">
+          <div className={isHomepage ? 'w-full' : 'container mx-auto px-2 sm:px-6 py-8 w-full'}>
             <ToastContainer theme="dark" />
             <Routes>
               <Route path="/login" element={
@@ -119,12 +123,7 @@ function AppContent() {
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route 
                 path="/" 
-                element={
-                  <div className="text-center">
-                    <h2 className="text-4xl font-bold mb-4">Welcome to ZenManager</h2>
-                    <p className="text-xl">Your comprehensive salon management solution.</p>
-                  </div>
-                } 
+                element={<Homepage />}
               />
               <Route 
                 path="/profile" 

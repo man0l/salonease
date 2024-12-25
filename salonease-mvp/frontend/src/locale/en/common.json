@@ -41,11 +41,21 @@
     "minutes": "minutes"
   },
   "footer": {
-    "copyright": "© 2024 ZenManager. All rights reserved.",
+    "sections": {
+      "product": "Product",
+      "company": "Company",
+      "legal": "Legal",
+      "connect": "Connect"
+    },
     "links": {
-      "terms": "Terms",
-      "privacy": "Privacy Policy"
-    }
+      "features": "Features",
+      "pricing": "Pricing",
+      "about": "About",
+      "contact": "Contact",
+      "privacy": "Privacy",
+      "terms": "Terms"
+    },
+    "copyright": "© 2024 ZenManager. All rights reserved."
   },
   "header": {
     "brand": "ZenManager",
@@ -53,7 +63,7 @@
     "profile": "Profile",
     "logout": "Logout",
     "login": "Login",
-    "signup": "Sign Up"
+    "signup": "Start Free 30-Day Trial"
   },
   "nav": {
     "brand": "ZenManager",

@@ -38,7 +38,8 @@ module.exports = {
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',
         'gradient-accent': 'var(--gradient-accent)',
-        'gradient-light': 'var(--gradient-light)'
+        'gradient-light': 'var(--gradient-light)',
+        'gradient-text': 'var(--gradient-text)',
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
@@ -53,6 +54,8 @@ module.exports = {
       boxShadow: {
         'custom': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
         'card': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        'glow-primary': 'var(--shadow-glow-primary)',
+        'glow-white': 'var(--shadow-glow-white)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',

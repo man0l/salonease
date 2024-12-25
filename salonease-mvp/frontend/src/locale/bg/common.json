@@ -46,7 +46,17 @@
     "copyright": "© 2024 ZenManager. Всички права запазени.",
     "links": {
       "terms": "Общи условия",
-      "privacy": "Поверителност"
+      "privacy": "Поверителност",
+      "features": "Функции",
+      "pricing": "Цени",
+      "about": "За нас",
+      "contact": "Контакти"
+    },
+    "sections": {
+      "product": "Продукт",
+      "company": "Компания",
+      "legal": "Правни",
+      "connect": "Свържи се с нас"
     }
   },
   "header": {
@@ -55,7 +65,7 @@
     "profile": "Профил",
     "logout": "Изход",
     "login": "Вход",
-    "signup": "Регистрация"
+    "signup": "Пробвай безплатно за 30 дни"
   },
   "nav": {
     "brand": "ZenManager",

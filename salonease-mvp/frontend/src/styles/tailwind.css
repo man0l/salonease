@@ -25,6 +25,9 @@
     --gradient-primary: linear-gradient(135deg, #fae8ff 0%, #f5d0fe 100%);
     --gradient-accent: linear-gradient(135deg, #e879f9 0%, #c026d3 100%);
     --gradient-light: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%);
+    --shadow-glow-primary: 0 0 20px rgba(192, 38, 211, 0.2);
+    --shadow-glow-white: 0 0 20px rgba(255, 255, 255, 0.3);
+    --gradient-text: linear-gradient(135deg, #c026d3 0%, #86198f 100%);
   }
 
   :root[data-theme="dark"] {
@@ -51,6 +54,9 @@
     --gradient-primary: linear-gradient(135deg, #701a75 0%, #86198f 100%);
     --gradient-accent: linear-gradient(135deg, #a21caf 0%, #c026d3 100%);
     --gradient-light: linear-gradient(135deg, #4a044e 0%, #701a75 100%);
+    --shadow-glow-primary: 0 0 20px rgba(232, 121, 249, 0.2);
+    --shadow-glow-white: 0 0 20px rgba(255, 255, 255, 0.1);
+    --gradient-text: linear-gradient(135deg, #e879f9 0%, #c026d3 100%);
   }
 }
 
