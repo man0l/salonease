@@ -35,7 +35,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./salonease-mvp/backend
-          file: ./salonease-mvp/backend/Dockerfile
+          file: ./salonease-mvp/backend/Dockerfile.prod
           push: true
           tags: ghcr.io/man0l/salonease:backend-latest,ghcr.io/man0l/salonease:backend-${{ env.COMMIT_SHORT_SHA }}
           cache-from: type=gha
@@ -45,7 +45,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./salonease-mvp/frontend
-          file: ./salonease-mvp/frontend/Dockerfile
+          file: ./salonease-mvp/frontend/Dockerfile.prod
           push: true
           tags: ghcr.io/man0l/salonease:frontend-latest,ghcr.io/man0l/salonease:frontend-${{ env.COMMIT_SHORT_SHA }}
           cache-from: type=gha
