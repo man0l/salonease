@@ -48,14 +48,6 @@ services:
       - ./salonease-mvp/backend/.env
     environment:
       - NODE_ENV=production
-      - DB_USER=${POSTGRES_USER}
-      - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - DB_NAME=${POSTGRES_DB}
-      - DB_HOST=db
-      - DB_POOL_MAX=5
-      - DB_POOL_MIN=0
-      - DB_POOL_IDLE=10000
-      - DB_POOL_ACQUIRE=30000
       - FRONTEND_URL=https://zenmanager.eu
     labels:
       - "traefik.enable=true"
@@ -76,10 +68,8 @@ services:
 
   db:
     image: postgres:13-alpine
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+    env_file:
+      - ./salonease-mvp/backend/.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -93,9 +83,8 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    env_file:
+      - ./salonease-mvp/backend/.env
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     labels:
