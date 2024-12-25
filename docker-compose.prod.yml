@@ -26,12 +26,12 @@ services:
   frontend:
     image: ghcr.io/man0l/salonease:frontend-latest
     env_file:
-      - ./frontend/.env
+      - ./salonease-mvp/frontend/.env
     environment:
-      - REACT_APP_API_URL=https://zen-manager.eu/api
+      - REACT_APP_API_URL=https://zenmanager.eu/api
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`zen-manager.eu`) && !PathPrefix(`/api`)"
+      - "traefik.http.routers.frontend.rule=Host(`zenmanager.eu`) && !PathPrefix(`/api`)"
       - "traefik.http.routers.frontend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
@@ -45,7 +45,7 @@ services:
   backend:
     image: ghcr.io/man0l/salonease:backend-latest
     env_file:
-      - ./backend/.env
+      - ./salonease-mvp/backend/.env
     environment:
       - NODE_ENV=production
       - DB_USER=${POSTGRES_USER}
@@ -56,10 +56,10 @@ services:
       - DB_POOL_MIN=0
       - DB_POOL_IDLE=10000
       - DB_POOL_ACQUIRE=30000
-      - FRONTEND_URL=https://zen-manager.eu
+      - FRONTEND_URL=https://zenmanager.eu
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`zen-manager.eu`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.rule=Host(`zenmanager.eu`) && PathPrefix(`/api`)"
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
       - "traefik.http.services.backend.loadbalancer.server.port=5000"
@@ -100,7 +100,7 @@ services:
       - pgadmin_data:/var/lib/pgadmin
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.zen-manager.eu`)"
+      - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.zenmanager.eu`)"
       - "traefik.http.routers.pgadmin.entrypoints=websecure"
       - "traefik.http.routers.pgadmin.tls.certresolver=myresolver"
       - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
