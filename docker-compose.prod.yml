@@ -64,9 +64,6 @@ services:
       db:
         condition: service_healthy
     restart: unless-stopped
-    command: >
-      sh -c "NODE_ENV=production && npx sequelize-cli db:migrate &&
-             node src/server.js"
 
   db:
     image: postgres:13-alpine
