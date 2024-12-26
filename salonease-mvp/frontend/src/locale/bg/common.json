@@ -210,5 +210,9 @@
   "date": {
     "monthYear": "{{date, MMMM YYYY}}",
     "dateRange": "{{startDate, MMMM DD}} – {{endDate, DD}}, {{startDate, YYYY}}"
+  },
+  "meta": {
+    "title": "ZenManager - софтуер за салони за красота",
+    "description": "софтуер за салони за красота ZenManager"
   }
 }

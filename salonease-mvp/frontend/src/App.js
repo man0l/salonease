@@ -37,7 +37,7 @@ import PublicRoute from './components/Routes/PublicRoute';
 import InvoiceDashboard from './components/Billing/InvoiceDashboard';
 import Profile from './components/Profile/Profile'
 import Homepage from './components/Pages/Homepage';
-
+import { useTranslation } from 'react-i18next';
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
   
@@ -63,8 +63,13 @@ const setTheme = (theme) => {
 function AppContent() {
   const { user } = useAuth();
   const location = useLocation();
-  
+  const { t } = useTranslation(['common']);
   React.useEffect(() => {
+    document.title = t('common:meta.title');
+    document
+      .querySelector('meta[name="description"]')
+      .setAttribute('content', t('common:meta.description'));
+
     const savedTheme = 'light';
     setTheme(savedTheme);
   }, []);

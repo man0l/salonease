@@ -183,5 +183,9 @@
   "date": {
     "monthYear": "{{date, MMMM YYYY}}",
     "dateRange": "{{startDate, MMMM DD}} – {{endDate, DD}}, {{startDate, YYYY}}"
+  },
+  "meta": {
+    "title": "ZenManager - Beauty Salon Software",
+    "description": "Beauty salon software ZenManager"
   }
 }
