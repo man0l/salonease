@@ -31,8 +31,8 @@ module.exports = {
   production: {
     username: process.env.POSTGRES_USER,
     password: process.env.POSTGRES_PASSWORD,
-    database: process.env.POSTGRES_DB,
-    host: process.env.POSTGRES_HOST,
+    database: process.env.POSTGRES_DB || 'salonease',
+    host: process.env.POSTGRES_HOST || 'db',
     dialect: 'postgres',
     logging: false,
     pool: {
