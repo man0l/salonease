@@ -38,8 +38,8 @@ i18n.use(initReactI18next).init({
       pages: require('./locale/bg/pages.json')
     },
   },
-  lng: "en", // default language
-  fallbackLng: "en",
+  lng: "bg", // changed default language to Bulgarian
+  fallbackLng: "bg", // changed fallback language to Bulgarian
   interpolation: {
     escapeValue: false
   }
