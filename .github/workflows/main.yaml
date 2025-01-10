@@ -48,5 +48,8 @@ jobs:
           file: ./salonease-mvp/frontend/Dockerfile.prod
           push: true
           tags: ghcr.io/man0l/salonease:frontend-latest,ghcr.io/man0l/salonease:frontend-${{ env.COMMIT_SHORT_SHA }}
+          build-args: |
+            REACT_APP_MAILERLITE_API_KEY=${{ secrets.REACT_APP_MAILERLITE_API_KEY }}
+            REACT_APP_STRIPE_PUBLISHABLE_KEY=${{ secrets.REACT_APP_STRIPE_PUBLISHABLE_KEY }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

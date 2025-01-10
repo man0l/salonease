@@ -24,16 +24,6 @@ services:
     restart: unless-stopped
 
   frontend:
-    build:
-      context: ./salonease-mvp/frontend
-      dockerfile: Dockerfile
-      args:
-        - REACT_APP_API_URL=${REACT_APP_API_URL}
-        - REACT_APP_BACKEND_PORT=${REACT_APP_BACKEND_PORT}
-        - REACT_APP_STRIPE_BOOKING_PRICE_ID=${REACT_APP_STRIPE_BOOKING_PRICE_ID}
-        - REACT_APP_STRIPE_BASE_PRICE_ID=${REACT_APP_STRIPE_BASE_PRICE_ID}
-        - REACT_APP_STRIPE_PUBLISHABLE_KEY=${REACT_APP_STRIPE_PUBLISHABLE_KEY}
-        - REACT_APP_MAILERLITE_API_KEY=${REACT_APP_MAILERLITE_API_KEY}
     image: ghcr.io/man0l/salonease:frontend-latest
     env_file:
       - ./salonease-mvp/frontend/.env
