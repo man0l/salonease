@@ -16,6 +16,9 @@ const LeadMagnet = () => {
   });
   const [loading, setLoading] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [notification, setNotification] = useState({
     show: false,
     message: '',
@@ -29,6 +32,58 @@ const LeadMagnet = () => {
     '/images/guide4.png',
     '/images/guide5.png',
   ];
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+    setIsDragging(true);
+  };
+
+  const onTouchMove = (e) => {
+    if (isDragging) {
+      setTouchEnd(e.targetTouches[0].clientX);
+    }
+  };
+
+  const onTouchEnd = () => {
+    setIsDragging(false);
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      nextImage();
+    } else if (isRightSwipe) {
+      prevImage();
+    }
+  };
+
+  // Mouse events for desktop drag
+  const onMouseDown = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.clientX);
+    setIsDragging(true);
+  };
+
+  const onMouseMove = (e) => {
+    if (isDragging) {
+      setTouchEnd(e.clientX);
+    }
+  };
+
+  const onMouseUp = () => {
+    onTouchEnd();
+  };
+
+  const onMouseLeave = () => {
+    if (isDragging) {
+      onTouchEnd();
+    }
+  };
 
   const nextImage = () => {
     setCurrentImage((prev) => (prev + 1) % images.length);
@@ -113,6 +168,66 @@ const LeadMagnet = () => {
     });
   };
 
+  // Update the carousel JSX in both mobile and desktop sections
+  const renderCarousel = (isMobile = false) => (
+    <div 
+      className="relative w-full aspect-[3/4] rounded-xl overflow-hidden shadow-2xl"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      onMouseDown={onMouseDown}
+      onMouseMove={onMouseMove}
+      onMouseUp={onMouseUp}
+      onMouseLeave={onMouseLeave}
+      style={{ touchAction: 'pan-y pinch-zoom' }}
+    >
+      {images.map((src, index) => (
+        <img
+          key={src}
+          src={src}
+          alt={`Guide preview ${index + 1}`}
+          className={`absolute inset-0 w-full h-full object-cover transform transition-all duration-500 ${
+            isDragging ? 'transition-none' : ''
+          } ${
+            index === currentImage 
+              ? 'opacity-100 translate-x-0' 
+              : index < currentImage 
+                ? 'opacity-0 -translate-x-full' 
+                : 'opacity-0 translate-x-full'
+          }`}
+          draggable="false"
+        />
+      ))}
+      
+      {/* Navigation Buttons */}
+      <button
+        onClick={prevImage}
+        className={`absolute left-${isMobile ? '2' : '4'} top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg transition-all duration-200`}
+      >
+        <ChevronLeftIcon className={`h-${isMobile ? '5' : '6'} w-${isMobile ? '5' : '6'} text-gray-800`} />
+      </button>
+      <button
+        onClick={nextImage}
+        className={`absolute right-${isMobile ? '2' : '4'} top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg transition-all duration-200`}
+      >
+        <ChevronRightIcon className={`h-${isMobile ? '5' : '6'} w-${isMobile ? '5' : '6'} text-gray-800`} />
+      </button>
+
+      {/* Dots Indicator */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+        {images.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentImage(index)}
+            className={`w-2 h-2 rounded-full transition-all duration-200 ${
+              index === currentImage ? 'bg-white w-4' : 'bg-white/60'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-0 sm:py-6">
       <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-8 relative overflow-hidden">
@@ -132,49 +247,7 @@ const LeadMagnet = () => {
 
           {/* Mobile Carousel - Only visible on mobile */}
           <div className="lg:hidden relative mb-8">
-            <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden shadow-2xl">
-              {images.map((src, index) => (
-                <img
-                  key={src}
-                  src={src}
-                  alt={`Guide preview ${index + 1}`}
-                  className={`absolute inset-0 w-full h-full object-cover transform transition-all duration-500 ${
-                    index === currentImage 
-                      ? 'opacity-100 translate-x-0' 
-                      : index < currentImage 
-                        ? 'opacity-0 -translate-x-full' 
-                        : 'opacity-0 translate-x-full'
-                  }`}
-                />
-              ))}
-              
-              {/* Mobile Navigation Buttons */}
-              <button
-                onClick={prevImage}
-                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg transition-all duration-200"
-              >
-                <ChevronLeftIcon className="h-5 w-5 text-gray-800" />
-              </button>
-              <button
-                onClick={nextImage}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg transition-all duration-200"
-              >
-                <ChevronRightIcon className="h-5 w-5 text-gray-800" />
-              </button>
-
-              {/* Mobile Dots Indicator */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
-                {images.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentImage(index)}
-                    className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                      index === currentImage ? 'bg-white w-4' : 'bg-white/60'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
+            {renderCarousel(true)}
           </div>
 
           {/* Audience Section */}
@@ -279,49 +352,7 @@ const LeadMagnet = () => {
           {/* Right Column - Guide Preview (Desktop only) */}
           <div className="relative hidden lg:block">
             <div className="relative h-full flex items-center justify-center">
-              <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden shadow-2xl">
-                {images.map((src, index) => (
-                  <img
-                    key={src}
-                    src={src}
-                    alt={`Guide preview ${index + 1}`}
-                    className={`absolute inset-0 w-full h-full object-cover transform transition-all duration-500 ${
-                      index === currentImage 
-                        ? 'opacity-100 translate-x-0' 
-                        : index < currentImage 
-                          ? 'opacity-0 -translate-x-full' 
-                          : 'opacity-0 translate-x-full'
-                    }`}
-                  />
-                ))}
-                
-                {/* Desktop Navigation Buttons */}
-                <button
-                  onClick={prevImage}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg transition-all duration-200"
-                >
-                  <ChevronLeftIcon className="h-6 w-6 text-gray-800" />
-                </button>
-                <button
-                  onClick={nextImage}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg transition-all duration-200"
-                >
-                  <ChevronRightIcon className="h-6 w-6 text-gray-800" />
-                </button>
-
-                {/* Desktop Dots Indicator */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
-                  {images.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentImage(index)}
-                      className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                        index === currentImage ? 'bg-white w-4' : 'bg-white/60'
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
+              {renderCarousel(false)}
             </div>
           </div>
         </div>
