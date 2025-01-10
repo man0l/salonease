@@ -1,11 +1,11 @@
-# Move these to before the build stage since environment variables are needed during build
+# Stage 1: Build the application
+FROM node:18 as builder
+
+# Define build arguments and environment variables
 ARG REACT_APP_MAILERLITE_API_KEY
 ARG REACT_APP_STRIPE_PUBLISHABLE_KEY
 ENV REACT_APP_MAILERLITE_API_KEY=$REACT_APP_MAILERLITE_API_KEY
 ENV REACT_APP_STRIPE_PUBLISHABLE_KEY=$REACT_APP_STRIPE_PUBLISHABLE_KEY
-
-# Stage 1: Build the application
-FROM node:18 as builder
 
 WORKDIR /app
 
