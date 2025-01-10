@@ -38,6 +38,7 @@ import InvoiceDashboard from './components/Billing/InvoiceDashboard';
 import Profile from './components/Profile/Profile'
 import Homepage from './components/Pages/Homepage';
 import LeadMagnet from './components/Pages/LeadMagnet';
+import LandingLayout from './components/Layouts/LandingLayout';
 import { useTranslation } from 'react-i18next';
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -76,20 +77,28 @@ function AppContent() {
   }, []);
 
   const isHomepage = location.pathname === '/';
+  const isLandingPage = ['/lead-magnet', '/guide'].includes(location.pathname);
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <Header />
+      {!isLandingPage && <Header />}
       <div className="flex-grow flex">
-        {user && (
+        {user && !isLandingPage && (
           <PrivateRoute allowedRoles={[ROLES.SALON_OWNER, ROLES.STAFF, ROLES.SUPER_ADMIN]}>
             <Sidebar className="w-64 flex-shrink-0 bg-card border-r border-muted" />
           </PrivateRoute>
         )}
         <main className="flex-grow overflow-x-hidden overflow-y-auto">
-          <div className={isHomepage ? 'w-full' : 'container mx-auto px-2 sm:px-6 py-8 w-full'}>
+          <div className={isHomepage || isLandingPage ? 'w-full' : 'container mx-auto px-2 sm:px-6 py-8 w-full'}>
             <ToastContainer theme="dark" />
             <Routes>
+              {/* Landing Pages */}
+              <Route element={<LandingLayout />}>
+                <Route path="/lead-magnet" element={<LeadMagnet />} />
+                <Route path="/guide" element={<LeadMagnet />} />
+              </Route>
+
+              {/* Regular Routes */}
               <Route path="/login" element={
                 <PublicRoute>
                   <Login />
@@ -236,11 +245,6 @@ function AppContent() {
                   </StripeWrapper>
                 } 
               />
-              <Route path="/guide" element={
-                <PublicRoute>
-                  <LeadMagnet />
-                </PublicRoute>
-              } />
             </Routes>
           </div>
         </main>

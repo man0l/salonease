@@ -114,25 +114,68 @@ const LeadMagnet = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-12 relative overflow-hidden">
-
-        {/* Full-width header section */}
-        <div className="mb-12">
-          <p className="text-lg text-gray-700 text-center max-w-3xl mx-auto mb-8 leading-relaxed bg-amber-50/80 p-6 rounded-lg border border-amber-100 shadow-sm">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-0 sm:py-6">
+      <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-8 relative overflow-hidden">
+        {/* Compact header section */}
+        <div className="mb-6">
+          <p className="text-lg text-gray-700 text-center max-w-3xl mx-auto mb-6 leading-relaxed bg-amber-50/80 p-4 sm:p-6 rounded-lg border border-amber-100 shadow-sm">
             {t('leadMagnet.audience')}
-          </p>  
-          {/* <h1 className="text-4xl sm:text-5xl font-extrabold text-center mb-6 bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">
-            {t('leadMagnet.title')}
-          </h1> */}
+          </p>
           
           <h2 className="text-2xl sm:text-3xl font-semibold text-center text-primary-600 mb-4 opacity-90">
             {t('leadMagnet.subtitle')}
           </h2>
 
-          <p className="text-lg text-gray-600 text-center max-w-3xl mx-auto mb-8 leading-relaxed">
+          <p className="text-lg text-gray-600 text-center max-w-3xl mx-auto mb-6 leading-relaxed">
             {t('leadMagnet.mainDescription')}
           </p>
+
+          {/* Mobile Carousel - Only visible on mobile */}
+          <div className="lg:hidden relative mb-8">
+            <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden shadow-2xl">
+              {images.map((src, index) => (
+                <img
+                  key={src}
+                  src={src}
+                  alt={`Guide preview ${index + 1}`}
+                  className={`absolute inset-0 w-full h-full object-cover transform transition-all duration-500 ${
+                    index === currentImage 
+                      ? 'opacity-100 translate-x-0' 
+                      : index < currentImage 
+                        ? 'opacity-0 -translate-x-full' 
+                        : 'opacity-0 translate-x-full'
+                  }`}
+                />
+              ))}
+              
+              {/* Mobile Navigation Buttons */}
+              <button
+                onClick={prevImage}
+                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg transition-all duration-200"
+              >
+                <ChevronLeftIcon className="h-5 w-5 text-gray-800" />
+              </button>
+              <button
+                onClick={nextImage}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg transition-all duration-200"
+              >
+                <ChevronRightIcon className="h-5 w-5 text-gray-800" />
+              </button>
+
+              {/* Mobile Dots Indicator */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+                {images.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImage(index)}
+                    className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                      index === currentImage ? 'bg-white w-4' : 'bg-white/60'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
 
           {/* Audience Section */}
           <div className="max-w-2xl mx-auto">            
@@ -150,12 +193,12 @@ const LeadMagnet = () => {
           </div>
         </div>
 
-        {/* Two-column layout for content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        {/* Two-column layout for content - Stack on mobile */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Left Column - Benefits and Form */}
           <div>
             {/* Benefits Section */}
-            <div className="mb-12">
+            <div className="mb-8">
               <h3 className="text-xl font-semibold text-center text-gray-900 mb-6">
                 {t('leadMagnet.benefits.title')}
               </h3>
@@ -233,7 +276,7 @@ const LeadMagnet = () => {
             </div>
           </div>
 
-          {/* Right Column - Guide Preview */}
+          {/* Right Column - Guide Preview (Desktop only) */}
           <div className="relative hidden lg:block">
             <div className="relative h-full flex items-center justify-center">
               <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden shadow-2xl">
@@ -252,7 +295,7 @@ const LeadMagnet = () => {
                   />
                 ))}
                 
-                {/* Navigation Buttons */}
+                {/* Desktop Navigation Buttons */}
                 <button
                   onClick={prevImage}
                   className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg transition-all duration-200"
@@ -266,7 +309,7 @@ const LeadMagnet = () => {
                   <ChevronRightIcon className="h-6 w-6 text-gray-800" />
                 </button>
 
-                {/* Dots Indicator */}
+                {/* Desktop Dots Indicator */}
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
                   {images.map((_, index) => (
                     <button
