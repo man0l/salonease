@@ -135,6 +135,7 @@ function AppContent() {
                 </PublicRoute>
               } />
               <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route 
                 path="/" 

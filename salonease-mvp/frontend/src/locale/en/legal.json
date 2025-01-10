@@ -8,12 +8,58 @@
     "data_collection": "Data Collection",
     "contact_us": "Contact Us"
   },
-  "welcome_message": "Welcome to [COMPANY_NAME]!",
-  "terms_intro": "These terms and conditions outline the rules and regulations for the use of [COMPANY_NAME]'s Website, located at [WEBSITE_URL].",
-  "terms_acceptance": "By accessing this website we assume you accept these terms and conditions. Do not continue to use [WEBSITE_URL] if you do not agree to take all of the terms and conditions stated on this page.",
-  "cookies_explanation": "We employ the use of cookies. By accessing [WEBSITE_URL], you agreed to use cookies in agreement with the [COMPANY_NAME]'s Privacy Policy.",
-  "license_explanation": "Unless otherwise stated, [COMPANY_NAME] and/or its licensors own the intellectual property rights for all material on [WEBSITE_URL]. All intellectual property rights are reserved. You may access this from [WEBSITE_URL] for your own personal use subjected to restrictions set in these terms and conditions.",
-  "privacy_intro": "This Privacy Policy describes how we collect, use, and handle your personal information.",
-  "data_collection_explanation": "We collect information that you provide directly to us when using our services.",
-  "contact_information": "If you have any questions about this Privacy Policy, please contact us at [CONTACT_EMAIL]."
+  "company": {
+    "name": "Pazaruvai Umno Ltd.",
+    "website": "https://zenmanager.eu",
+    "email": "hello@zenmanager.eu"
+  },
+  "welcome_message": "Welcome to Pazaruvai Umno Ltd.!",
+  "terms_intro": "These terms and conditions outline the rules and regulations for the use of Pazaruvai Umno Ltd.'s Website, located at https://zenmanager.eu.",
+  "terms_acceptance": "By accessing this website we assume you accept these terms and conditions. Do not continue to use https://zenmanager.eu if you do not agree to take all of the terms and conditions stated on this page.",
+  "cookies_explanation": "We employ the use of cookies. By accessing https://zenmanager.eu, you agreed to use cookies in agreement with the Pazaruvai Umno Ltd.'s Privacy Policy.",
+  "license_explanation": "Unless otherwise stated, Pazaruvai Umno Ltd. and/or its licensors own the intellectual property rights for all material on https://zenmanager.eu. All intellectual property rights are reserved. You may access this from https://zenmanager.eu for your own personal use subjected to restrictions set in these terms and conditions.",
+  "privacy": {
+    "title": "Privacy Policy",
+    "last_updated": "Last updated: {{date}}",
+    "introduction": "At {{company}}, we value your privacy and are committed to protecting your personal data. This privacy policy will inform you about how we look after your personal data when you visit our website ({{website}}) and tell you about your privacy rights and how the law protects you.",
+    "sections": {
+      "information_collection": {
+        "title": "Information We Collect",
+        "content": "We collect several types of information from and about users of our website, including information about your salon, staff, services, clients, and bookings."
+      },
+      "log_data": {
+        "title": "Log Data",
+        "content": "Like many site operators, we collect information that your browser sends whenever you visit our website. This Log Data may include information such as your computer's Internet Protocol (IP) address, browser type, browser version, the pages of our site that you visit, the time and date of your visit, the time spent on those pages and other statistics."
+      },
+      "cookies": {
+        "title": "Cookies",
+        "content": "Cookies are files with a small amount of data, which may include an anonymous unique identifier. We use cookies to understand and save your preferences for future visits, keep track of advertisements, and compile aggregate data about site traffic and site interaction."
+      },
+      "security": {
+        "title": "Security",
+        "content": "The security of your Personal Information is important to us, but remember that no method of transmission over the Internet, or method of electronic storage, is 100% secure. While we strive to use commercially acceptable means to protect your Personal Information, we cannot guarantee its absolute security."
+      },
+      "gdpr": {
+        "title": "GDPR - Your Rights Under EU Data Protection Law",
+        "content": "If you are a resident of the European Union (EU) or European Economic Area (EEA), you have certain data protection rights under the GDPR. We aim to take reasonable steps to allow you to correct, amend, delete, or limit the use of your Personal Information. Your rights include:",
+        "rights": [
+          "The right to access – You have the right to request copies of your personal data.",
+          "The right to rectification – You have the right to request that we correct any information you believe is inaccurate or complete information you believe is incomplete.",
+          "The right to erasure – You have the right to request that we erase your personal data, under certain conditions.",
+          "The right to restrict processing – You have the right to request that we restrict the processing of your personal data, under certain conditions.",
+          "The right to object to processing – You have the right to object to our processing of your personal data, under certain conditions.",
+          "The right to data portability – You have the right to request that we transfer the data that we have collected to another organization, or directly to you, under certain conditions."
+        ],
+        "exercise_rights": "To exercise any of these rights, please contact us using the contact information provided in this Privacy Policy. We will respond to your request within 30 days."
+      },
+      "changes": {
+        "title": "Changes to This Privacy Policy",
+        "content": "We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page. You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page. Last modified on {{date}}."
+      },
+      "contact": {
+        "title": "Contact Us",
+        "content": "If you have any questions about this Privacy Policy, please contact us at {{email}}."
+      }
+    }
+  }
 }
