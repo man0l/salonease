@@ -8,6 +8,8 @@ services:
     volumes:
       - ./salonease-mvp/frontend:/app:delegated
       - /app/node_modules
+    environment:
+      - REACT_APP_MAILERLITE_API_KEY=${REACT_APP_MAILERLITE_API_KEY}
     depends_on:
       - backend
 

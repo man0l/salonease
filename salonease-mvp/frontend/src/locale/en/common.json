@@ -28,6 +28,8 @@
     "invalid": "Invalid {{field}}",
     "email": "Email",
     "fullName": "Full Name",
+    "firstName": "First Name",
+    "lastName": "Last Name",
     "address": "Address",
     "contactNumber": "Contact Number",
     "description": "Description",
@@ -187,5 +189,32 @@
   "meta": {
     "title": "ZenManager - Beauty Salon Software",
     "description": "Beauty salon software ZenManager"
+  },
+  "leadMagnet": {
+    "title": "Transform Your Salon with Proven Strategies!",
+    "subtitle": "Most Valuable Promise",
+    "mainDescription": "Take control of your salon's operations with the \"Guide to a Profitable Salon\"! Discover the key methods to streamline scheduling, improve team productivity, and boost customer satisfaction—all tailored to salon owners like you.",
+    "benefits": {
+      "title": "What You'll Gain from This Free Guide:",
+      "items": [
+        "Simplified staff management techniques.",
+        "Strategies to eliminate scheduling chaos.",
+        "Tools to increase bookings and revenue.",
+        "Tips for better team communication and retention."
+      ]
+    },
+    "cta": {
+      "title": "Ready to Take the First Step Toward a More Profitable Salon?",
+      "subtitle": "Download your free copy today and start making impactful changes immediately!"
+    },
+    "form": {
+      "title": "Sign Up and Get Your Free Guide Now!",
+      "subtitle": "No spam, just actionable insights.",
+      "button": "Get My Free Guide",
+      "disclaimer": "Your email address is safe with us. You can unsubscribe anytime.",
+      "success": "Thank you! Your guide has been sent to your email.",
+      "error": "An error occurred. Please try again.",
+      "alreadySubscribed": "You are already subscribed! Check your email for the guide."
+    }
   }
 }

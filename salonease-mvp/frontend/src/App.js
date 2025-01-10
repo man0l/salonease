@@ -37,6 +37,7 @@ import PublicRoute from './components/Routes/PublicRoute';
 import InvoiceDashboard from './components/Billing/InvoiceDashboard';
 import Profile from './components/Profile/Profile'
 import Homepage from './components/Pages/Homepage';
+import LeadMagnet from './components/Pages/LeadMagnet';
 import { useTranslation } from 'react-i18next';
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -235,6 +236,11 @@ function AppContent() {
                   </StripeWrapper>
                 } 
               />
+              <Route path="/guide" element={
+                <PublicRoute>
+                  <LeadMagnet />
+                </PublicRoute>
+              } />
             </Routes>
           </div>
         </main>
