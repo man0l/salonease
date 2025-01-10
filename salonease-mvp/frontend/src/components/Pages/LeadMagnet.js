@@ -19,6 +19,7 @@ const LeadMagnet = () => {
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [showThankYou, setShowThankYou] = useState(false);
   const [notification, setNotification] = useState({
     show: false,
     message: '',
@@ -108,7 +109,7 @@ const LeadMagnet = () => {
         {
           email: formData.email,
           fields: {
-            name: `${formData.firstName} ${formData.lastName}`.trim(),
+            name: formData.firstName,
             first_name: formData.firstName,
             last_name: formData.lastName,
             language: i18n.language,
@@ -132,15 +133,9 @@ const LeadMagnet = () => {
         });
       } catch (fbError) {
         console.error('Facebook tracking error:', fbError);
-        // Don't fail the form submission if tracking fails
       }
       
-      setNotification({
-        show: true,
-        message: t('leadMagnet.form.success'),
-        type: 'success',
-      });
-
+      setShowThankYou(true);
       setFormData({ firstName: '', lastName: '', email: '' });
     } catch (error) {
       console.error('MailerLite Error:', error.response?.data || error);
@@ -227,6 +222,42 @@ const LeadMagnet = () => {
       </div>
     </div>
   );
+
+  if (showThankYou) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+          <div className="max-w-3xl mx-auto">
+            <CheckCircleIcon className="mx-auto h-16 w-16 text-green-500 mb-6" />
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+              {t('leadMagnet.thankYou.title')}
+            </h1>
+            <p className="text-xl text-gray-600 mb-8">
+              {t('leadMagnet.thankYou.subtitle')}
+            </p>
+            <div className="bg-gray-50 rounded-lg p-6 mb-8">
+              <p className="text-gray-700 mb-6">
+                {t('leadMagnet.thankYou.message')}
+              </p>
+              <div className="space-y-4">
+                {t('leadMagnet.thankYou.nextSteps', { returnObjects: true }).map((step, index) => (
+                  <div key={index} className="flex items-center space-x-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                      <span className="text-primary-600 font-semibold">{index + 1}</span>
+                    </div>
+                    <span className="text-gray-700 text-left">{step}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <p className="text-sm text-gray-500">
+              {t('leadMagnet.thankYou.support')}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-0 sm:py-6">

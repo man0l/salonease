@@ -217,6 +217,18 @@
       "error": "An error occurred. Please try again.",
       "alreadySubscribed": "You are already subscribed! Check your email for the guide.",
       "submitting": "Submitting..."
+    },
+    "thankYou": {
+      "title": "Thank You for Subscribing!",
+      "subtitle": "Your guide is on its way to your inbox",
+      "message": "Please check your email in the next few minutes. If you don't see it, please check your spam folder.",
+      "nextSteps": [
+        "Open the email from ZenManager",
+        "Click the download link in the email",
+        "Save the guide to your device",
+        "Start implementing the strategies today!"
+      ],
+      "support": "If you need any help, contact us at hello@zenmanager.eu"
     }
   }
 }
