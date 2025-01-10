@@ -191,9 +191,10 @@
     "description": "Beauty salon software ZenManager"
   },
   "leadMagnet": {
-    "title": "Transform Your Salon with Proven Strategies!",
-    "subtitle": "Most Valuable Promise",
-    "mainDescription": "Take control of your salon's operations with the \"Guide to a Profitable Salon\"! Discover the key methods to streamline scheduling, improve team productivity, and boost customer satisfaction—all tailored to salon owners like you.",
+    "audience": "If you you are a manicurist / hairstylist / makeup artist and you are tired of the constant problems and chaos, then this is for you",
+    "title": "New guide reveals the secret to more personal time and less chaos in the salon",
+    "subtitle": "Free your time and say goodbye to stress by holding and motivating your staff and increasing your revenue with a few simple steps in just 4 weeks",
+    "mainDescription": "without expensive courses and without more wasted money",
     "benefits": {
       "title": "What You'll Gain from This Free Guide:",
       "items": [
@@ -214,7 +215,8 @@
       "disclaimer": "Your email address is safe with us. You can unsubscribe anytime.",
       "success": "Thank you! Your guide has been sent to your email.",
       "error": "An error occurred. Please try again.",
-      "alreadySubscribed": "You are already subscribed! Check your email for the guide."
+      "alreadySubscribed": "You are already subscribed! Check your email for the guide.",
+      "submitting": "Submitting..."
     }
   }
 }

@@ -8,8 +8,8 @@ services:
     volumes:
       - ./salonease-mvp/frontend:/app:delegated
       - /app/node_modules
-    environment:
-      - REACT_APP_MAILERLITE_API_KEY=${REACT_APP_MAILERLITE_API_KEY}
+    env_file:
+      - salonease-mvp/frontend/.env
     depends_on:
       - backend
 
@@ -22,13 +22,10 @@ services:
     volumes:
       - ./salonease-mvp/backend:/app:delegated
       - /app/node_modules
+    env_file:
+      - salonease-mvp/backend/.env
     environment:
       - NODE_ENV=development
-      - DB_USER=postgres
-      - DB_PASSWORD=password
-      - DB_NAME=salonease
-      - DB_HOST=db
-      - JWT_SECRET=the key is used mostly for testing
       - DB_POOL_MAX=5
       - DB_POOL_MIN=0
       - DB_POOL_IDLE=10000

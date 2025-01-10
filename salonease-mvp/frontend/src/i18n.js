@@ -1,15 +1,15 @@
 import i18n from "i18next";
-import { useTranslation, initReactI18next } from "react-i18next";
+import { initReactI18next } from "react-i18next";
 
 i18n.use(initReactI18next).init({
   resources: {
     en: {
+      common: require('./locale/en/common.json'),
       navigation: require('./locale/en/navigation.json'),
       salon: require('./locale/en/salon.json'),
       auth: require('./locale/en/auth.json'),
       service: require('./locale/en/service.json'),
       clients: require('./locale/en/clients.json'),
-      common: require('./locale/en/common.json'),
       bookings: require('./locale/en/bookings.json'),
       dashboard: require('./locale/en/dashboard.json'),
       legal: require('./locale/en/legal.json'),
@@ -21,12 +21,12 @@ i18n.use(initReactI18next).init({
       pages: require('./locale/en/pages.json')
     },
     bg: {
+      common: require('./locale/bg/common.json'),
       navigation: require('./locale/bg/navigation.json'),
       salon: require('./locale/bg/salon.json'),
       auth: require('./locale/bg/auth.json'),
       service: require('./locale/bg/service.json'),
       clients: require('./locale/bg/clients.json'),
-      common: require('./locale/bg/common.json'),
       bookings: require('./locale/bg/bookings.json'),
       dashboard: require('./locale/bg/dashboard.json'),
       legal: require('./locale/bg/legal.json'),
@@ -38,8 +38,10 @@ i18n.use(initReactI18next).init({
       pages: require('./locale/bg/pages.json')
     },
   },
-  lng: "bg", // changed default language to Bulgarian
-  fallbackLng: "bg", // changed fallback language to Bulgarian
+  lng: "bg", // default language
+  fallbackLng: "en",
+  defaultNS: "common",
+  ns: ["common", "navigation", "salon", "auth", "service", "clients", "bookings", "dashboard", "legal", "staff", "reports", "modals", "billing", "profile", "pages"],
   interpolation: {
     escapeValue: false
   }
