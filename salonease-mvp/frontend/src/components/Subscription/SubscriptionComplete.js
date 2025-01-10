@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { useAuth } from '../../hooks/useAuth';
-import { authApi } from '../../utils/api';
+import { authApi, api } from '../../utils/api';
 
 const SubscriptionComplete = () => {
   const stripe = useStripe();
@@ -41,6 +41,32 @@ const SubscriptionComplete = () => {
             try {
               await authApi.completeOnboarding();
               await fetchUser();
+              
+              // Track StartTrial event
+              try {
+                // Split fullName into first and last name for Facebook tracking
+                const nameParts = user.fullName.split(' ');
+                const firstName = nameParts[0];
+                const lastName = nameParts.slice(1).join(' ');
+
+                await api.post('/facebook/events/start-trial', {
+                  email: user.email,
+                  fullName: user.fullName,
+                  firstName,
+                  lastName
+                });
+                // Also trigger the pixel event on the frontend
+                if (window.fbq) {
+                  window.fbq('track', 'StartTrial', {
+                    value: 0,
+                    currency: 'BGN'
+                  });
+                }
+              } catch (fbError) {
+                console.error('Facebook tracking error:', fbError);
+                // Don't fail the subscription process if tracking fails
+              }
+
               setStatus('success');
               toast.success(t('common:subscription.complete.success'));
               setTimeout(() => {
