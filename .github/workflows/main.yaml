@@ -70,6 +70,7 @@ jobs:
         run: |
           echo "REACT_APP_MAILERLITE_API_KEY=${{ secrets.REACT_APP_MAILERLITE_API_KEY }}" > ./salonease-mvp/frontend/.env.production
           echo "REACT_APP_STRIPE_PUBLISHABLE_KEY=${{ secrets.REACT_APP_STRIPE_PUBLISHABLE_KEY }}" >> ./salonease-mvp/frontend/.env.production
+          echo "REACT_APP_API_URL=https://zenmanager.eu/api" >> ./salonease-mvp/frontend/.env.production
           
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

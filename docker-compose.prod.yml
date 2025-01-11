@@ -27,8 +27,6 @@ services:
     image: ghcr.io/man0l/salonease:frontend-latest
     env_file:
       - ./salonease-mvp/frontend/.env
-    environment:
-      - REACT_APP_API_URL=https://zenmanager.eu/api
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`zenmanager.eu`) && !PathPrefix(`/api`)"
