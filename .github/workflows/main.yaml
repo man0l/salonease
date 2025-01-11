@@ -66,12 +66,10 @@ jobs:
           calculatedSha=$(git rev-parse --short ${{ github.sha }})
           echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_ENV
           
-      - name: Create runtime environment file
+      - name: Create environment file
         run: |
-          cat << EOF > ./salonease-mvp/frontend/.env.production
-          REACT_APP_MAILERLITE_API_KEY=${{ secrets.REACT_APP_MAILERLITE_API_KEY }}
-          REACT_APP_STRIPE_PUBLISHABLE_KEY=${{ secrets.REACT_APP_STRIPE_PUBLISHABLE_KEY }}
-          EOF
+          echo "REACT_APP_MAILERLITE_API_KEY=${{ secrets.REACT_APP_MAILERLITE_API_KEY }}" > ./salonease-mvp/frontend/.env.production
+          echo "REACT_APP_STRIPE_PUBLISHABLE_KEY=${{ secrets.REACT_APP_STRIPE_PUBLISHABLE_KEY }}" >> ./salonease-mvp/frontend/.env.production
           
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
