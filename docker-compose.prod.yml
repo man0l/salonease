@@ -94,6 +94,7 @@ services:
       - ./salonease-mvp/backend/.env
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+      - pgadmin_logs:/var/log/pgadmin
       - ./pgadmin/config_distro.py:/pgadmin4/config_distro.py
     labels:
       - "traefik.enable=true"
@@ -103,6 +104,7 @@ services:
       - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
     networks:
       - app-network
+    user: "5050:5050"
     depends_on:
       - db
     restart: unless-stopped
@@ -124,4 +126,5 @@ networks:
 
 volumes:
   postgres_data:
-  pgadmin_data: 
+  pgadmin_data:
+  pgadmin_logs:
