@@ -104,7 +104,14 @@ services:
       - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
     networks:
       - app-network
-    user: "5050:5050"
+    user: root
+    entrypoint: >
+      /bin/sh -c "
+      mkdir -p /var/log/pgadmin &&
+      chown -R 5050:5050 /var/log/pgadmin &&
+      chmod 750 /var/log/pgadmin &&
+      /entrypoint.sh
+      "
     depends_on:
       - db
     restart: unless-stopped
@@ -127,4 +134,4 @@ networks:
 volumes:
   postgres_data:
   pgadmin_data:
-  pgadmin_logs:
+  pgadmin_logs: 
