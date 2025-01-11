@@ -64,7 +64,9 @@ services:
       - "traefik.http.middlewares.cors.headers.accesscontrolallowheaders=*"
       - "traefik.http.middlewares.cors.headers.accesscontrolmaxage=100"
       - "traefik.http.middlewares.cors.headers.addvaryheader=true"
-      - "traefik.http.routers.backend.middlewares=strip-api@docker"
+      - "traefik.http.services.backend-service.loadbalancer.server.port=5000"
+      - "traefik.http.services.backend-service.loadbalancer.passHostHeader=true"
+      - "traefik.http.routers.backend.service=backend-service"
       - "com.centurylinklabs.watchtower.enable=true"
     networks:
       - app-network
