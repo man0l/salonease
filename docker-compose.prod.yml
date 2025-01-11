@@ -47,6 +47,8 @@ services:
     environment:
       - NODE_ENV=production
       - FRONTEND_URL=https://zenmanager.eu
+      - CORS_ORIGIN=https://zenmanager.eu
+      - PORT=5000
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`zenmanager.eu`) && PathPrefix(`/api`)"
@@ -54,7 +56,12 @@ services:
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
       - "traefik.http.services.backend.loadbalancer.server.port=5000"
       - "traefik.http.middlewares.strip-api-prefix.stripprefix.prefixes=/api"
-      - "traefik.http.routers.backend.middlewares=strip-api-prefix@docker"
+      - "traefik.http.middlewares.cors.headers.accesscontrolallowmethods=GET,POST,PUT,DELETE,OPTIONS"
+      - "traefik.http.middlewares.cors.headers.accesscontrolalloworiginlist=https://zenmanager.eu"
+      - "traefik.http.middlewares.cors.headers.accesscontrolallowheaders=*"
+      - "traefik.http.middlewares.cors.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.cors.headers.addvaryheader=true"
+      - "traefik.http.routers.backend.middlewares=strip-api-prefix@docker,cors@docker"
       - "com.centurylinklabs.watchtower.enable=true"
     networks:
       - app-network
