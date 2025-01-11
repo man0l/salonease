@@ -4,10 +4,7 @@ import appConfig from '../config/appConfig';
 
 export const passwordSchema = yup.string()
   .min(8, 'Password must be at least 8 characters')
-  .matches(/[a-z]/, 'Password must contain a lowercase letter')
-  .matches(/[A-Z]/, 'Password must contain an uppercase letter')
-  .matches(/[0-9]/, 'Password must contain a number')
-  .matches(/[@$!%*?&#]/, 'Password must contain a special character')
+  .matches(/^[a-zA-Z0-9]{8,}$/, 'Password must contain only letters and numbers')
   .required('Password is required');
 
 export const emailSchema = yup.string()
