@@ -84,6 +84,7 @@ services:
       - ./salonease-mvp/backend/.env
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/config_distro.py:/pgadmin4/config_distro.py
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.zenmanager.eu`)"
