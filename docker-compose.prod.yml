@@ -100,6 +100,10 @@ services:
       - ./pgadmin/config_distro.py:/pgadmin4/config_distro.py
     environment:
       - SCRIPT_NAME=/
+      - PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION=False
+      - PGADMIN_CONFIG_PROXY_X_FOR_COUNT=1
+      - PGADMIN_CONFIG_PROXY_X_PROTO_COUNT=1
+      - PGADMIN_CONFIG_PROXY_X_HOST_COUNT=1
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.zenmanager.eu`)"
@@ -107,14 +111,10 @@ services:
       - "traefik.http.routers.pgadmin.tls.certresolver=myresolver"
       - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
       - "traefik.http.middlewares.pgadmin-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.pgadmin-headers.headers.customrequestheaders.X-Forwarded-For=10.0.0.1"
       - "traefik.http.middlewares.pgadmin-headers.headers.customrequestheaders.X-Forwarded-Host=pgadmin.zenmanager.eu"
-      - "traefik.http.middlewares.pgadmin-headers.headers.sslredirect=true"
-      - "traefik.http.middlewares.pgadmin-headers.headers.stsincludesubdomains=true"
-      - "traefik.http.middlewares.pgadmin-headers.headers.stsseconds=315360000"
-      - "traefik.http.routers.pgadmin.middlewares=pgadmin-headers,pgadmin-cf"
-      - "traefik.http.middlewares.pgadmin-cf.headers.hostsProxyHeaders=X-Forwarded-Host"
-      - "traefik.http.middlewares.pgadmin-cf.headers.customRequestHeaders.CF-Connecting-IP=${X-Real-IP}"
-      - "traefik.http.middlewares.pgadmin-cf.headers.customRequestHeaders.X-Real-IP=${X-Real-IP}"
+      - "traefik.http.middlewares.pgadmin-headers.headers.customrequestheaders.X-Real-IP=10.0.0.1"
+      - "traefik.http.routers.pgadmin.middlewares=pgadmin-headers"
     networks:
       - app-network
     user: root
