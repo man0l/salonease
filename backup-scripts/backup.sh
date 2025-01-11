@@ -12,15 +12,29 @@ mkdir -p $BACKUP_DIR
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 BACKUP_FILE="$BACKUP_DIR/salonease_backup_$TIMESTAMP.sql"
 
-# Check if docker compose services are running
-if ! docker compose -f $COMPOSE_FILE ps | grep -q "db.*running"; then
+# Check if docker compose file exists
+if [ ! -f "$COMPOSE_FILE" ]; then
+    echo "Error: Docker compose file not found at $COMPOSE_FILE"
+    exit 1
+fi
+
+# List running containers for debugging
+echo "Checking running containers..."
+docker ps | grep "postgres"
+
+# Check if database container is running (more flexible check)
+if ! docker ps --format '{{.Names}}' | grep -q "_db_"; then
     echo "Error: Database container is not running"
+    echo "Current directory: $(pwd)"
+    echo "Docker compose file: $COMPOSE_FILE"
+    echo "Available containers:"
+    docker ps
     exit 1
 fi
 
 # Create the backup
 echo "Creating backup..."
-if docker compose -f $COMPOSE_FILE exec db pg_dump -U postgres salonease > "$BACKUP_FILE"; then
+if docker compose -f $COMPOSE_FILE exec -T db pg_dump -U postgres salonease > "$BACKUP_FILE"; then
     # Compress the backup
     echo "Compressing backup..."
     gzip "$BACKUP_FILE"
