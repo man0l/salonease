@@ -22,8 +22,8 @@ fi
 echo "Checking running containers..."
 docker ps | grep "postgres"
 
-# Check if database container is running (more flexible check)
-if ! docker ps --format '{{.Names}}' | grep -q "_db_"; then
+# Check if database container is running (using the correct container name pattern)
+if ! docker ps --format '{{.Names}}' | grep -q "salonease-db-"; then
     echo "Error: Database container is not running"
     echo "Current directory: $(pwd)"
     echo "Docker compose file: $COMPOSE_FILE"
