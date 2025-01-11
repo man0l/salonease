@@ -33,7 +33,7 @@ services:
       - ./salonease-mvp/frontend/.env
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`zenmanager.eu`) && !PathPrefix(`/api`)"
+      - "traefik.http.routers.frontend.rule=Host(`zenmanager.eu`) && !PathPrefix(`/api`) && !PathPrefix(`/uploads`)"
       - "traefik.http.routers.frontend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
       - "traefik.http.services.frontend.loadbalancer.server.port=80"
@@ -55,9 +55,17 @@ services:
       - PORT=5000
     labels:
       - "traefik.enable=true"
+      # Main API router
       - "traefik.http.routers.backend.rule=Host(`zenmanager.eu`) && PathPrefix(`/api`)"
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
+      
+      # Static files router for uploads
+      - "traefik.http.routers.backend-uploads.rule=Host(`zenmanager.eu`) && PathPrefix(`/uploads`)"
+      - "traefik.http.routers.backend-uploads.entrypoints=websecure"
+      - "traefik.http.routers.backend-uploads.tls.certresolver=myresolver"
+      - "traefik.http.routers.backend-uploads.service=backend-service"
+      
       - "traefik.http.services.backend.loadbalancer.server.port=5000"
       - "traefik.http.middlewares.strip-api.stripprefix.prefixes=/api"
       - "traefik.http.middlewares.cors.headers.accesscontrolallowmethods=GET,POST,PUT,DELETE,OPTIONS"
@@ -75,6 +83,8 @@ services:
       db:
         condition: service_healthy
     restart: unless-stopped
+    volumes:
+      - ./salonease-mvp/backend/uploads:/app/uploads
 
   db:
     image: postgres:13-alpine
