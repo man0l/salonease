@@ -593,7 +593,7 @@ const Homepage = () => {
                   <img 
                     src="/images/money_back_guarantee.png" 
                     alt="90 Day Money Back Guarantee" 
-                    className="w-24 h-24 object-contain"
+                    className="w-48 h-48 object-contain"
                   />
                 </div>
                 <h4 className="text-xl font-bold text-gray-900 mb-2">{t('pages:homepage.guarantee.title')}</h4>
