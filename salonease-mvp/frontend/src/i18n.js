@@ -39,7 +39,7 @@ i18n.use(initReactI18next).init({
     },
   },
   lng: "bg", // default language
-  fallbackLng: "en",
+  fallbackLng: "bg",
   defaultNS: "common",
   ns: ["common", "navigation", "salon", "auth", "service", "clients", "bookings", "dashboard", "legal", "staff", "reports", "modals", "billing", "profile", "pages"],
   interpolation: {
