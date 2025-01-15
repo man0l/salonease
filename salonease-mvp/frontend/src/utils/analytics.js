@@ -8,11 +8,7 @@ export const trackFacebookEvent = async (eventName, eventData) => {
     }
 
     if (window.fbq) {
-      window.fbq('track', 'Lead', {
-        email: formData.email,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-      });
+      window.fbq('track', eventName, eventData);
     }
 
     const response = await api.post('/facebook/events/lead', {
