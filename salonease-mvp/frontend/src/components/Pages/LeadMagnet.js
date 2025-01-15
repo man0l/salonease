@@ -127,9 +127,8 @@ const LeadMagnet = () => {
       
       try {
         await trackFacebookEvent('Lead', {
-          email: formData.email,
-          firstName: formData.firstName,
-          lastName: formData.lastName
+          currency: 'BGN',
+          value: 0,
         });
       } catch (fbError) {
         console.error('Facebook tracking error:', fbError);

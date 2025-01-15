@@ -2,7 +2,7 @@ import { api } from './api';
 
 export const trackFacebookEvent = async (eventName, eventData) => {
   try {
-    if (!eventName || !eventData?.email) {
+    if (!eventName && !eventData) {
       console.error('Invalid Facebook event data:', { eventName, eventData });
       return false;
     }
