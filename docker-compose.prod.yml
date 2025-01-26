@@ -151,18 +151,14 @@ services:
   n8n:
     image: n8nio/n8n:latest
     env_file:
-      - ./salonease-mvp/backend/.env  # Reuse existing DB credentials
+      - ./salonease-mvp/backend/.env
     environment:
       - DB_TYPE=postgresdb
-      - DB_POSTGRESDB_HOST=db
-      - DB_POSTGRESDB_PORT=5432
-      - DB_POSTGRESDB_USER=${POSTGRES_USER}  # From your .env file
-      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
-      - DB_POSTGRESDB_DATABASE=${POSTGRES_DB}
       - N8N_HOST=n8n.zenmanager.eu
       - N8N_PROTOCOL=https
       - N8N_PORT=5678
       - WEBHOOK_URL=https://n8n.zenmanager.eu/
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.n8n.rule=Host(`n8n.zenmanager.eu`)"
