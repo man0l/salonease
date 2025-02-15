@@ -72,7 +72,7 @@ fi
 
 # 3. Create database backup
 echo "Creating database backup..."
-if PGPASSWORD="${DB_POSTGRESDB_PASSWORD}" docker compose -f $COMPOSE_FILE exec -T db pg_dump \
+if docker compose -f $COMPOSE_FILE exec -T -e PGPASSWORD="${DB_POSTGRESDB_PASSWORD}" db pg_dump \
     -U "${DB_POSTGRESDB_USER}" \
     -d "${DB_POSTGRESDB_DATABASE}" \
     -h "${DB_POSTGRESDB_HOST:-db}" | gzip > "$DATABASE_BACKUP_FILE"; then
