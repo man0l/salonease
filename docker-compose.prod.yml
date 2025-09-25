@@ -168,7 +168,7 @@ services:
       - "traefik.http.services.n8n.loadbalancer.server.port=5678"
       
       # WebSocket support middleware
-      - "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Origin=n8n.zenmanager.eu"
+      #- "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Origin=n8n.zenmanager.eu"
       - "traefik.http.routers.n8n.middlewares=websocket-headers"
       
       - "com.centurylinklabs.watchtower.enable=true"
