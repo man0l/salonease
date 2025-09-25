@@ -169,7 +169,7 @@ services:
       
       # WebSocket support middleware
       #- "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Origin=n8n.zenmanager.eu"
-      - "traefik.http.routers.n8n.middlewares=websocket-headers"
+      #- "traefik.http.routers.n8n.middlewares=websocket-headers"
       
       - "com.centurylinklabs.watchtower.enable=true"
     networks:
