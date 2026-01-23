@@ -87,7 +87,7 @@ services:
       - ./salonease-mvp/backend/uploads:/app/uploads
 
   python-runner:
-    image: ghcr.io/man0l/mcp-run-workflows-contabo:latest
+    image: ghcr.io/man0l/cold-email-ninja:prod
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
     networks:
