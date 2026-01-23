@@ -86,6 +86,14 @@ services:
     volumes:
       - ./salonease-mvp/backend/uploads:/app/uploads
 
+  python-runner:
+    image: ghcr.io/man0l/mcp-run-workflows-contabo:latest
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    networks:
+      - app-network
+    restart: unless-stopped
+
   db:
     image: postgres:13-alpine
     env_file:
