@@ -112,6 +112,17 @@ services:
       retries: 5
     restart: unless-stopped
 
+  supabase-db17:
+    image: supabase/postgres:17.6.1.074
+    command: postgres -c listen_addresses='*' -c shared_preload_libraries='pg_cron,pg_net' -c cron.database_name=supabase_cloud_clone
+    env_file:
+      - ./supabase/.env
+    volumes:
+      - supabase_pg17_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    restart: unless-stopped
+
   supabase-kong:
     image: kong:2.1
     env_file:
@@ -201,12 +212,41 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  supabase-functions:
+    image: supabase/edge-runtime:v1.69.6
+    env_file:
+      - ./supabase/.env
+    environment:
+      - SUPABASE_URL=http://supabase-kong:8000
+      - SUPABASE_ANON_KEY=$${ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=$${SERVICE_ROLE_KEY}
+      - SUPABASE_DB_URL=postgresql://postgres:$${POSTGRES_PASSWORD}@db:5432/$${POSTGRES_DB}
+      - JWT_SECRET=$${JWT_SECRET}
+      - VERIFY_JWT=false
+    command:
+      - start
+      - --main-service
+      - /home/deno/functions/main
+    volumes:
+      - ./supabase/functions:/home/deno/functions:rw
+    networks:
+      - app-network
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
   supabase-studio:
     image: supabase/studio:latest
     env_file:
       - ./supabase/.env
     environment:
       - PORT=3000
+      - EDGE_FUNCTIONS_MANAGEMENT_FOLDER=/tmp/edge-functions
+      - EDGE_FUNCTIONS_URL=http://supabase-functions:9000
+      - POSTGRES_PASSWORD=$${POSTGRES_PASSWORD}
+      - AUTH_JWT_SECRET=$${JWT_SECRET}
+      - SUPABASE_PUBLIC_URL=$${SUPABASE_PUBLIC_URL}
     healthcheck:
       disable: true
     labels:
@@ -214,12 +254,16 @@ services:
       - "traefik.http.routers.supabase-studio.rule=Host(`studio.zenmanager.eu`)"
       - "traefik.http.routers.supabase-studio.entrypoints=websecure"
       - "traefik.http.routers.supabase-studio.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.supabase-studio-auth.basicauth.users=admin:$$2y$$05$$ttwQ1gfOS3bIpnG7k6SiHOT3f7iLDIqW1cl/KtKtPXZIu0AcOefUC"
+      - "traefik.http.routers.supabase-studio.middlewares=supabase-studio-auth"
       - "traefik.http.services.supabase-studio.loadbalancer.server.port=3000"
       - "com.centurylinklabs.watchtower.enable=true"
     networks:
       - app-network
     depends_on:
       supabase-meta:
+        condition: service_started
+      supabase-functions:
         condition: service_started
       supabase-kong:
         condition: service_started
@@ -317,3 +361,4 @@ volumes:
   pgadmin_logs: 
   n8n_data:
   supabase_storage:
+  supabase_pg17_data:
