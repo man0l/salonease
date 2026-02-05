@@ -96,11 +96,13 @@ services:
 
   db:
     image: pgvector/pgvector:pg13
+    command: postgres -c wal_level=logical
     env_file:
       - ./salonease-mvp/backend/.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-pgvector.sql:/docker-entrypoint-initdb.d/init-pgvector.sql:ro
+      - ./supabase/init:/docker-entrypoint-initdb.d/supabase:ro
     networks:
       - app-network
     healthcheck:
@@ -110,19 +112,117 @@ services:
       retries: 5
     restart: unless-stopped
 
-  supabase:
-    image: supabase/postgrest:latest
+  supabase-kong:
+    image: kong:2.1
     env_file:
-      - ./salonease-mvp/backend/.env
+      - ./supabase/.env
     environment:
-      - PGRST_DB_URI=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      - PGRST_DB_SCHEMA=public
-      - PGRST_DB_ANON_ROLE=${POSTGRES_USER}
+      - KONG_DATABASE=off
+      - KONG_DECLARATIVE_CONFIG=/var/lib/kong/kong.yml
+      - KONG_DNS_ORDER=LAST,A,CNAME
+      - KONG_PLUGINS=request-transformer,cors,key-auth,acl
+    volumes:
+      - ./supabase/kong.yml:/var/lib/kong/kong.yml:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.supabase-api.rule=Host(`api.zenmanager.eu`)"
+      - "traefik.http.routers.supabase-api.entrypoints=websecure"
+      - "traefik.http.routers.supabase-api.tls.certresolver=myresolver"
+      - "traefik.http.services.supabase-api.loadbalancer.server.port=8000"
+      - "com.centurylinklabs.watchtower.enable=true"
     networks:
       - app-network
     depends_on:
       db:
         condition: service_healthy
+    restart: unless-stopped
+
+  supabase-auth:
+    image: supabase/gotrue:v2.2.12
+    env_file:
+      - ./supabase/.env
+    networks:
+      - app-network
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  supabase-rest:
+    image: postgrest/postgrest:v9.0.0
+    env_file:
+      - ./supabase/.env
+    networks:
+      - app-network
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  supabase-realtime:
+    image: supabase/realtime:v0.21.0
+    env_file:
+      - ./supabase/.env
+    environment:
+      - PORT=4000
+    command: >
+      bash -c "./prod/rel/realtime/bin/realtime eval Realtime.Release.migrate
+      && ./prod/rel/realtime/bin/realtime start"
+    networks:
+      - app-network
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  supabase-storage:
+    image: supabase/storage-api:v0.10.0
+    env_file:
+      - ./supabase/.env
+    volumes:
+      - supabase_storage:/var/lib/storage
+    networks:
+      - app-network
+    depends_on:
+      db:
+        condition: service_healthy
+      supabase-rest:
+        condition: service_started
+    restart: unless-stopped
+
+  supabase-meta:
+    image: supabase/postgres-meta:v0.29.0
+    env_file:
+      - ./supabase/.env
+    networks:
+      - app-network
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  supabase-studio:
+    image: supabase/studio:latest
+    env_file:
+      - ./supabase/.env
+    environment:
+      - PORT=3000
+    healthcheck:
+      disable: true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.supabase-studio.rule=Host(`studio.zenmanager.eu`)"
+      - "traefik.http.routers.supabase-studio.entrypoints=websecure"
+      - "traefik.http.routers.supabase-studio.tls.certresolver=myresolver"
+      - "traefik.http.services.supabase-studio.loadbalancer.server.port=3000"
+      - "com.centurylinklabs.watchtower.enable=true"
+    networks:
+      - app-network
+    depends_on:
+      supabase-meta:
+        condition: service_started
+      supabase-kong:
+        condition: service_started
     restart: unless-stopped
 
   pgadmin:
@@ -216,3 +316,4 @@ volumes:
   pgadmin_data:
   pgadmin_logs: 
   n8n_data:
+  supabase_storage:
