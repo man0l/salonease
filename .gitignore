@@ -1,3 +1,4 @@
 **/.env
 supabase/kong.yml
+supabase/studio.env
 supabase/.temp/

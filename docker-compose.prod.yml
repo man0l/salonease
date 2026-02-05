@@ -114,11 +114,13 @@ services:
 
   supabase-db17:
     image: supabase/postgres:17.6.1.074
-    command: postgres -c listen_addresses='*' -c shared_preload_libraries='pg_cron,pg_net' -c cron.database_name=supabase_cloud_clone
+    entrypoint: /docker-custom/db-entrypoint.sh
+    command: postgres -c listen_addresses='*' -c shared_preload_libraries='pg_cron,pg_net' -c cron.database_name=salonease -c pg_net.database_name=salonease
     env_file:
       - ./supabase/.env
     volumes:
       - supabase_pg17_data:/var/lib/postgresql/data
+      - ./supabase/db-entrypoint.sh:/docker-custom/db-entrypoint.sh:ro
     networks:
       - app-network
     restart: unless-stopped
@@ -202,7 +204,7 @@ services:
     restart: unless-stopped
 
   supabase-meta:
-    image: supabase/postgres-meta:v0.29.0
+    image: supabase/postgres-meta:v0.95.2
     env_file:
       - ./supabase/.env
     networks:
@@ -210,6 +212,29 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    restart: unless-stopped
+
+  studio-pgmeta-proxy:
+    image: python:3.11-slim
+    command: python /app/pgmeta-proxy.py
+    environment:
+      - PG_META_URL=http://supabase-meta:8080
+      - PORT=8082
+    volumes:
+      - ./supabase/pgmeta-proxy.py:/app/pgmeta-proxy.py:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.studio-pgmeta-query.rule=Host(`studio.zenmanager.eu`) && Path(`/api/platform/pg-meta/default/query`)"
+      - "traefik.http.routers.studio-pgmeta-query.entrypoints=websecure"
+      - "traefik.http.routers.studio-pgmeta-query.tls.certresolver=myresolver"
+      - "traefik.http.routers.studio-pgmeta-query.priority=100"
+      - "traefik.http.routers.studio-pgmeta-query.middlewares=supabase-studio-auth"
+      - "traefik.http.services.studio-pgmeta-query.loadbalancer.server.port=8082"
+    networks:
+      - app-network
+    depends_on:
+      supabase-meta:
+        condition: service_started
     restart: unless-stopped
 
   supabase-functions:
@@ -246,7 +271,11 @@ services:
       - EDGE_FUNCTIONS_URL=http://supabase-functions:9000
       - POSTGRES_PASSWORD=$${POSTGRES_PASSWORD}
       - AUTH_JWT_SECRET=$${JWT_SECRET}
-      - SUPABASE_PUBLIC_URL=$${SUPABASE_PUBLIC_URL}
+      - SNIPPETS_MANAGEMENT_FOLDER=/tmp/snippets
+      - STUDIO_PG_META_URL=http://studio-pgmeta-proxy:8082
+    volumes:
+      - ./supabase/studio.env:/app/apps/studio/.env:ro
+      - ./supabase/functions:/tmp/edge-functions:ro
     healthcheck:
       disable: true
     labels:
