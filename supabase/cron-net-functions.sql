@@ -91,3 +91,23 @@ select cron.schedule('enrichment_worker_c', '*/1 * * * *', $$select public.invok
 select cron.schedule('enrichment_worker_d', '*/1 * * * *', $$select public.invoke_enrichment_worker(1);$$);
 select cron.schedule('enrichment_worker_e', '*/1 * * * *', $$select public.invoke_enrichment_worker(1);$$);
 select cron.schedule('verification_worker_a', '*/1 * * * *', $$select public.invoke_verification_worker(1);$$);
+
+-- Retention policy: purge system data older than 1 day (hourly)
+-- Application data (campaigns, leads, enrichment_jobs, email_verification_files) is never purged.
+create or replace function public.cleanup_system_data()
+returns void
+language plpgsql
+security definer
+as $$
+begin
+  -- pg_cron job run history
+  delete from cron.job_run_details where end_time < now() - interval '1 day';
+  -- pg_net HTTP responses
+  delete from net._http_response where created < now() - interval '1 day';
+  -- pgmq archived messages
+  delete from pgmq.a_lead_enrichment where archived_at < now() - interval '1 day';
+end;
+$$;
+
+do $$ begin perform cron.unschedule('system_data_cleanup'); exception when others then null; end $$;
+select cron.schedule('system_data_cleanup', '0 * * * *', $$select public.cleanup_system_data();$$);
