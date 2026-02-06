@@ -83,6 +83,25 @@ Deno.serve(async (req: Request) => {
 
     let processed = 0;
 
+    // Helper: run DB updates in batches of CONCURRENCY
+    const CONCURRENCY = 25;
+    async function batchUpdate(items: { id: string; casual: string }[]) {
+      let done = 0;
+      for (let i = 0; i < items.length; i += CONCURRENCY) {
+        const batch = items.slice(i, i + CONCURRENCY);
+        await Promise.all(
+          batch.map((item) =>
+            supabase
+              .from("leads")
+              .update({ company_name_casual: item.casual })
+              .eq("id", item.id)
+          )
+        );
+        done += batch.length;
+      }
+      return done;
+    }
+
     if (use_openai) {
       // Get OpenAI key from api_keys table
       const { data: keyRow } = await supabase
@@ -126,35 +145,26 @@ Deno.serve(async (req: Request) => {
           const content = JSON.parse(result.choices[0].message.content);
           const casualNames: string[] = content.names || content.result || Object.values(content);
 
-          for (let j = 0; j < chunk.length && j < casualNames.length; j++) {
-            await supabase
-              .from("leads")
-              .update({ company_name_casual: casualNames[j] })
-              .eq("id", chunk[j].id);
-            processed++;
-          }
+          const updates = chunk
+            .slice(0, casualNames.length)
+            .map((lead, j) => ({ id: lead.id, casual: casualNames[j] }));
+          processed += await batchUpdate(updates);
         } catch {
           // Fallback to heuristic for this chunk
-          for (const lead of chunk) {
-            const casual = casualiseName(lead.company_name);
-            await supabase
-              .from("leads")
-              .update({ company_name_casual: casual })
-              .eq("id", lead.id);
-            processed++;
-          }
+          const updates = chunk.map((lead) => ({
+            id: lead.id,
+            casual: casualiseName(lead.company_name),
+          }));
+          processed += await batchUpdate(updates);
         }
       }
     } else {
-      // Heuristic-only mode (fast, no API cost)
-      for (const lead of leads) {
-        const casual = casualiseName(lead.company_name);
-        await supabase
-          .from("leads")
-          .update({ company_name_casual: casual })
-          .eq("id", lead.id);
-        processed++;
-      }
+      // Heuristic-only mode (fast, no API cost) — batch 25 concurrent DB updates
+      const updates = leads.map((lead) => ({
+        id: lead.id,
+        casual: casualiseName(lead.company_name),
+      }));
+      processed = await batchUpdate(updates);
     }
 
     return jsonResponse({ processed, total: leads.length, campaign_id });
