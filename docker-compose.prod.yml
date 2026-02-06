@@ -123,6 +123,11 @@ services:
       - ./supabase/db-entrypoint.sh:/docker-custom/db-entrypoint.sh:ro
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
 
   supabase-kong:
@@ -170,6 +175,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      supabase-db17:
+        condition: service_healthy
     restart: unless-stopped
 
   supabase-realtime:
@@ -211,6 +218,8 @@ services:
       - app-network
     depends_on:
       db:
+        condition: service_healthy
+      supabase-db17:
         condition: service_healthy
     restart: unless-stopped
 
