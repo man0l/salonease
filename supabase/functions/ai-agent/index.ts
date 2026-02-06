@@ -31,11 +31,41 @@ You have tools to:
 - Run pipeline steps: scrape → clean → find emails → find decision makers → casualise names
 - Check job progress
 
-Rules:
+## CRITICAL: Confirmation Flow
+
+You MUST follow these confirmation rules for every pipeline step. NEVER skip them.
+
+### 1. Scrape Google Maps
+- ALWAYS run with test_only=true FIRST. This scrapes only 20 leads as a quality check.
+- Present sample results to the user: show a few lead names, categories, and locations.
+- Ask: "These are sample results. Do they look relevant? Should I proceed with the full scrape?"
+- Only after explicit confirmation, run with test_only=false for the full scrape.
+
+### 2. Clean & Validate
+- ALWAYS run with dry_run=true FIRST. This returns a summary without starting the job.
+- Present the summary: total leads, leads with websites, categories breakdown if available.
+- Ask: "I found X leads with websites ready to validate. Want me to start the cleaning job?"
+- Only after confirmation, run with dry_run=false.
+
+### 3. Find Emails (PAID API — costs credits)
+- ALWAYS run with dry_run=true FIRST.
+- Present the summary: total leads, leads WITHOUT emails that will be processed, estimated API cost (~1 credit per lead).
+- Ask: "This will process X leads at ~X API credits. Want me to proceed?"
+- Only after confirmation, run with dry_run=false.
+
+### 4. Find Decision Makers (PAID API — costs money)
+- ALWAYS run with dry_run=true FIRST.
+- Present the summary: total leads, leads WITHOUT decision makers, estimated cost.
+- Ask: "This will process X leads using OpenAI + DataForSEO. Want me to proceed?"
+- Only after confirmation, run with dry_run=false.
+
+### 5. Casualise Names
+- No confirmation needed. Runs inline, free, completes immediately.
+
+## General Rules
 - Always confirm which campaign to operate on before running tools. Use list_campaigns if unsure.
-- Pipeline steps should run in order: scrape_google_maps → clean_and_validate → find_emails → find_decision_makers → casualise_names
-- Scrape, clean, find_emails, and find_decision_makers are ASYNC — they create background jobs processed by a worker. Tell the user to check back or ask you for status.
-- casualise_names runs inline and completes immediately.
+- Pipeline steps should run in order: scrape → clean → find emails → find decision makers → casualise names
+- Scrape, clean, find_emails, and find_decision_makers are ASYNC — they create background jobs. Tell the user to check the Jobs tab or ask you for status.
 - When creating a scrape job, always ask for keywords if not provided.
 - Be concise but helpful. Report job IDs and eligible lead counts after each step.`;
 
@@ -70,7 +100,7 @@ const TOOLS = [
     function: {
       name: "scrape_google_maps",
       description:
-        "Scrape business leads from Google Maps for a campaign. Creates an async background job.",
+        "Scrape business leads from Google Maps for a campaign. Set test_only=true for a QA test (20 leads) before committing to a full scrape. Set test_only=false for the full scrape after user confirms.",
       parameters: {
         type: "object",
         properties: {
@@ -82,7 +112,11 @@ const TOOLS = [
           },
           max_leads: {
             type: "number",
-            description: "Target number of leads (default 1000)",
+            description: "Target number of leads for full scrape (default 1000). Ignored when test_only=true.",
+          },
+          test_only: {
+            type: "boolean",
+            description: "If true, scrape only 20 leads as a QA quality check. ALWAYS call with test_only=true first.",
           },
         },
         required: ["campaign_id", "keywords"],
@@ -94,7 +128,7 @@ const TOOLS = [
     function: {
       name: "clean_and_validate",
       description:
-        "Clean and validate leads — checks that websites are live, optionally filters by category. Creates an async background job.",
+        "Clean and validate leads — checks that websites are live, optionally filters by category. Set dry_run=true to get a preview summary without creating a job. Set dry_run=false to actually start the job after user confirms.",
       parameters: {
         type: "object",
         properties: {
@@ -105,6 +139,10 @@ const TOOLS = [
             description: "Optional category filter (OR logic)",
           },
           max_leads: { type: "number", description: "Max leads to process" },
+          dry_run: {
+            type: "boolean",
+            description: "If true, return a preview summary without creating a job. ALWAYS call with dry_run=true first.",
+          },
         },
         required: ["campaign_id"],
       },
@@ -115,7 +153,7 @@ const TOOLS = [
     function: {
       name: "find_emails",
       description:
-        "Find email addresses for leads by scraping their websites. Creates an async background job.",
+        "Find email addresses for leads by scraping their websites. PAID API (~1 credit per lead). Set dry_run=true to get a cost preview without creating a job. Set dry_run=false to start after user confirms.",
       parameters: {
         type: "object",
         properties: {
@@ -128,6 +166,10 @@ const TOOLS = [
             type: "boolean",
             description: "Re-process leads that already have emails (default false)",
           },
+          dry_run: {
+            type: "boolean",
+            description: "If true, return a cost/eligibility preview without creating a job. ALWAYS call with dry_run=true first.",
+          },
         },
         required: ["campaign_id"],
       },
@@ -138,7 +180,7 @@ const TOOLS = [
     function: {
       name: "find_decision_makers",
       description:
-        "Find decision makers (owners, founders, CEOs) for leads via about/contact pages and LinkedIn. Creates an async background job.",
+        "Find decision makers (owners, founders, CEOs) for leads via about/contact pages and LinkedIn. PAID API (OpenAI + DataForSEO). Set dry_run=true to get a cost preview without creating a job. Set dry_run=false to start after user confirms.",
       parameters: {
         type: "object",
         properties: {
@@ -150,6 +192,10 @@ const TOOLS = [
           include_existing: {
             type: "boolean",
             description: "Re-process leads with existing decision makers (default false)",
+          },
+          dry_run: {
+            type: "boolean",
+            description: "If true, return a cost/eligibility preview without creating a job. ALWAYS call with dry_run=true first.",
           },
         },
         required: ["campaign_id"],
@@ -166,6 +212,22 @@ const TOOLS = [
         type: "object",
         properties: {
           campaign_id: { type: "string", description: "Campaign UUID" },
+        },
+        required: ["campaign_id"],
+      },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
+      name: "get_sample_leads",
+      description:
+        "Fetch a sample of recent leads for a campaign to review quality (e.g. after a QA test scrape). Returns up to 10 leads with key fields.",
+      parameters: {
+        type: "object",
+        properties: {
+          campaign_id: { type: "string", description: "Campaign UUID" },
+          limit: { type: "number", description: "Number of sample leads (default 10, max 20)" },
         },
         required: ["campaign_id"],
       },
@@ -217,6 +279,8 @@ async function handleToolCall(
       return await toolFindDecisionMakers(supabase, args);
     case "casualise_names":
       return await toolCasualiseNames(supabase, args.campaign_id);
+    case "get_sample_leads":
+      return await toolGetSampleLeads(supabase, args.campaign_id, args.limit);
     case "get_active_jobs":
       return await toolGetActiveJobs(supabase, args.campaign_id);
     default:
@@ -283,15 +347,17 @@ async function toolGetCampaignStats(
 
 // deno-lint-ignore no-explicit-any
 async function toolScrapeGoogleMaps(supabase: SupabaseClient, args: Record<string, any>): Promise<string> {
-  const { campaign_id, keywords, max_leads = 1000 } = args;
+  const { campaign_id, keywords, max_leads = 1000, test_only = true } = args;
 
   // Verify campaign
-  const { error: campErr } = await supabase
+  const { data: campaign, error: campErr } = await supabase
     .from("campaigns")
-    .select("id")
+    .select("id, name")
     .eq("id", campaign_id)
     .single();
   if (campErr) return JSON.stringify({ error: "Campaign not found" });
+
+  const scrapeLimit = test_only ? 20 : max_leads;
 
   const { data: job, error } = await supabase
     .from("bulk_jobs")
@@ -301,39 +367,80 @@ async function toolScrapeGoogleMaps(supabase: SupabaseClient, args: Record<strin
       config: {
         keywords,
         locations_file: "data/us_locations.csv",
-        max_leads,
-        concurrent: 20,
+        max_leads: scrapeLimit,
+        concurrent: test_only ? 5 : 20,
+        test_only,
       },
     })
     .select()
     .single();
 
   if (error) return JSON.stringify({ error: error.message });
+
+  if (test_only) {
+    return JSON.stringify({
+      job_id: job.id,
+      type: "scrape_maps",
+      mode: "QA_TEST",
+      keywords,
+      max_leads: 20,
+      campaign_name: campaign.name,
+      message: `QA test scrape started for campaign "${campaign.name}". Will scrape ~20 leads to verify keyword quality. Once done, I'll show you sample results for review.`,
+    });
+  }
+
   return JSON.stringify({
     job_id: job.id,
     type: "scrape_maps",
+    mode: "FULL_SCRAPE",
     keywords,
     max_leads,
-    message: "Scrape job created. Contabo worker will process it.",
+    campaign_name: campaign.name,
+    message: `Full scrape job created for campaign "${campaign.name}". Will scrape up to ${max_leads} leads for keywords: ${keywords.join(", ")}. Contabo worker will process it.`,
   });
 }
 
 // deno-lint-ignore no-explicit-any
 async function toolCleanAndValidate(supabase: SupabaseClient, args: Record<string, any>): Promise<string> {
-  const { campaign_id, categories = [], max_leads = 1000 } = args;
+  const { campaign_id, categories = [], max_leads = 1000, dry_run = true } = args;
 
-  const { error: campErr } = await supabase
+  const { data: campaign, error: campErr } = await supabase
     .from("campaigns")
-    .select("id")
+    .select("id, name")
     .eq("id", campaign_id)
     .single();
   if (campErr) return JSON.stringify({ error: "Campaign not found" });
 
-  const { count } = await supabase
+  // Count leads with websites
+  const { count: totalLeads } = await supabase
     .from("leads")
-    .select("id", { count: "exact" })
+    .select("id", { count: "exact", head: true })
+    .eq("campaign_id", campaign_id);
+
+  const { count: withWebsite } = await supabase
+    .from("leads")
+    .select("id", { count: "exact", head: true })
     .eq("campaign_id", campaign_id)
     .not("company_website", "is", null);
+
+  const { count: alreadyValidated } = await supabase
+    .from("leads")
+    .select("id", { count: "exact", head: true })
+    .eq("campaign_id", campaign_id)
+    .contains("enrichment_status", { website_validated: true });
+
+  if (dry_run) {
+    return JSON.stringify({
+      mode: "PREVIEW",
+      campaign_name: campaign.name,
+      total_leads: totalLeads || 0,
+      leads_with_website: withWebsite || 0,
+      already_validated: alreadyValidated || 0,
+      will_process: Math.min((withWebsite || 0), max_leads),
+      categories: categories.length > 0 ? categories : "all (no filter)",
+      message: `Preview: ${withWebsite || 0} leads have websites. ${alreadyValidated || 0} already validated. Will validate up to ${Math.min((withWebsite || 0), max_leads)} leads.`,
+    });
+  }
 
   const { data: job, error } = await supabase
     .from("bulk_jobs")
@@ -344,7 +451,7 @@ async function toolCleanAndValidate(supabase: SupabaseClient, args: Record<strin
         categories,
         max_leads,
         workers: 10,
-        total_with_website: count || 0,
+        total_with_website: withWebsite || 0,
       },
     })
     .select()
@@ -354,30 +461,58 @@ async function toolCleanAndValidate(supabase: SupabaseClient, args: Record<strin
   return JSON.stringify({
     job_id: job.id,
     type: "clean_leads",
-    leads_with_website: count || 0,
-    message: "Clean job created. Worker will validate websites.",
+    leads_with_website: withWebsite || 0,
+    message: `Clean job created for campaign "${campaign.name}". Worker will validate ${withWebsite || 0} websites.`,
   });
 }
 
 // deno-lint-ignore no-explicit-any
 async function toolFindEmails(supabase: SupabaseClient, args: Record<string, any>): Promise<string> {
-  const { campaign_id, max_leads = 100, include_existing = false } = args;
+  const { campaign_id, max_leads = 100, include_existing = false, dry_run = true } = args;
 
-  const { error: campErr } = await supabase
+  const { data: campaign, error: campErr } = await supabase
     .from("campaigns")
-    .select("id")
+    .select("id, name")
     .eq("id", campaign_id)
     .single();
   if (campErr) return JSON.stringify({ error: "Campaign not found" });
 
-  let countQuery = supabase
+  // Count total and eligible leads
+  const { count: totalLeads } = await supabase
     .from("leads")
-    .select("id", { count: "exact" })
+    .select("id", { count: "exact", head: true })
     .eq("campaign_id", campaign_id);
-  if (!include_existing) countQuery = countQuery.is("email", null);
 
-  const { count } = await countQuery.limit(max_leads);
-  const eligible = Math.min(count || 0, max_leads);
+  const { count: withEmail } = await supabase
+    .from("leads")
+    .select("id", { count: "exact", head: true })
+    .eq("campaign_id", campaign_id)
+    .not("email", "is", null);
+
+  const { count: withoutEmail } = await supabase
+    .from("leads")
+    .select("id", { count: "exact", head: true })
+    .eq("campaign_id", campaign_id)
+    .is("email", null);
+
+  const eligible = include_existing
+    ? Math.min(totalLeads || 0, max_leads)
+    : Math.min(withoutEmail || 0, max_leads);
+
+  if (dry_run) {
+    return JSON.stringify({
+      mode: "PREVIEW",
+      campaign_name: campaign.name,
+      total_leads: totalLeads || 0,
+      already_have_email: withEmail || 0,
+      without_email: withoutEmail || 0,
+      will_process: eligible,
+      include_existing,
+      estimated_api_credits: eligible,
+      max_leads_limit: max_leads,
+      message: `Preview: ${totalLeads || 0} total leads. ${withEmail || 0} already have emails, ${withoutEmail || 0} need emails. Will process ${eligible} leads at ~${eligible} API credits.`,
+    });
+  }
 
   const { data: job, error } = await supabase
     .from("bulk_jobs")
@@ -394,29 +529,57 @@ async function toolFindEmails(supabase: SupabaseClient, args: Record<string, any
     job_id: job.id,
     type: "find_emails",
     eligible_leads: eligible,
-    message: `Find-emails job created for ${eligible} leads.`,
+    message: `Find-emails job created for ${eligible} leads in campaign "${campaign.name}".`,
   });
 }
 
 // deno-lint-ignore no-explicit-any
 async function toolFindDecisionMakers(supabase: SupabaseClient, args: Record<string, any>): Promise<string> {
-  const { campaign_id, max_leads = 100, include_existing = false } = args;
+  const { campaign_id, max_leads = 100, include_existing = false, dry_run = true } = args;
 
-  const { error: campErr } = await supabase
+  const { data: campaign, error: campErr } = await supabase
     .from("campaigns")
-    .select("id")
+    .select("id, name")
     .eq("id", campaign_id)
     .single();
   if (campErr) return JSON.stringify({ error: "Campaign not found" });
 
-  let countQuery = supabase
+  // Count total and eligible leads
+  const { count: totalLeads } = await supabase
     .from("leads")
-    .select("id", { count: "exact" })
+    .select("id", { count: "exact", head: true })
     .eq("campaign_id", campaign_id);
-  if (!include_existing) countQuery = countQuery.is("decision_maker_name", null);
 
-  const { count } = await countQuery.limit(max_leads);
-  const eligible = Math.min(count || 0, max_leads);
+  const { count: withDM } = await supabase
+    .from("leads")
+    .select("id", { count: "exact", head: true })
+    .eq("campaign_id", campaign_id)
+    .not("decision_maker_name", "is", null);
+
+  const { count: withoutDM } = await supabase
+    .from("leads")
+    .select("id", { count: "exact", head: true })
+    .eq("campaign_id", campaign_id)
+    .is("decision_maker_name", null);
+
+  const eligible = include_existing
+    ? Math.min(totalLeads || 0, max_leads)
+    : Math.min(withoutDM || 0, max_leads);
+
+  if (dry_run) {
+    return JSON.stringify({
+      mode: "PREVIEW",
+      campaign_name: campaign.name,
+      total_leads: totalLeads || 0,
+      already_have_dm: withDM || 0,
+      without_dm: withoutDM || 0,
+      will_process: eligible,
+      include_existing,
+      estimated_cost: `~${eligible} OpenAI calls + DataForSEO lookups`,
+      max_leads_limit: max_leads,
+      message: `Preview: ${totalLeads || 0} total leads. ${withDM || 0} already have decision makers, ${withoutDM || 0} need enrichment. Will process ${eligible} leads using OpenAI + DataForSEO.`,
+    });
+  }
 
   const { data: job, error } = await supabase
     .from("bulk_jobs")
@@ -433,7 +596,7 @@ async function toolFindDecisionMakers(supabase: SupabaseClient, args: Record<str
     job_id: job.id,
     type: "find_decision_makers",
     eligible_leads: eligible,
-    message: `Find-decision-makers job created for ${eligible} leads.`,
+    message: `Find-decision-makers job created for ${eligible} leads in campaign "${campaign.name}".`,
   });
 }
 
@@ -493,6 +656,47 @@ async function toolCasualiseNames(
     processed,
     total: leads.length,
     message: `Casualised ${processed} company names.`,
+  });
+}
+
+async function toolGetSampleLeads(
+  supabase: SupabaseClient,
+  campaignId: string,
+  limit?: number,
+): Promise<string> {
+  const sampleSize = Math.min(limit || 10, 20);
+
+  const { data: leads, error } = await supabase
+    .from("leads")
+    .select("company_name, company_website, title, city, state, phone, email, rating, reviews")
+    .eq("campaign_id", campaignId)
+    .order("created_at", { ascending: false })
+    .limit(sampleSize);
+
+  if (error) return JSON.stringify({ error: error.message });
+  if (!leads?.length) return JSON.stringify({ leads: [], message: "No leads found for this campaign." });
+
+  // Summarise categories
+  const categories: Record<string, number> = {};
+  for (const l of leads) {
+    const cat = l.title || "Unknown";
+    categories[cat] = (categories[cat] || 0) + 1;
+  }
+
+  return JSON.stringify({
+    sample_count: leads.length,
+    leads: leads.map((l: Record<string, unknown>) => ({
+      company: l.company_name,
+      website: l.company_website,
+      category: l.title,
+      location: [l.city, l.state].filter(Boolean).join(", "),
+      phone: l.phone,
+      email: l.email,
+      rating: l.rating,
+      reviews: l.reviews,
+    })),
+    category_breakdown: categories,
+    message: `Showing ${leads.length} sample leads.`,
   });
 }
 
