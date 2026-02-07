@@ -147,6 +147,16 @@ services:
       - "traefik.http.routers.supabase-api.entrypoints=websecure"
       - "traefik.http.routers.supabase-api.tls.certresolver=myresolver"
       - "traefik.http.services.supabase-api.loadbalancer.server.port=8000"
+      # Auth relay: serve Edge Function at zenmanager.eu/auth-relay so GoTrue's
+      # hostname check passes (GoTrue only accepts redirects to zenmanager.eu)
+      - "traefik.http.routers.auth-relay.rule=Host(`zenmanager.eu`) && PathPrefix(`/auth-relay`)"
+      - "traefik.http.routers.auth-relay.entrypoints=websecure"
+      - "traefik.http.routers.auth-relay.tls.certresolver=myresolver"
+      - "traefik.http.routers.auth-relay.priority=100"
+      - "traefik.http.routers.auth-relay.middlewares=auth-relay-rewrite"
+      - "traefik.http.routers.auth-relay.service=supabase-api"
+      - "traefik.http.middlewares.auth-relay-rewrite.replacepathregex.regex=^/auth-relay(.*)"
+      - "traefik.http.middlewares.auth-relay-rewrite.replacepathregex.replacement=/functions/v1/auth-relay$$1"
       - "com.centurylinklabs.watchtower.enable=true"
     networks:
       - app-network
