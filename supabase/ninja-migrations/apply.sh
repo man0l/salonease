@@ -12,7 +12,7 @@ if [ -z "$1" ]; then
 fi
 
 CONN_STRING="$1"
-MIGRATIONS_DIR="$(dirname "$0")/migrations"
+MIGRATIONS_DIR="$(dirname "$0")"
 
 for migration in "$MIGRATIONS_DIR"/*.sql; do
   echo "Applying $(basename "$migration")..."
