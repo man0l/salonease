@@ -94,6 +94,16 @@ services:
       - app-network
     restart: unless-stopped
 
+  cold-email-ninja-worker:
+    image: ghcr.io/man0l/cold-email-ninja-app:worker-latest
+    env_file:
+      - ./cold-email-ninja-app-workers/.env
+    networks:
+      - app-network
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    restart: unless-stopped
+
   db:
     image: pgvector/pgvector:pg13
     command: postgres -c wal_level=logical
@@ -118,6 +128,8 @@ services:
     command: postgres -c listen_addresses='*' -c shared_preload_libraries='pg_cron,pg_net' -c cron.database_name=salonease -c pg_net.database_name=salonease
     env_file:
       - ./supabase/.env
+    ports:
+      - "54322:5432"
     volumes:
       - supabase_pg17_data:/var/lib/postgresql/data
       - ./supabase/db-entrypoint.sh:/docker-custom/db-entrypoint.sh:ro
@@ -257,7 +269,7 @@ services:
     restart: unless-stopped
 
   supabase-functions:
-    image: supabase/edge-runtime:v1.69.6
+    image: ghcr.io/man0l/cold-email-ninja-app:functions-latest
     env_file:
       - ./supabase/.env
     environment:
@@ -272,7 +284,11 @@ services:
       - --main-service
       - /home/deno/functions/main
     volumes:
-      - ./supabase/functions:/home/deno/functions:rw
+      # Salonease-specific functions (not in cold-email-ninja-app repo)
+      - ./supabase/functions/enrichment-worker:/home/deno/functions/enrichment-worker:ro
+      - ./supabase/functions/verification-worker:/home/deno/functions/verification-worker:ro
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     networks:
       - app-network
     depends_on:
@@ -357,6 +373,7 @@ services:
     image: containrrr/watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /root/.docker/config.json:/config.json:ro
     environment:
       - WATCHTOWER_CLEANUP=true
       - WATCHTOWER_LABEL_ENABLE=true
