@@ -162,7 +162,7 @@ services:
     networks:
       - app-network
     depends_on:
-      db:
+      supabase-db17:
         condition: service_healthy
     restart: unless-stopped
 
