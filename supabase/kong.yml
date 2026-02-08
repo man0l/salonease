@@ -95,6 +95,7 @@ services:
       hide_groups_header: true
       allow:
       - admin
+      - anon
 - name: storage-v1
   url: http://supabase-storage:5000/
   routes:
