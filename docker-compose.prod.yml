@@ -125,7 +125,7 @@ services:
   supabase-db17:
     image: supabase/postgres:17.6.1.074
     entrypoint: /docker-custom/db-entrypoint.sh
-    command: postgres -c listen_addresses='*' -c shared_preload_libraries='pg_cron,pg_net' -c cron.database_name=salonease -c pg_net.database_name=salonease
+    command: postgres -c listen_addresses='*' -c shared_preload_libraries='pg_cron,pg_net' -c cron.database_name=salonease -c pg_net.database_name=salonease -c wal_level=logical
     env_file:
       - ./supabase/.env
     ports:
@@ -202,18 +202,26 @@ services:
     restart: unless-stopped
 
   supabase-realtime:
-    image: supabase/realtime:v0.21.0
+    # Container name pattern required: realtime v2 constructs tenant id by parsing the subdomain
+    container_name: realtime-dev.supabase-realtime
+    image: supabase/realtime:v2.34.47
     env_file:
       - ./supabase/.env
     environment:
-      - PORT=4000
-    command: >
-      bash -c "./prod/rel/realtime/bin/realtime eval Realtime.Release.migrate
-      && ./prod/rel/realtime/bin/realtime start"
+      PORT: 4000
+      DB_AFTER_CONNECT_QUERY: "SET search_path TO _realtime"
+      DB_ENC_KEY: supabaserealtime
+      API_JWT_SECRET: ${JWT_SECRET}
+      ERL_AFLAGS: -proto_dist inet_tcp
+      DNS_NODES: "''"
+      RLIMIT_NOFILE: "10000"
+      APP_NAME: realtime
+      SEED_SELF_HOST: "true"
+      RUN_JANITOR: "true"
     networks:
       - app-network
     depends_on:
-      db:
+      supabase-db17:
         condition: service_healthy
     restart: unless-stopped
 
