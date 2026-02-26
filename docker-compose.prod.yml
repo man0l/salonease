@@ -282,8 +282,8 @@ services:
     environment:
       - SUPABASE_URL=http://supabase-kong:8000
       - SUPABASE_INTERNAL_REST_URL=http://supabase-rest:3000
-      - SUPABASE_ANON_KEY=$${ANON_KEY}
-      - SUPABASE_SERVICE_ROLE_KEY=$${SERVICE_ROLE_KEY}
+      - SUPABASE_ANON_KEY=${ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SERVICE_ROLE_KEY}
       - SUPABASE_DB_URL=postgresql://postgres:$${POSTGRES_PASSWORD}@db:5432/$${POSTGRES_DB}
       - JWT_SECRET=$${JWT_SECRET}
       - VERIFY_JWT=false
