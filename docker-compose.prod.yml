@@ -98,10 +98,15 @@ services:
     image: ghcr.io/man0l/cold-email-ninja-app:worker-latest
     env_file:
       - ./cold-email-ninja-app-workers/.env
+    environment:
+      # Override external URL with internal Docker network to avoid Traefik → 503 on transient issues
+      - SUPABASE_URL=http://supabase-kong:8000
     networks:
       - app-network
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
+    depends_on:
+      - supabase-kong
     restart: unless-stopped
 
   db:
@@ -400,6 +405,7 @@ services:
       - N8N_PORT=5678
       - WEBHOOK_URL=https://n8n.zenmanager.eu/
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_PROXY_HOPS=1
       - NODE_FUNCTION_ALLOW_EXTERNAL=uuid
       - NODE_FUNCTION_ALLOW_BUILTIN=*
     labels:
