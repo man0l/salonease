@@ -476,6 +476,54 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  flowcraft-db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=flowcraft
+      - POSTGRES_USER=flowcraft
+      - POSTGRES_PASSWORD=c0juOJEO2aT0NmgQ5H4_-32KafTR66sS
+    volumes:
+      - flowcraft_db_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flowcraft"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  flowcraft-strapi:
+    image: ghcr.io/man0l/flowcraft-strapi:latest
+    env_file:
+      - ./flowcraft-strapi/.env
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - PORT=1337
+      - DATABASE_CLIENT=postgres
+      - DATABASE_HOST=flowcraft-db
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=flowcraft
+      - DATABASE_USERNAME=flowcraft
+      - DATABASE_PASSWORD=c0juOJEO2aT0NmgQ5H4_-32KafTR66sS
+      - DATABASE_SSL=false
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.flowcraft-strapi.rule=Host(`flowcraft-strapi.zenmanager.eu`)"
+      - "traefik.http.routers.flowcraft-strapi.entrypoints=websecure"
+      - "traefik.http.routers.flowcraft-strapi.tls.certresolver=myresolver"
+      - "traefik.http.services.flowcraft-strapi.loadbalancer.server.port=1337"
+      - "com.centurylinklabs.watchtower.enable=true"
+    networks:
+      - app-network
+    volumes:
+      - flowcraft_strapi_uploads:/app/public/uploads
+    depends_on:
+      flowcraft-db:
+        condition: service_healthy
+    restart: unless-stopped
+
 networks:
   app-network:
     driver: bridge
@@ -483,8 +531,10 @@ networks:
 volumes:
   postgres_data:
   pgadmin_data:
-  pgadmin_logs: 
+  pgadmin_logs:
   n8n_data:
   supabase_storage:
   supabase_pg17_data:
   strapi_uploads:
+  flowcraft_db_data:
+  flowcraft_strapi_uploads:
