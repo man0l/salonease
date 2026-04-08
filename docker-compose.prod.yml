@@ -2,7 +2,8 @@ services:
   traefik:
     image: traefik:v2.10
     env_file:
-      - ./salonease-mvp/backend/.env
+      - path: ./salonease-mvp/backend/.env
+        required: false
     command:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
@@ -30,7 +31,8 @@ services:
   frontend:
     image: ghcr.io/man0l/salonease:frontend-latest
     env_file:
-      - ./salonease-mvp/frontend/.env
+      - path: ./salonease-mvp/frontend/.env
+        required: false
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`zenmanager.eu`) && !PathPrefix(`/api`) && !PathPrefix(`/uploads`)"
@@ -47,7 +49,8 @@ services:
   backend:
     image: ghcr.io/man0l/salonease:backend-latest
     env_file:
-      - ./salonease-mvp/backend/.env
+      - path: ./salonease-mvp/backend/.env
+        required: false
     environment:
       - NODE_ENV=production
       - FRONTEND_URL=https://zenmanager.eu
@@ -97,7 +100,8 @@ services:
   cold-email-ninja-worker:
     image: ghcr.io/man0l/cold-email-ninja-app:worker-latest
     env_file:
-      - ./cold-email-ninja-app-workers/.env
+      - path: ./cold-email-ninja-app-workers/.env
+        required: false
     environment:
       # Override external URL with internal Docker network to avoid Traefik → 503 on transient issues
       - SUPABASE_URL=http://supabase-kong:8000
@@ -113,7 +117,8 @@ services:
     image: pgvector/pgvector:pg13
     command: postgres -c wal_level=logical
     env_file:
-      - ./salonease-mvp/backend/.env
+      - path: ./salonease-mvp/backend/.env
+        required: false
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-pgvector.sql:/docker-entrypoint-initdb.d/init-pgvector.sql:ro
@@ -132,7 +137,8 @@ services:
     entrypoint: /docker-custom/db-entrypoint.sh
     command: postgres -c listen_addresses='*' -c shared_preload_libraries='pg_cron,pg_net' -c cron.database_name=salonease -c pg_net.database_name=salonease -c wal_level=logical
     env_file:
-      - ./supabase/.env
+      - path: ./supabase/.env
+        required: false
     ports:
       - "54322:5432"
     volumes:
@@ -150,7 +156,8 @@ services:
   supabase-kong:
     image: kong:2.1
     env_file:
-      - ./supabase/.env
+      - path: ./supabase/.env
+        required: false
     environment:
       - KONG_DATABASE=off
       - KONG_DECLARATIVE_CONFIG=/var/lib/kong/kong.yml
@@ -185,7 +192,8 @@ services:
   supabase-auth:
     image: supabase/gotrue:v2.2.12
     env_file:
-      - ./supabase/.env
+      - path: ./supabase/.env
+        required: false
     networks:
       - app-network
     depends_on:
@@ -196,7 +204,8 @@ services:
   supabase-rest:
     image: postgrest/postgrest:v9.0.0
     env_file:
-      - ./supabase/.env
+      - path: ./supabase/.env
+        required: false
     networks:
       - app-network
     depends_on:
@@ -211,7 +220,8 @@ services:
     container_name: realtime-dev.supabase-realtime
     image: supabase/realtime:v2.75.0
     env_file:
-      - ./supabase/.env
+      - path: ./supabase/.env
+        required: false
     environment:
       PORT: 4000
       DB_AFTER_CONNECT_QUERY: "SET search_path TO _realtime"
@@ -232,7 +242,8 @@ services:
   supabase-storage:
     image: supabase/storage-api:v0.10.0
     env_file:
-      - ./supabase/.env
+      - path: ./supabase/.env
+        required: false
     volumes:
       - supabase_storage:/var/lib/storage
     networks:
@@ -247,7 +258,8 @@ services:
   supabase-meta:
     image: supabase/postgres-meta:v0.95.2
     env_file:
-      - ./supabase/.env
+      - path: ./supabase/.env
+        required: false
     networks:
       - app-network
     depends_on:
@@ -283,7 +295,8 @@ services:
   supabase-functions:
     image: ghcr.io/man0l/cold-email-ninja-app:functions-latest
     env_file:
-      - ./supabase/.env
+      - path: ./supabase/.env
+        required: false
     environment:
       - SUPABASE_URL=http://supabase-kong:8000
       - SUPABASE_INTERNAL_REST_URL=http://supabase-rest:3000
@@ -312,7 +325,8 @@ services:
   supabase-studio:
     image: supabase/studio:latest
     env_file:
-      - ./supabase/.env
+      - path: ./supabase/.env
+        required: false
     environment:
       - PORT=3000
       - EDGE_FUNCTIONS_MANAGEMENT_FOLDER=/tmp/edge-functions
@@ -349,7 +363,8 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     env_file:
-      - ./salonease-mvp/backend/.env
+      - path: ./salonease-mvp/backend/.env
+        required: false
     volumes:
       - pgadmin_data:/var/lib/pgadmin
       - pgadmin_logs:/var/log/pgadmin
@@ -397,7 +412,8 @@ services:
   n8n:
     image: n8nio/n8n:latest
     env_file:
-      - ./salonease-mvp/backend/.env
+      - path: ./salonease-mvp/backend/.env
+        required: false
     environment:
       - DB_TYPE=postgresdb
       - N8N_HOST=n8n.zenmanager.eu
@@ -453,6 +469,8 @@ services:
       - "com.centurylinklabs.watchtower.enable=true"
     networks:
       - app-network
+    volumes:
+      - strapi_uploads:/app/public/uploads
     depends_on:
       supabase-db17:
         condition: service_healthy
@@ -469,3 +487,4 @@ volumes:
   n8n_data:
   supabase_storage:
   supabase_pg17_data:
+  strapi_uploads:
