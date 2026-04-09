@@ -478,10 +478,13 @@ services:
 
   flowcraft-db:
     image: postgres:15-alpine
+    env_file:
+      - path: ./flowcraft-strapi/.env
+        required: false
     environment:
       - POSTGRES_DB=flowcraft
       - POSTGRES_USER=flowcraft
-      - POSTGRES_PASSWORD=c0juOJEO2aT0NmgQ5H4_-32KafTR66sS
+      - POSTGRES_PASSWORD=${FLOWCRAFT_DB_PASSWORD}
     volumes:
       - flowcraft_db_data:/var/lib/postgresql/data
     networks:
@@ -506,7 +509,7 @@ services:
       - DATABASE_PORT=5432
       - DATABASE_NAME=flowcraft
       - DATABASE_USERNAME=flowcraft
-      - DATABASE_PASSWORD=c0juOJEO2aT0NmgQ5H4_-32KafTR66sS
+      - DATABASE_PASSWORD=${FLOWCRAFT_DB_PASSWORD}
       - DATABASE_SSL=false
     labels:
       - "traefik.enable=true"
