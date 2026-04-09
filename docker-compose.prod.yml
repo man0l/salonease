@@ -449,7 +449,8 @@ services:
   midjourney-strapi:
     image: ghcr.io/man0l/midjourney-strapi:latest
     env_file:
-      - ./midjourney-strapi/.env
+      - path: ./midjourney-strapi/.env
+        required: false
     environment:
       - NODE_ENV=production
       - HOST=0.0.0.0
