@@ -89,13 +89,13 @@ services:
     volumes:
       - ./salonease-mvp/backend/uploads:/app/uploads
 
-  python-runner:
-    image: ghcr.io/man0l/cold-email-ninja:prod
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
-    networks:
-      - app-network
-    restart: unless-stopped
+  # python-runner:
+  #   image: ghcr.io/man0l/cold-email-ninja:prod
+  #   labels:
+  #     - "com.centurylinklabs.watchtower.enable=true"
+  #   networks:
+  #     - app-network
+  #   restart: unless-stopped
 
   cold-email-ninja-worker:
     image: ghcr.io/man0l/cold-email-ninja-app:worker-latest
