@@ -446,6 +446,23 @@ services:
     restart: unless-stopped
 
 
+  midjourney-db:
+    image: postgres:17-alpine
+    environment:
+      - POSTGRES_DB=strapi
+      - POSTGRES_USER=strapi
+      - POSTGRES_PASSWORD=${MIDJOURNEY_DB_PASSWORD}
+    volumes:
+      - midjourney_db_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U strapi"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
   midjourney-strapi:
     image: ghcr.io/man0l/midjourney-strapi:latest
     env_file:
@@ -456,9 +473,11 @@ services:
       - HOST=0.0.0.0
       - PORT=1337
       - DATABASE_CLIENT=postgres
-      - DATABASE_HOST=supabase-db17
+      - DATABASE_HOST=midjourney-db
       - DATABASE_PORT=5432
-      - DATABASE_NAME=postgres
+      - DATABASE_NAME=strapi
+      - DATABASE_USERNAME=strapi
+      - DATABASE_PASSWORD=${MIDJOURNEY_DB_PASSWORD}
       - DATABASE_SSL=false
       - DATABASE_SCHEMA=midjourney-prompt-generator
     labels:
@@ -473,7 +492,7 @@ services:
     volumes:
       - strapi_uploads:/app/public/uploads
     depends_on:
-      supabase-db17:
+      midjourney-db:
         condition: service_healthy
     restart: unless-stopped
 
@@ -540,5 +559,6 @@ volumes:
   supabase_storage:
   supabase_pg17_data:
   strapi_uploads:
+  midjourney_db_data:
   flowcraft_db_data:
   flowcraft_strapi_uploads:
