@@ -113,6 +113,28 @@ services:
       - supabase-kong
     restart: unless-stopped
 
+  # slashloop viral-video research worker — the slashloop repo's queue drainer
+  # (src/worker), with no Vercel 60s ceiling so full-length OpenRouter video
+  # analysis can finish. Image is built by the slashloop repo's
+  # build-worker-image Action on master merges and pushed to GHCR; watchtower
+  # auto-updates it here. .env (./slashloop-worker/.env, required:false) holds
+  # the CLOUD Supabase creds + OpenRouter/Apify keys — same values as the
+  # slashloop Vercel production env.
+  slashloop-worker:
+    image: ghcr.io/man0l/slashloop-worker:master
+    env_file:
+      - path: ./slashloop-worker/.env
+        required: false
+    environment:
+      # No 60s ceiling here — let Qwen analyze full-length clips.
+      - OPENROUTER_VIDEO_TIMEOUT_MS=300000
+      - OPENROUTER_VIDEO_MAX_DURATION_SEC=3600
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    networks:
+      - app-network
+    restart: unless-stopped
+
   db:
     image: pgvector/pgvector:pg13
     command: postgres -c wal_level=logical
