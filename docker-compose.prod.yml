@@ -147,6 +147,14 @@ services:
     networks:
       - app-network
     restart: unless-stopped
+    # SIGTERM only sets a shutdown flag the worker checks BETWEEN jobs; the
+    # in-flight job runs to completion. An analyze job is an OpenRouter video
+    # call bounded by OPENROUTER_VIDEO_TIMEOUT_MS (300s), so a 10s stop kills
+    # work that has already been paid for and leaves the MediaJob 'running'
+    # until reclaimStuckJobs sweeps it 15 minutes later.
+    # NOTE: watchtower ignores this and uses WATCHTOWER_TIMEOUT — both must be
+    # raised together (see the watchtower service below).
+    stop_grace_period: 300s
 
   slashloop-worker-maintenance:
     image: ghcr.io/man0l/slashloop-worker:master
@@ -165,6 +173,11 @@ services:
     networks:
       - app-network
     restart: unless-stopped
+    # A refresh job is a ~170s Apify scrape plus fan-out across every workspace
+    # that shares the same canonical query (multi-tenant batching), all inside
+    # one job. Killing it at 10s bills the scrape and applies it to only some
+    # subscribers. See slashloop docs/apify-multi-tenant-batching-plan.md 14.4.
+    stop_grace_period: 300s
 
   db:
     image: pgvector/pgvector:pg13
@@ -459,6 +472,13 @@ services:
     environment:
       - WATCHTOWER_CLEANUP=true
       - WATCHTOWER_LABEL_ENABLE=true
+      # Watchtower stops containers with ITS OWN timeout and does not read a
+      # service's stop_grace_period. At the 10s default it SIGKILLs the
+      # slashloop workers mid-job on every auto-update (a scrape or a video
+      # analysis runs for minutes). This is the global ceiling; each container
+      # still stops as soon as it exits, so slower shutdowns are only paid for
+      # when a container is genuinely busy.
+      - WATCHTOWER_TIMEOUT=300s
     command: --interval 300 --label-enable
     networks:
       - app-network
