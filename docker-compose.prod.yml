@@ -136,6 +136,9 @@ services:
       - WORKER_IDLE_MS=2000
       # Monthly Apify spend cap (cents = USD): was 1000 ($10), raised to $50.
       - APIFY_SPEND_CAP_CENTS=5000
+      # Two worker containers share one pgbouncer pool — give the worker a
+      # real pool size (src/db.ts reads DB_CONNECTION_LIMIT).
+      - DB_CONNECTION_LIMIT=4
       # No 60s ceiling here — let Qwen analyze full-length clips.
       - OPENROUTER_VIDEO_TIMEOUT_MS=300000
       - OPENROUTER_VIDEO_MAX_DURATION_SEC=3600
@@ -154,6 +157,9 @@ services:
       - WORKER_KINDS=refresh,rescore
       - WORKER_IDLE_MS=5000
       - APIFY_SPEND_CAP_CENTS=5000
+      # Two worker containers share one pgbouncer pool — give the worker a
+      # real pool size (src/db.ts reads DB_CONNECTION_LIMIT).
+      - DB_CONNECTION_LIMIT=4
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
     networks:
