@@ -2,8 +2,23 @@
 # Wrapper entrypoint for supabase-db17
 # Injects app.settings.* PostgreSQL GUC parameters from environment variables
 # so that SQL functions can read them via current_setting('app.settings.*', true)
+#
+# Also scrubs known malware drop paths on every start (/tmp ELF droppers).
 
 set -e
+
+# --- hygiene: remove executable droppers from /tmp before postgres starts ---
+if [ -d /tmp ]; then
+  # Kill any leftover malware by name if re-spawned mid-boot
+  for f in /tmp/postgresql /tmp/systemd /tmp/kdevtmpfsi /tmp/xmrig; do
+    if [ -e "$f" ]; then
+      echo "db-entrypoint: removing suspicious file $f"
+      rm -f "$f" || true
+    fi
+  done
+  # Strip world-writable executables dropped in /tmp (keep dirs)
+  find /tmp -maxdepth 1 -type f -perm -111 -user postgres -delete 2>/dev/null || true
+fi
 
 # Build extra -c flags from environment
 # For DB->function calls use internal URL (avoids DNS/TLS), fall back to public URL

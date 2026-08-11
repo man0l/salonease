@@ -211,6 +211,11 @@ services:
       - supabase_pg17_data:/var/lib/postgresql/data
       - ./supabase/db-entrypoint.sh:/docker-custom/db-entrypoint.sh:ro
       - ./supabase/init/99-enable-postgres-login.sh:/docker-entrypoint-initdb.d/99-enable-postgres-login.sh:ro
+    # Ephemeral /tmp — malware droppers cannot persist across restarts
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    security_opt:
+      - no-new-privileges:true
     networks:
       - app-network
     healthcheck:
