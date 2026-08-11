@@ -134,6 +134,8 @@ services:
     environment:
       - WORKER_KINDS=analyze,fetch
       - WORKER_IDLE_MS=2000
+      # Monthly Apify spend cap (cents = USD): was 1000 ($10), raised to $50.
+      - APIFY_SPEND_CAP_CENTS=5000
       # No 60s ceiling here — let Qwen analyze full-length clips.
       - OPENROUTER_VIDEO_TIMEOUT_MS=300000
       - OPENROUTER_VIDEO_MAX_DURATION_SEC=3600
@@ -151,6 +153,7 @@ services:
     environment:
       - WORKER_KINDS=refresh,rescore
       - WORKER_IDLE_MS=5000
+      - APIFY_SPEND_CAP_CENTS=5000
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
     networks:
