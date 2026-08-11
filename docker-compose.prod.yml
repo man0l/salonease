@@ -120,15 +120,37 @@ services:
   # auto-updates it here. .env (./slashloop-worker/.env, required:false) holds
   # the CLOUD Supabase creds + OpenRouter/Apify keys — same values as the
   # slashloop Vercel production env.
+  #
+  # WORKER_KINDS splits the queue across two containers (same image):
+  #   slashloop-worker            -> analyze + fetch  (video analysis + download)
+  #   slashloop-worker-maintenance -> refresh + rescore (source scrapes / scores)
+  # Both consume MediaJob rows safely (FOR UPDATE SKIP LOCKED); the Vercel
+  # worker defers all claims to these once WORKER_URL is set on Vercel.
   slashloop-worker:
     image: ghcr.io/man0l/slashloop-worker:master
     env_file:
       - path: ./slashloop-worker/.env
         required: false
     environment:
+      - WORKER_KINDS=analyze,fetch
+      - WORKER_IDLE_MS=2000
       # No 60s ceiling here — let Qwen analyze full-length clips.
       - OPENROUTER_VIDEO_TIMEOUT_MS=300000
       - OPENROUTER_VIDEO_MAX_DURATION_SEC=3600
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  slashloop-worker-maintenance:
+    image: ghcr.io/man0l/slashloop-worker:master
+    env_file:
+      - path: ./slashloop-worker/.env
+        required: false
+    environment:
+      - WORKER_KINDS=refresh,rescore
+      - WORKER_IDLE_MS=5000
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
     networks:
