@@ -122,9 +122,11 @@ services:
   # slashloop Vercel production env.
   #
   # WORKER_KINDS splits the queue across three containers (same image):
-  #   slashloop-worker             -> analyze + fetch  (video analysis + download)
+  #   slashloop-worker             -> analyze + fetch + thumb
   #   slashloop-worker-maintenance -> rescore
-  #   slashloop-worker-scraper     -> refresh via SCRAPER_PROVIDER=proxy
+  #   slashloop-worker-scraper     -> refresh + thumb via SCRAPER_PROVIDER=proxy
+  # `thumb` is the overflow cover ingest from a refresh past the 15/run cap.
+  # It used to sit in queued forever after the kinds split omitted it.
   # Both consume MediaJob rows safely (FOR UPDATE SKIP LOCKED); the Vercel
   # worker defers all claims to these once WORKER_URL is set on Vercel.
   slashloop-worker:
@@ -133,7 +135,7 @@ services:
       - path: ./slashloop-worker/.env
         required: false
     environment:
-      - WORKER_KINDS=analyze,fetch
+      - WORKER_KINDS=analyze,fetch,thumb
       - WORKER_IDLE_MS=2000
       # Monthly Apify spend cap (cents = USD): was 1000 ($10), raised to $50.
       - APIFY_SPEND_CAP_CENTS=5000
@@ -189,7 +191,7 @@ services:
       - path: ./slashloop-worker/.env
         required: false
     environment:
-      - WORKER_KINDS=refresh
+      - WORKER_KINDS=refresh,thumb
       - WORKER_IDLE_MS=5000
       - WORKER_RESCORE_EVERY=0
       - SCRAPER_PROVIDER=proxy
