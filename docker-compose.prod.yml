@@ -97,22 +97,6 @@ services:
   #     - app-network
   #   restart: unless-stopped
 
-  cold-email-ninja-worker:
-    image: ghcr.io/man0l/cold-email-ninja-app:worker-latest
-    env_file:
-      - path: ./cold-email-ninja-app-workers/.env
-        required: false
-    environment:
-      # Override external URL with internal Docker network to avoid Traefik → 503 on transient issues
-      - SUPABASE_URL=http://supabase-kong:8000
-    networks:
-      - app-network
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
-    depends_on:
-      - supabase-kong
-    restart: unless-stopped
-
   # slashloop viral-video research worker — the slashloop repo's queue drainer
   # (src/worker), with no Vercel 60s ceiling so full-length OpenRouter video
   # analysis can finish. Image is built by the slashloop repo's
