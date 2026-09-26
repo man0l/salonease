@@ -653,6 +653,42 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  # Paperclip (paperclip.ing) — AI company / agent board behind Traefik.
+  # Public authenticated mode at https://bots.balkanbit.app (port 3100).
+  # Image pre-installs claude/codex/opencode/gemini CLIs for *_local adapters.
+  # Secrets live in ./paperclip/.env on the host (required:false so first
+  # `docker compose up` still starts); generate once on Contabo:
+  #   mkdir -p paperclip && openssl rand -hex 32 ...
+  # Opencode free-subscription login is interactive (user runs it):
+  #   docker compose -f docker-compose.prod.yml exec paperclip opencode auth login
+  paperclip:
+    image: ghcr.io/paperclipai/paperclip:latest
+    env_file:
+      - path: ./paperclip/.env
+        required: false
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3100
+      - PAPERCLIP_HOME=/paperclip
+      - PAPERCLIP_DEPLOYMENT_MODE=authenticated
+      - PAPERCLIP_DEPLOYMENT_EXPOSURE=public
+      - PAPERCLIP_PUBLIC_URL=https://bots.balkanbit.app
+      - PAPERCLIP_AUTH_PUBLIC_BASE_URL=https://bots.balkanbit.app
+      - PAPERCLIP_ALLOWED_HOSTNAMES=bots.balkanbit.app
+      - TRUST_PROXY=true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.paperclip.rule=Host(`bots.balkanbit.app`)"
+      - "traefik.http.routers.paperclip.entrypoints=websecure"
+      - "traefik.http.routers.paperclip.tls.certresolver=myresolver"
+      - "traefik.http.services.paperclip.loadbalancer.server.port=3100"
+      - "com.centurylinklabs.watchtower.enable=true"
+    networks:
+      - app-network
+    volumes:
+      - paperclip_data:/paperclip
+    restart: unless-stopped
+
 networks:
   app-network:
     driver: bridge
@@ -668,3 +704,4 @@ volumes:
   midjourney_db_data:
   flowcraft_db_data:
   flowcraft_strapi_uploads:
+  paperclip_data:
