@@ -659,8 +659,30 @@ services:
   # Secrets live in ./paperclip/.env on the host (required:false so first
   # `docker compose up` still starts); generate once on Contabo:
   #   mkdir -p paperclip && openssl rand -hex 32 ...
+  # Dedicated PG17 cluster (paperclip migrations need PG15+ syntax such as
+  # UNIQUE NULLS NOT DISTINCT — the pg13 `db` service is too old, and the
+  # supabase-db17 superuser login is disabled). PAPERCLIP_DB_PASSWORD lives
+  # in the gitignored /.env at compose root; DATABASE_URL in ./paperclip/.env:
+  #   DATABASE_URL=postgresql://paperclip:${PAPERCLIP_DB_PASSWORD}@paperclip-db:5432/paperclip
   # Opencode free-subscription login is interactive (user runs it):
   #   docker compose -f docker-compose.prod.yml exec paperclip opencode auth login
+  paperclip-db:
+    image: postgres:17-alpine
+    environment:
+      - POSTGRES_DB=paperclip
+      - POSTGRES_USER=paperclip
+      - POSTGRES_PASSWORD=${PAPERCLIP_DB_PASSWORD}
+    volumes:
+      - paperclip_pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paperclip"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
   paperclip:
     image: ghcr.io/paperclipai/paperclip:latest
     env_file:
@@ -687,6 +709,9 @@ services:
       - app-network
     volumes:
       - paperclip_data:/paperclip
+    depends_on:
+      paperclip-db:
+        condition: service_healthy
     restart: unless-stopped
 
 networks:
@@ -705,3 +730,4 @@ volumes:
   flowcraft_db_data:
   flowcraft_strapi_uploads:
   paperclip_data:
+  paperclip_pgdata:
