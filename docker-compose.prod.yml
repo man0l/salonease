@@ -447,6 +447,7 @@ services:
       - PAPERCLIP_PUBLIC_URL=https://bots.balkanbit.app
       - PAPERCLIP_AUTH_PUBLIC_BASE_URL=https://bots.balkanbit.app
       - PAPERCLIP_ALLOWED_HOSTNAMES=bots.balkanbit.app
+      - CODEX_HOME=/paperclip/codex-home
       - TRUST_PROXY=true
     labels:
       - "traefik.enable=true"
