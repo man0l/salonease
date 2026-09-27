@@ -1,0 +1,42 @@
+name: validate-compose
+
+# SLA-15 follow-up: guarantee that any edit to docker-compose.prod.yml
+# (by any agent or human) keeps the sanctioned VPS deploy working.
+# `docker compose config` proves the file interpolates with only the
+# documented queue env vars; assert-compose.py proves the deploy
+# invariants (no published queue ports, GHCR image, exact-host router,
+# host secret file, volumes, healthchecks, resource budgets).
+
+on:
+  pull_request:
+    paths:
+      - docker-compose.prod.yml
+      - .github/workflows/validate-compose.yml
+      - .github/scripts/assert-compose.py
+  push:
+    branches:
+      - master
+    paths:
+      - docker-compose.prod.yml
+      - .github/workflows/validate-compose.yml
+      - .github/scripts/assert-compose.py
+  workflow_dispatch: {}
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Interpolate compose (fails on missing required vars)
+        env:
+          SLASHLOOP_QUEUE_DB_PASSWORD: ci-dummy-password
+          SLASHLOOP_QUEUE_KEY_ACTIVE_ID: ci-dummy-key-id
+          SLASHLOOP_QUEUE_HMAC_SECRET: ci-dummy-hmac-secret
+        run: |
+          docker compose -f docker-compose.prod.yml config --quiet
+          docker compose -f docker-compose.prod.yml config --format json > /tmp/compose.json
+
+      - name: Assert deploy guardrails
+        run: python3 .github/scripts/assert-compose.py /tmp/compose.json
