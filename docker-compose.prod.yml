@@ -474,11 +474,13 @@ services:
   # ghcr.io/man0l/slashloop-queue-api:master; queue-db/queue-backup: stock
   # postgres:17), THIS file is the only compose source, and the VPS deploy
   # is: git pull (+ .env vars if needed), then
-  #   docker compose --env-file slashloop-queue/queue.env \
-  #     -f docker-compose.prod.yml up -d queue-db queue-api queue-backup
-  # Host secrets (mode 600, never committed): slashloop-queue/queue.env
-  # (SLASHLOOP_QUEUE_DB_PASSWORD, SLASHLOOP_QUEUE_KEY_ACTIVE_ID,
-  # SLASHLOOP_QUEUE_HMAC_SECRET) + slashloop-queue/db_password.
+  #   docker compose -f docker-compose.prod.yml up -d queue-db queue-api queue-backup
+  # Interpolation vars (SLASHLOOP_QUEUE_*) come from the project `.env`
+  # (/root/salonease/.env, mode 600, never committed) — same convention as
+  # the other DB passwords there. Never pass `--env-file`: it SHADOWS .env
+  # and breaks the other services' interpolation.
+  # Other host secret (mode 600, never committed):
+  # slashloop-queue/db_password (compose secret file).
   # Postgres publishes NO ports — queue-db stays internal by construction.
   # Traefik: SNI/Host match on queue.slashloop.dev ONLY, TLS via the
   # existing myresolver (TLS-ALPN), body-size + rate-limit middleware.
