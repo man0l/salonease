@@ -485,8 +485,11 @@ services:
         "--port",
         "18789",
       ]
+    environment:
+      CODEX_HOME: /home/node/.codex
     volumes:
       - openclaw_state:/home/node/.openclaw
+      - /root/salonease/openclaw/codex-home:/home/node/.codex
     networks:
       - app-network
     cap_drop:
