@@ -515,7 +515,7 @@ services:
           "dist/docker-healthcheck.js",
         ]
       interval: 30s
-      timeout: 5s
+      timeout: 30s
       retries: 5
       start_period: 300s
     deploy:
