@@ -473,6 +473,11 @@ services:
     image: openclaw-gateway:2026.9.6-opencode
     restart: unless-stopped
     init: true
+    # OpenClaw uses a 330s gateway shutdown policy and a persistent owner
+    # lease. Compose's default ~10s SIGTERM window force-kills the gateway
+    # before it can release that lease, making the next container crash-loop
+    # until the stale lease expires.
+    stop_grace_period: 340s
     expose:
       - "18789"
     env_file:
