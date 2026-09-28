@@ -467,28 +467,37 @@ services:
     restart: unless-stopped
 
   openclaw-gateway:
-    image: openclaw/openclaw:2026.9.6
+    build:
+      context: ./openclaw
+      dockerfile: Dockerfile
+    image: openclaw-gateway:2026.9.6-opencode
     restart: unless-stopped
     init: true
     expose:
       - "18789"
     env_file:
       - path: ./openclaw/.env
-        required: false
+        required: true
+    # Fail visibly instead of starting with an unusable model provider.
     command:
       [
-        "node",
-        "dist/index.js",
-        "gateway",
-        "--bind",
-        "lan",
-        "--port",
-        "18789",
+        "/bin/sh",
+        "-ec",
+        "test -n \"$${OPENCLAW_GATEWAY_TOKEN:-}\" && test -n \"$${OPENROUTER_API_KEY:-}\" && exec node dist/index.js gateway --bind lan --port 18789",
       ]
     environment:
+      OPENCLAW_CONFIG_PATH: /home/node/.openclaw/openclaw.prod.json
+      OPENCLAW_STATE_DIR: /home/node/.openclaw
+      OPENCLAW_CONFIG_READONLY: "1"
       CODEX_HOME: /home/node/.openclaw/agents/main/agent/codex-home
+      OPENCODE_CONFIG: /home/node/.openclaw/opencode.json
+      XDG_CONFIG_HOME: /home/node/.openclaw/opencode/config
+      XDG_DATA_HOME: /home/node/.openclaw/opencode/share
+      XDG_CACHE_HOME: /home/node/.openclaw/opencode/cache
     volumes:
       - openclaw_state:/home/node/.openclaw
+      - ./openclaw/openclaw.prod.json:/home/node/.openclaw/openclaw.prod.json:ro
+      - ./openclaw/opencode.json:/home/node/.openclaw/opencode.json:ro
       - /root/salonease/openclaw/codex-home:/home/node/.openclaw/agents/main/agent/codex-home
       - /root/salonease/paperclip/codex-home/models.json:/paperclip/codex-home/models.json:ro
     networks:
@@ -513,7 +522,7 @@ services:
       resources:
         limits:
           cpus: "1.0"
-          memory: 1G
+          memory: 1280M
         reservations:
           memory: 256M
     logging:
@@ -522,7 +531,7 @@ services:
         max-size: "10m"
         max-file: "3"
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.centurylinklabs.watchtower.enable=false"
 
   # =========================================================================
   # SlashLoop queue producer ingress (queue.slashloop.dev) — SLA-15.
