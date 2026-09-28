@@ -466,6 +466,66 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  openclaw-gateway:
+    image: openclaw/openclaw:2026.9.6
+    restart: unless-stopped
+    init: true
+    expose:
+      - "18789"
+    environment:
+      HOME: /home/node
+      OPENCLAW_HOME: /home/node
+      OPENCLAW_STATE_DIR: /home/node/.openclaw
+      OPENCLAW_CONFIG_PATH: /home/node/.openclaw/openclaw.json
+      OPENCLAW_CONFIG_DIR: /home/node/.openclaw
+      OPENCLAW_WORKSPACE_DIR: /home/node/.openclaw/workspace
+      OPENCLAW_GATEWAY_PORT: "18789"
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:?missing OPENCLAW_GATEWAY_TOKEN}
+    command:
+      [
+        "node",
+        "dist/index.js",
+        "gateway",
+        "--bind",
+        "lan",
+        "--port",
+        "18789",
+      ]
+    volumes:
+      - openclaw_state:/home/node/.openclaw
+    networks:
+      - app-network
+    cap_drop:
+      - NET_RAW
+      - NET_ADMIN
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "dist/docker-healthcheck.js",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
   # =========================================================================
   # SlashLoop queue producer ingress (queue.slashloop.dev) — SLA-15.
   #
@@ -631,6 +691,7 @@ volumes:
   paperclip_pgdata:
   slashloop_queue_pgdata:
   slashloop_queue_backups:
+  openclaw_state:
 
 secrets:
   slashloop_queue_db_password:
