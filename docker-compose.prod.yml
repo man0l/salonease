@@ -205,7 +205,7 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
-      timeout: 5s
+      timeout: 20s
       retries: 5
     restart: unless-stopped
 
@@ -517,12 +517,12 @@ services:
       interval: 30s
       timeout: 5s
       retries: 5
-      start_period: 20s
+      start_period: 300s
     deploy:
       resources:
         limits:
           cpus: "1.0"
-          memory: 1280M
+          memory: 2G
         reservations:
           memory: 256M
     logging:
