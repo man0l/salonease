@@ -472,15 +472,9 @@ services:
     init: true
     expose:
       - "18789"
-    environment:
-      HOME: /home/node
-      OPENCLAW_HOME: /home/node
-      OPENCLAW_STATE_DIR: /home/node/.openclaw
-      OPENCLAW_CONFIG_PATH: /home/node/.openclaw/openclaw.json
-      OPENCLAW_CONFIG_DIR: /home/node/.openclaw
-      OPENCLAW_WORKSPACE_DIR: /home/node/.openclaw/workspace
-      OPENCLAW_GATEWAY_PORT: "18789"
-      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:?missing OPENCLAW_GATEWAY_TOKEN}
+    env_file:
+      - path: ./openclaw/.env
+        required: false
     command:
       [
         "node",
