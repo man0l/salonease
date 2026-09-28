@@ -486,10 +486,10 @@ services:
         "18789",
       ]
     environment:
-      CODEX_HOME: /home/node/.codex
+      CODEX_HOME: /home/node/.openclaw/agents/main/agent/codex-home
     volumes:
       - openclaw_state:/home/node/.openclaw
-      - /root/salonease/openclaw/codex-home:/home/node/.codex
+      - /root/salonease/openclaw/codex-home:/home/node/.openclaw/agents/main/agent/codex-home
       - /root/salonease/paperclip/codex-home/models.json:/paperclip/codex-home/models.json:ro
     networks:
       - app-network
