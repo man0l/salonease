@@ -490,6 +490,7 @@ services:
     volumes:
       - openclaw_state:/home/node/.openclaw
       - /root/salonease/openclaw/codex-home:/home/node/.codex
+      - /root/salonease/paperclip/codex-home/models.json:/paperclip/codex-home/models.json:ro
     networks:
       - app-network
     cap_drop:
