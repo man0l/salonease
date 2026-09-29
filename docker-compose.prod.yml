@@ -176,6 +176,11 @@ services:
         required: false
     environment:
       - WORKER_KINDS=refresh,thumb
+      # Single experiment-tick leader (see SLA-100/SLA-105): the shared
+      # ./slashloop-worker/.env parks the tick everywhere
+      # (EXPERIMENT_TICK_ENABLED=0); the refresh-draining scraper re-enables
+      # it here so exactly one container advances experiments.
+      - EXPERIMENT_TICK_ENABLED=1
       - WORKER_IDLE_MS=5000
       - WORKER_RESCORE_EVERY=0
       - SCRAPER_PROVIDER=proxy
