@@ -580,6 +580,7 @@ services:
       API_SERVER_PORT: "8642"
     volumes:
       - hermes_state:/home/hermes/.hermes
+      - ./hermes/config.yaml:/home/hermes/.hermes/config.yaml:ro
       # Bind only the dotenv file into the default Hermes secrets location.
       # env_file alone injects process variables but Hermes skills/config read
       # this hard path directly. Keep it read-only from the container.
