@@ -1,0 +1,15 @@
+# Hermes gateway model policy (mirrors the openclaw-gateway free-only rule).
+# Primary: OpenCode Zen free model. Fallbacks: the exact OpenRouter free
+# routes pinned in openclaw/openclaw.prod.json. No paid models.
+# Provider keys (OPENCODE_ZEN_API_KEY, OPENROUTER_API_KEY) come from the
+# service environment (hermes/.env) and are never baked into this file.
+model:
+  provider: opencode-zen
+  default: space-bunny-free
+fallback_providers:
+  - provider: openrouter
+    model: stealth/space-bunny-alpha
+  - provider: openrouter
+    model: openrouter/free
+  - provider: openrouter
+    model: cohere/north-mini-code:free
