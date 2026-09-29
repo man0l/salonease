@@ -5,13 +5,24 @@ Internal-only service on `app-network`, reachable by Paperclip at
 over Docker DNS, same as `openclaw-gateway`.
 
 On the deployment host, create `hermes/.env` from `.env.example`, fill in the
-gateway key and provider key, then deploy only through Git:
+gateway key and both provider keys, then deploy only through Git:
 
 ```sh
 cd /root/salonease
 git pull
 docker compose -f docker-compose.prod.yml up -d --build hermes-gateway
 ```
+
+## Model policy (free-only, mirrors openclaw-gateway)
+
+`config.yaml` is the externally managed gateway model configuration,
+mounted read-only (same pattern as `openclaw/openclaw.prod.json`). It pins
+OpenCode Zen `space-bunny-free` as the primary model, with the exact
+OpenRouter free routes from `openclaw/openclaw.prod.json` as ordered
+fallbacks (`stealth/space-bunny-alpha`, `openrouter/free`,
+`cohere/north-mini-code:free`). No paid models are configured.
+`OPENCODE_ZEN_API_KEY` and `OPENROUTER_API_KEY` are read from the service
+environment. The repository never contains provider secrets.
 
 `API_SERVER_KEY` is the Hermes gateway key. Paperclip must store the same
 value as `agentDefaultsPayload.apiKey` when the gateway joins (see

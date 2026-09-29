@@ -543,6 +543,9 @@ services:
   # http://hermes-gateway:8642, same pattern as openclaw-gateway.
   # Secrets live in ./hermes/.env on the host (required:true so the service
   # fails visibly instead of starting with an unusable gateway key).
+  # Model policy lives in ./hermes/config.yaml (mounted read-only, same
+  # pattern as openclaw-gateway): OpenCode Zen free primary + the exact
+  # OpenRouter free fallbacks from openclaw/openclaw.prod.json. No paid models.
   # Generate once on Contabo:
   #   cp hermes/.env.example hermes/.env && openssl rand -hex 32 ...
   # Resources are conservative: the VPS runs ~4.2 GiB used of 5.9 GiB with
@@ -564,7 +567,7 @@ services:
       [
         "/bin/sh",
         "-ec",
-        "test -n \"$${API_SERVER_KEY:-}\" && test -n \"$${OPENROUTER_API_KEY:-}\" && exec hermes gateway run --replace --accept-hooks",
+        "test -n \"$${API_SERVER_KEY:-}\" && test -n \"$${OPENCODE_ZEN_API_KEY:-}\" && test -n \"$${OPENROUTER_API_KEY:-}\" && exec hermes gateway run --replace --accept-hooks",
       ]
     environment:
       API_SERVER_ENABLED: "true"
@@ -572,6 +575,7 @@ services:
       API_SERVER_PORT: "8642"
     volumes:
       - hermes_state:/home/hermes/.hermes
+      - ./hermes/config.yaml:/home/hermes/.hermes/config.yaml:ro
     networks:
       - app-network
     healthcheck:
