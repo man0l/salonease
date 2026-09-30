@@ -120,7 +120,7 @@ services:
         required: false
     environment:
       - WORKER_KINDS=analyze,fetch,thumb
-      - WORKER_IDLE_MS=2000
+      - WORKER_IDLE_MS=10000
       # Monthly Apify spend cap (cents = USD): was 1000 ($10), raised to $50.
       - APIFY_SPEND_CAP_CENTS=5000
       # Two worker containers share one pgbouncer pool — give the worker a
@@ -150,7 +150,7 @@ services:
         required: false
     environment:
       - WORKER_KINDS=rescore
-      - WORKER_IDLE_MS=5000
+      - WORKER_IDLE_MS=10000
       - APIFY_SPEND_CAP_CENTS=5000
       # Two worker containers share one pgbouncer pool — give the worker a
       # real pool size (src/db.ts reads DB_CONNECTION_LIMIT).
@@ -181,7 +181,7 @@ services:
       # (EXPERIMENT_TICK_ENABLED=0); the refresh-draining scraper re-enables
       # it here so exactly one container advances experiments.
       - EXPERIMENT_TICK_ENABLED=1
-      - WORKER_IDLE_MS=5000
+      - WORKER_IDLE_MS=10000
       - WORKER_RESCORE_EVERY=0
       - SCRAPER_PROVIDER=proxy
       - SCRAPER_PROXY_COUNTRY=US
