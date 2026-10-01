@@ -22,6 +22,12 @@ Compose mounts it read-only at `/home/hermes/.hermes/skills`, where Hermes
 discovers each `<skill-name>/SKILL.md`. Updating the snapshot through Git makes
 skill changes reviewable and avoids stale content in the `hermes_state` volume.
 
+Hermes 0.17 hard-codes mutable skills-hub metadata at `skills/.hub` (lock,
+audit log, taps, and index cache). A dedicated `hermes_hub` named volume is
+mounted over that nested path only; the parent skills snapshot stays read-only.
+This lets read-only `skills` commands initialize their metadata without making
+the reviewed skill content writable.
+
 ## Model policy (free-only, mirrors openclaw-gateway)
 
 `config.yaml` is the externally managed gateway model configuration,

@@ -30,7 +30,7 @@ RUN python3 -m pip install --break-system-packages --no-cache-dir "hermes-agent[
   && command -v hermes >/dev/null
 
 RUN useradd --create-home --shell /bin/bash --uid 10001 hermes \
-  && mkdir -p /home/hermes/.hermes /home/hermes/workspace \
+  && mkdir -p /home/hermes/.hermes /home/hermes/.hermes/skills/.hub /home/hermes/workspace \
   && chown -R hermes:hermes /home/hermes
 
 USER hermes
