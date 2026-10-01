@@ -576,6 +576,10 @@ services:
     volumes:
       - hermes_state:/home/hermes/.hermes
       - ./hermes/config.yaml:/home/hermes/.hermes/config.yaml:ro
+      # Paperclip does not sync skills to the hermes_gateway adapter yet, so
+      # mount the reviewed bundled-skill snapshot directly into Hermes' skill
+      # discovery path. The nested bind overrides the writable state volume.
+      - ./hermes/skills:/home/hermes/.hermes/skills:ro
     networks:
       - app-network
     healthcheck:
