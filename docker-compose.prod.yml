@@ -585,6 +585,10 @@ services:
       # env_file alone injects process variables but Hermes skills/config read
       # this hard path directly. Keep it read-only from the container.
       - /root/salonease/hermes/.env:/home/hermes/.hermes/.env:ro
+      # Paperclip does not sync skills to the hermes_gateway adapter yet, so
+      # mount the reviewed bundled-skill snapshot directly into Hermes' skill
+      # discovery path. The nested bind overrides the writable state volume.
+      - ./hermes/skills:/home/hermes/.hermes/skills:ro
     networks:
       - app-network
     healthcheck:

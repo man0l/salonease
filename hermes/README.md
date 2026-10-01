@@ -13,6 +13,15 @@ git pull
 docker compose -f docker-compose.prod.yml up -d --build hermes-gateway
 ```
 
+## Skills
+
+Paperclip's `hermes_gateway` adapter does not synchronize Paperclip company
+skills yet (`supported: false`, `mode: unsupported`). `hermes/skills/` is
+therefore a reviewed, committed snapshot of the Paperclip bundled skills.
+Compose mounts it read-only at `/home/hermes/.hermes/skills`, where Hermes
+discovers each `<skill-name>/SKILL.md`. Updating the snapshot through Git makes
+skill changes reviewable and avoids stale content in the `hermes_state` volume.
+
 ## Model policy (free-only, mirrors openclaw-gateway)
 
 `config.yaml` is the externally managed gateway model configuration,
