@@ -589,11 +589,12 @@ services:
       # mount the reviewed bundled-skill snapshot directly into Hermes' skill
       # discovery path. The nested bind overrides the writable state volume.
       - ./hermes/skills:/home/hermes/.hermes/skills:ro
-      # Hermes hard-codes mutable hub metadata at skills/.hub. A nested named
-      # volume gives that path a writable target while every reviewed skill
-      # under the parent snapshot remains read-only. The image pre-creates the
-      # mount point with Hermes' UID so the first-use named volume is writable.
-      - hermes_hub:/home/hermes/.hermes/skills/.hub
+      # Hermes hard-codes mutable hub metadata through skills/.hub, which the
+      # snapshot symlinks to the sibling hub directory. The named volume gives
+      # that resolved path a writable target while every reviewed skill under
+      # the parent snapshot remains read-only. The image pre-creates the mount
+      # point with Hermes' UID so the first-use named volume is writable.
+      - hermes_hub:/home/hermes/.hermes/hub
     networks:
       - app-network
     healthcheck:
