@@ -631,6 +631,12 @@ services:
   # postgres:17), THIS file is the only compose source, and the VPS deploy
   # is: git pull (+ .env vars if needed), then
   #   docker compose -f docker-compose.prod.yml up -d queue-db queue-api queue-backup
+  # SLA-330: queue-api image updates now ride watchtower like the workers
+  # (`com.centurylinklabs.watchtower.enable=true` below), so a master push to
+  # build-queue-api-image goes live within ~5 min (--interval 300) with no
+  # `up -d`. The `up -d` above is only needed for a CONFIG change here (a new
+  # label, env, volume), never for a new image. queue-db/queue-backup are
+  # stock images pinned by tag, so they never need a pull at all.
   # Interpolation vars (SLASHLOOP_QUEUE_*) come from the project `.env`
   # (/root/salonease/.env, mode 600, never committed) — same convention as
   # the other DB passwords there. Never pass `--env-file`: it SHADOWS .env
@@ -640,8 +646,10 @@ services:
   # Postgres publishes NO ports — queue-db stays internal by construction.
   # Traefik: SNI/Host match on queue.slashloop.dev ONLY, TLS via the
   # existing myresolver (TLS-ALPN), body-size + rate-limit middleware.
-  # Source of truth for the queue services: slashloop repo
-  # deploy/queue-compose.fragment.yml (mirror changes there).
+  # Source of truth for the queue services: THIS BLOCK. Not the slashloop
+  # repo's deploy/queue-compose.fragment.yml — that was a never-deployed
+  # duplicate that drifted from here until a merged fix sat un-deployed
+  # for 4 days (SLA-330); it is now an empty stub. Do not mirror.
   # =========================================================================
 
   queue-db:
@@ -732,6 +740,14 @@ services:
       - "traefik.http.middlewares.queue-ratelimit.ratelimit.average=1"
       - "traefik.http.middlewares.queue-ratelimit.ratelimit.burst=120"
       - "traefik.http.middlewares.queue-ratelimit.ratelimit.period=1s"
+      # SLA-330: queue-api MUST be watchtower-managed like every other image
+      # built in Actions. Without this label watchtower (--label-enable)
+      # skipped it, so a merged src/queue/** fix stayed un-deployed until
+      # someone noticed and ran `up -d queue-api` by hand — while the three
+      # workers had already auto-updated, so the box looked freshly deployed.
+      # Applying the label needs one `up -d queue-api`; after that every
+      # build-queue-api-image push on master lands here automatically.
+      - "com.centurylinklabs.watchtower.enable=true"
 
   queue-backup:
     image: postgres:17
