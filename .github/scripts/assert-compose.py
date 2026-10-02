@@ -9,9 +9,15 @@ drift shipped unnoticed.
 
 Scope and non-goals, stated so the next editor does not over-read it:
 
-  * This asserts the Slashloop queue services only: queue-db, queue-api and
-    queue-backup, plus the top-level volumes/secrets entries they depend on.
-    It asserts nothing about the Salonease services that share the file.
+  * The per-service assertions are scoped to the Slashloop queue services:
+    queue-db, queue-api and queue-backup, plus the top-level volumes/secrets
+    entries they depend on. Nothing is asserted about the other services that
+    share the file.
+  * One check is deliberately NOT name-scoped: `check_watchtower_coverage`
+    sweeps every service in the file, because the SLA-330 failure mode was a
+    CI-built image on a mutable tag that watchtower never updates, and that
+    does not care which service it is. Scoping it to a list would leave the
+    same outage open under any service added later.
   * It reads the COMMITTED docker-compose.prod.yml and nothing else. It never
     reads the VPS project .env, never reads a secret file, and takes no
     credentials. A green run here says "this file still says what it must
@@ -29,12 +35,14 @@ Usage:
 
 `--self-test` re-runs the same checks against deliberately broken copies of
 the real file and fails if any mutation slips through, so "the gate bites" is
-re-proven on every compose edit instead of once by hand.
+re-proven on every compose edit instead of once by hand. It also asserts that a
+few legitimate edits stay ACCEPTED, so the gate cannot pass by being noisy.
 """
 
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 
 # ---------------------------------------------------------------------------
@@ -139,6 +147,33 @@ EXPECTED_QUEUE_BACKUP_MOUNTS = [
 EXPECTED_TOP_LEVEL_VOLUMES = ["slashloop_queue_pgdata", "slashloop_queue_backups"]
 
 QUEUE_SERVICES = ("queue-db", "queue-api", "queue-backup")
+
+# ---------------------------------------------------------------------------
+# Watchtower coverage sweep.
+#
+# EXPECTED_QUEUE_API_LABELS pins queue-api's label, which catches the SLA-330
+# regression. It cannot catch the *general* shape of that bug: the service
+# carrying a mutable CI image without the label does not exist in the list yet
+# when the list is written, so a newly added one lands green. That is the same
+# outage with a different service name, so it is swept instead of enumerated.
+#
+# watchtower runs with --label-enable, so it updates ONLY containers carrying
+# this label. An image is covered when this repo's Actions can overwrite its
+# tag in place; a pinned version tag cannot be, so it is bumped deliberately
+# and needs no label.
+# ---------------------------------------------------------------------------
+
+WATCHTOWER_LABEL = "com.centurylinklabs.watchtower.enable=true"
+CI_IMAGE_PREFIX = "ghcr.io/man0l/"
+MUTABLE_TAGS = frozenset({"master", "main", "latest", "edge", "dev"})
+SERVICE_HEAD = re.compile(r"^ {2}([A-Za-z0-9_.-]+):\s*$")
+
+# Reviewed opt-outs. Empty today: every CI image on a mutable tag in this file
+# is watchtower-managed. Adding an entry is a deliberate, reviewable diff with a
+# stated reason, rather than a service quietly going un-managed. Third-party
+# images (traefik, postgres, pgadmin, watchtower) are never in scope — nobody
+# rebuilds them here, so a stale one is an ordinary dependency bump.
+UNMANAGED_BY_DESIGN: dict[str, str] = {}
 
 
 # ---------------------------------------------------------------------------
@@ -462,6 +497,49 @@ def check_depends_on(doc: Doc, report: Report, name: str, span: tuple[int, int])
     report.equals(doc.scalar(condition), "service_healthy", condition + 1, f"`{name}` depends_on condition")
 
 
+def is_ci_mutable_image(image: str) -> bool:
+    """True when this repo's Actions can overwrite the image tag in place."""
+    if not image or not image.startswith(CI_IMAGE_PREFIX):
+        return False
+    tail = image.rsplit("/", 1)[-1]
+    tag = tail.rsplit(":", 1)[-1] if ":" in tail else "latest"
+    return tag in MUTABLE_TAGS
+
+
+def check_watchtower_coverage(doc: Doc, report: Report) -> None:
+    """Every CI-built image on a mutable tag must be watchtower-managed.
+
+    Unlike the named checks, this one is not scoped to a fixed list of service
+    names, so a service added tomorrow is covered by the same rule today.
+    """
+    span = doc.top("services")
+    if span is None:
+        return
+    low, high = span
+    for at in range(low + 1, high):
+        match = SERVICE_HEAD.match(doc.lines[at])
+        if not match:
+            continue
+        name = match.group(1)
+        if name in UNMANAGED_BY_DESIGN:
+            continue
+        end = doc.block_end(at, high, 2)
+        image_at = doc.find(at + 1, end, 4, "image")
+        image = doc.scalar(image_at) if image_at is not None else ""
+        if not is_ci_mutable_image(image):
+            continue
+        labels_at = doc.find(at + 1, end, 4, "labels")
+        labels = (
+            doc.items(labels_at + 1, doc.block_end(labels_at, end, 4), 6)
+            if labels_at is not None
+            else []
+        )
+        report.exactly_once(
+            labels, WATCHTOWER_LABEL, at + 1,
+            f"`{name}` runs {image}, watchtower-managed",
+        )
+
+
 def run(text: str) -> Report:
     doc = Doc(text)
     report = Report()
@@ -499,6 +577,8 @@ def run(text: str) -> Report:
 
     check_depends_on(doc, report, "queue-api", spans["queue-api"])
     check_depends_on(doc, report, "queue-backup", spans["queue-backup"])
+
+    check_watchtower_coverage(doc, report)
 
     return report
 
@@ -611,24 +691,98 @@ MUTATIONS = [
         'QUEUE_API_PORT: "4100"',
         'QUEUE_API_PORT: "8080"',
     ),
+    # The SLA-330 shape. The label is removed from a service that does exist in
+    # the expectations, so this also pins the named-list half of the coverage.
+    (
+        "watchtower label removed from queue-api",
+        _WT_ANCHOR,
+        '      # build-queue-api-image push on master lands here automatically.\n',
+    ),
+    # The generalised shape, and the one the named list structurally cannot
+    # catch: a service nobody wrote an expectation for, added with a CI image on
+    # a mutable tag and no label. This is the outage with a different name.
+    (
+        "new CI-built mutable service added without the watchtower label",
+        "\n  queue-backup:\n",
+        "\n  slashloop-new-thing:\n"
+        '    image: ghcr.io/man0l/slashloop-new-thing:master\n'
+        "    restart: unless-stopped\n"
+        "    networks:\n"
+        "      - app-network\n"
+        "\n  queue-backup:\n",
+    ),
+    (
+        "new CI-built mutable service added but excluded without a reason",
+        "\n  queue-backup:\n",
+        "\n  slashloop-new-thing:\n"
+        '    image: ghcr.io/man0l/slashloop-new-thing:master\n'
+        "    restart: unless-stopped\n"
+        "    networks:\n"
+        "      - app-network\n"
+        "    labels:\n"
+        '      - "com.centurylinklabs.watchtower.enable=false"\n'
+        "\n  queue-backup:\n",
+    ),
+    # A third-party image on a mutable tag is not this repo's to update, so it
+    # must NOT trip the sweep. See NEGATIVE_MUTATIONS below.
+]
+
+
+# The other half of "the gate bites": it must also stay quiet on legitimate
+# input, or it becomes noise and gets disabled. Each of these is a real,
+# reasonable compose edit that must still pass.
+NEGATIVE_MUTATIONS = [
+    (
+        "third-party image on a mutable tag",
+        "    image: pgvector/pgvector:pg13",
+        "    image: pgvector/pgvector:latest",
+    ),
+    (
+        "CI image moved to a pinned tag",
+        "    image: ghcr.io/man0l/salonease:frontend-latest",
+        "    image: ghcr.io/man0l/salonease:frontend-2026.10.1",
+    ),
+    (
+        "a new third-party service with no labels at all",
+        "\n  queue-backup:\n",
+        "\n  redis-cache:\n"
+        "    image: redis:7-alpine\n"
+        "    restart: unless-stopped\n"
+        "\n  queue-backup:\n",
+    ),
 ]
 
 
 def self_test(text: str) -> Report:
     report = Report()
-    for name, old, new in MUTATIONS:
+
+    def applicable(case: tuple[str, str, str]) -> tuple[bool, str]:
+        name, old, _ = case
         occurrences = text.count(old)
-        if occurrences != 1:
-            report.check(
-                False, 1, f"self-test mutation {name!r} is still applicable",
-                f"anchor occurs {occurrences} times, expected exactly 1",
-            )
+        if occurrences == 1:
+            return True, ""
+        return False, f"anchor occurs {occurrences} times, expected exactly 1"
+
+    for name, old, new in MUTATIONS:
+        ok, why = applicable((name, old, new))
+        if not report.check(ok, 1, f"self-test mutation {name!r} is still applicable", why):
             continue
         caught = run(text.replace(old, new, 1)).failures
         report.check(
             bool(caught), 1, f"self-test mutation {name!r} is rejected",
             "the checks passed a deliberately broken compose file",
         )
+
+    for name, old, new in NEGATIVE_MUTATIONS:
+        ok, why = applicable((name, old, new))
+        if not report.check(ok, 1, f"self-test case {name!r} is still applicable", why):
+            continue
+        caught = run(text.replace(old, new, 1)).failures
+        report.check(
+            not caught, 1, f"self-test case {name!r} stays accepted",
+            f"false positive: {[label for _, label, _ in caught]}",
+        )
+
     return report
 
 
