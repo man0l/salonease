@@ -51,6 +51,11 @@ EXPECTED_QUEUE_API_EXPOSE = ["4100"]
 # The queue ingress edge. Backticks and spacing are load-bearing: Traefik
 # parses this string, and a one-character edit silently changes routing.
 EXPECTED_QUEUE_API_LABELS = [
+    # SLA-330: watchtower runs --label-enable, so a service without this
+    # label is NEVER auto-updated. queue-api lacked it for 4 days: merges
+    # into the src/queue/** image went green and stayed dead in prod while
+    # the workers updated normally, so the box looked freshly deployed.
+    "com.centurylinklabs.watchtower.enable=true",
     "traefik.enable=true",
     "traefik.http.routers.queue-api.rule=Host(`queue.slashloop.dev`) && (Path(`/healthz`) || PathPrefix(`/v1/jobs`))",
     "traefik.http.routers.queue-api.entrypoints=websecure",
@@ -506,6 +511,14 @@ def run(text: str) -> Report:
 # itself a failure, because it means a guard is decorative.
 # ---------------------------------------------------------------------------
 
+# Anchor for the watchtower mutations below. The bare label line occurs in every
+# service block, so these key off the comment line unique to queue-api's copy,
+# which keeps the self-test's "occurs exactly once" precondition true.
+_WT_ANCHOR = (
+    '      # build-queue-api-image push on master lands here automatically.\n'
+    '      - "com.centurylinklabs.watchtower.enable=true"\n'
+)
+
 MUTATIONS = [
     (
         "published port on queue-db",
@@ -526,6 +539,17 @@ MUTATIONS = [
         "queue-api built on the VPS instead of Actions",
         "    image: ghcr.io/man0l/slashloop-queue-api:master\n",
         "    build:\n      context: ../queue-api\n    image: ghcr.io/man0l/slashloop-queue-api:master\n",
+    ),
+    (
+        "queue-api no longer watchtower-managed (SLA-330)",
+        _WT_ANCHOR,
+        '      # build-queue-api-image push on master lands here automatically.\n',
+    ),
+    (
+        "queue-api opted out of watchtower (SLA-330)",
+        _WT_ANCHOR,
+        '      # build-queue-api-image push on master lands here automatically.\n'
+        '      - "com.centurylinklabs.watchtower.enable=false"\n',
     ),
     (
         "router rule host widened",
