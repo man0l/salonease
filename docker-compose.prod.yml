@@ -749,6 +749,12 @@ services:
       # build-queue-api-image push on master lands here automatically.
       - "com.centurylinklabs.watchtower.enable=true"
 
+  slashloop-new-thing:
+    image: ghcr.io/man0l/slashloop-new-thing:master
+    restart: unless-stopped
+    networks:
+      - app-network
+
   queue-backup:
     image: postgres:17
     restart: unless-stopped
