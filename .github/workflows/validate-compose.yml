@@ -1,0 +1,60 @@
+# Compose gate (SLA-332).
+#
+# docs/vps-deploy-policy.md §8 (slashloop repo) claims this enforcement
+# exists. Until this workflow landed it did not: `.github/` held only
+# main.yaml, so "green master" on a compose edit meant "GitGuardian ran".
+# A published queue port, a non-GHCR queue-api image or an edited router rule
+# could merge and be pulled to the VPS. That is how the SLA-330 mirror drift
+# shipped undetected.
+#
+# Two steps, both read-only:
+#   1. `docker compose config` proves the file is still valid compose.
+#   2. assert-compose.py proves the queue services still say what production
+#      depends on, and re-proves its own mutations still fail.
+#
+# No secrets are read, and no value from the VPS project `.env` is available
+# here or needed: the assertions only read the committed compose file.
+name: Validate compose
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-compose-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  assert-compose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # `docker compose config` resolves `env_file:` entries and required
+      # `${VAR:?...}` interpolations against the host, and a checkout has
+      # neither on purpose: the real values live only in the VPS project
+      # `.env`. Create empty placeholders for the paths the compose file
+      # names and pass non-secret placeholder values for the required vars, so
+      # the step can validate structure without touching a real value. Nothing
+      # downstream reads these as credentials.
+      - name: Compose config is valid
+        run: |
+          grep -oE '\./[A-Za-z0-9._/-]*\.env' docker-compose.prod.yml \
+            | sort -u \
+            | while read -r file; do
+                mkdir -p "$(dirname "$file")"
+                : > "$file"
+              done
+          SLASHLOOP_QUEUE_DB_PASSWORD=ci-placeholder \
+          SLASHLOOP_QUEUE_KEY_ACTIVE_ID=ci-placeholder \
+          SLASHLOOP_QUEUE_HMAC_SECRET=ci-placeholder \
+            docker compose -f docker-compose.prod.yml config --quiet
+
+      - name: Assert queue compose invariants
+        run: python3 .github/scripts/assert-compose.py --self-test
