@@ -687,6 +687,8 @@ services:
       queue-db:
         condition: service_healthy
     # NO ports: section — reachable only through Traefik on the internal net.
+    ports:
+      - "127.0.0.1:4100:4100"
     expose:
       - "4100"
     environment:
