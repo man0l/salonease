@@ -440,6 +440,11 @@ services:
 
   paperclip:
     image: ghcr.io/paperclipai/paperclip:latest
+    # Permit the nested Codex namespace sandbox; keep default capabilities.
+    # Load infra/paperclip/paperclip-codex.apparmor on the host before startup.
+    security_opt:
+      - seccomp=./infra/paperclip/codex-seccomp.json
+      - apparmor=paperclip-codex
     env_file:
       - path: ./paperclip/.env
         required: false
