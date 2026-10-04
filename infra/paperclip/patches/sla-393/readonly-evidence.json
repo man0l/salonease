@@ -1,0 +1,25 @@
+{
+  "cliVersion": "0.159.2",
+  "parentRunId": "a46be9a0-7734-4ffb-9824-d7a5a8c73192",
+  "server": "paperclip_projects",
+  "tool": "list_project_repositories",
+  "strictConfig": true,
+  "probeTimeUtc": "2026-10-04T07:50:53Z",
+  "cliThreadId": "01a105e4-f63c-7352-8a29-86593836fd44",
+  "initializedServerName": "paperclip-project-tools",
+  "toolsError": null,
+  "discoveredToolNames": [
+    "create_project",
+    "create_task",
+    "list_projects",
+    "list_project_repositories"
+  ],
+  "callResultKeys": [
+    "content",
+    "structuredContent"
+  ],
+  "ignoredHeaderWarning": false,
+  "callResultSha256": "f2e8f87c014b5162af6228b7e34d6ed64a551a69309a0cabe29b0467c99c673c",
+  "callResultIsError": null,
+  "callResultBytes": 36342
+}

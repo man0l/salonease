@@ -1,0 +1,5 @@
+{
+  "packages/adapters/codex-local/src/server/codex-home.ts": "d013f3334e7a7822dcf0aa4c5753c68be9d79fe4b49d964a4d3f8d57bd72a353",
+  "packages/adapters/codex-local/src/server/codex-home.test.ts": "6c05234c8f948288ee2839425889dfb770be12d48970dd82a8d2e8a7cd602d4f",
+  "server/src/services/heartbeat.ts": "ca824cac19a745bf96931eef59fb84408c795ecb8922b4d092044f1dec056ec5"
+}

@@ -1,0 +1,2 @@
+exit=1
+Error: /tmp/paperclip-run-sla-393-a46be9a0-773-x7ijMR/negative-schema-home/config.toml:3:1: unknown configuration field `mcp_servers.schema_probe.headers`

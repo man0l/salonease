@@ -1,0 +1,197 @@
+--- a/packages/adapters/codex-local/src/server/codex-home.ts
++++ b/packages/adapters/codex-local/src/server/codex-home.ts
+@@ -316,7 +316,7 @@
+       "",
+       `[mcp_servers.${tomlString(managedName)}]`,
+       `url = ${tomlString(url)}`,
+-      `headers = { Authorization = ${tomlString(`Bearer ${gateway.bearerToken}`)} }`,
++      `http_headers = { Authorization = ${tomlString(`Bearer ${gateway.bearerToken}`)} }`,
+     );
+   });
+   lines.push(MANAGED_MCP_BLOCK_END);
+--- a/packages/adapters/codex-local/src/server/codex-home.test.ts
++++ b/packages/adapters/codex-local/src/server/codex-home.test.ts
+@@ -996,6 +996,15 @@
+     try {
+       const alphaHome = path.join(root, "agent-alpha");
+       const zeroHome = path.join(root, "agent-zero");
++      await fs.mkdir(alphaHome, { recursive: true });
++      const providerConfig = 'model_provider = "zai"\n[model_providers.zai]\nbase_url = "https://provider.example/v1"\n';
++      await fs.writeFile(path.join(alphaHome, "config.toml"), `${providerConfig}
++# BEGIN PAPERCLIP MANAGED MCP
++[mcp_servers.stale_other_agent]
++url = "https://paperclip.example/old"
++headers = { Authorization = "Bearer old-run-token" }
++# END PAPERCLIP MANAGED MCP
++`);
+       await writeManagedCodexMcpConfig({
+         codexHome: alphaHome,
+         apiBaseUrl: "https://paperclip.example",
+@@ -1024,8 +1033,13 @@
+       const zero = await fs.readFile(path.join(zeroHome, "config.toml"), "utf8");
+       expect(alpha).toContain('[mcp_servers."alpha"]');
+       expect(alpha).toContain('Authorization = "Bearer alpha-token"');
++      expect(alpha).toContain('http_headers = { Authorization = "Bearer alpha-token" }');
++      expect(alpha).not.toMatch(/^headers\s*=/m);
+       expect(zero).not.toContain("mcp_servers.");
+       expect(zero).not.toContain("stale-token");
++      expect(alpha).toContain(providerConfig);
++      expect(alpha).not.toContain("stale_other_agent");
++      expect(alpha).not.toContain("old-run-token");
+       expect(alphaHome).not.toBe(zeroHome);
+     } finally {
+       await fs.rm(root, { recursive: true, force: true });
+@@ -1154,7 +1168,7 @@
+       // and is persisted 0600 on disk.
+       await fs.writeFile(
+         path.join(home, "config.toml"),
+-        "[mcp_servers.paperclip]\nheaders = { Authorization = \"Bearer secret-token\" }\n",
++        "[mcp_servers.paperclip]\nhttp_headers = { Authorization = \"Bearer secret-token\" }\n",
+         { mode: 0o600 },
+       );
+       staged = await stageCodexHomeForSync(home, { runId: "run-toml-mode" });
+--- /dev/null
++++ b/server/src/services/managed-mcp-gateway-scope.ts
+@@ -0,0 +1,44 @@
++export function gatewayAppliesToRun(input: {
++  gateway: {
++    agentId: string | null;
++    projectId: string | null;
++    issueId: string | null;
++    contextScopeType: string | null;
++    contextScopeId: string | null;
++    metadata: Record<string, unknown> | null;
++  };
++  agentId: string;
++  projectId: string | null;
++  issueId: string | null;
++}): boolean {
++  const { gateway, agentId, projectId, issueId } = input;
++  if (gateway.agentId && gateway.agentId !== agentId) return false;
++  // Older native assignment gateways stored their owner only in metadata.
++  // Never inject another agent's assignment, even if its connections are installed.
++  if (
++    typeof gateway.metadata?.nativeRuntimeAssignmentDigest === "string" &&
++    gateway.metadata.agentId !== agentId
++  ) return false;
++  if (gateway.projectId && gateway.projectId !== projectId) return false;
++  if (gateway.issueId && gateway.issueId !== issueId) return false;
++  if (
++    gateway.contextScopeType === "agent" &&
++    gateway.contextScopeId &&
++    gateway.contextScopeId !== agentId
++  )
++    return false;
++  if (
++    gateway.contextScopeType === "project" &&
++    gateway.contextScopeId &&
++    gateway.contextScopeId !== projectId
++  )
++    return false;
++  if (
++    gateway.contextScopeType === "issue" &&
++    gateway.contextScopeId &&
++    gateway.contextScopeId !== issueId
++  )
++    return false;
++  return true;
++}
++
+--- a/server/src/services/heartbeat.ts
++++ b/server/src/services/heartbeat.ts
+@@ -1,3 +1,4 @@
++import { gatewayAppliesToRun } from "./managed-mcp-gateway-scope.js";
+ import { publicChatTaskUrl } from "./chat-task-url.js";
+ import { toolActionDeliveryService } from "./tool-action-delivery.js";
+ import { githubBotConnectionIdsForRun } from "./chat-github-tools.js";
+@@ -4720,7 +4721,8 @@
+       )
+   ).filter(
+     (candidate) =>
+-      candidate.metadata?.nativeRuntimeAssignmentDigest === assignmentDigest,
++      candidate.metadata?.nativeRuntimeAssignmentDigest === assignmentDigest &&
++      gatewayAppliesToRun({ gateway: candidate, agentId: input.agent.id, projectId: null, issueId: null }),
+   );
+   if (!gateway) {
+     const slug = `native-${input.agent.id.replaceAll("-", "").slice(0, 12)}-${assignmentDigest.slice(0, 16)}`;
+@@ -4731,6 +4733,7 @@
+           name: `Native ${input.agent.name} ${assignmentDigest.slice(0, 8)}`,
+           slug,
+           description: "Run-scoped Paperclip Runner MCP gateway.",
++          agentId: input.agent.id,
+           profileId: profile!.id,
+           defaultProfileMode: "gateway_only",
+           metadata: {
+@@ -4834,36 +4837,6 @@
+   return MANAGED_MCP_LOCAL_ADAPTERS.has(adapterType);
+ }
+ 
+-function gatewayAppliesToRun(input: {
+-  gateway: typeof toolMcpGateways.$inferSelect;
+-  agentId: string;
+-  projectId: string | null;
+-  issueId: string | null;
+-}): boolean {
+-  const { gateway, agentId, projectId, issueId } = input;
+-  if (gateway.agentId && gateway.agentId !== agentId) return false;
+-  if (gateway.projectId && gateway.projectId !== projectId) return false;
+-  if (gateway.issueId && gateway.issueId !== issueId) return false;
+-  if (
+-    gateway.contextScopeType === "agent" &&
+-    gateway.contextScopeId &&
+-    gateway.contextScopeId !== agentId
+-  )
+-    return false;
+-  if (
+-    gateway.contextScopeType === "project" &&
+-    gateway.contextScopeId &&
+-    gateway.contextScopeId !== projectId
+-  )
+-    return false;
+-  if (
+-    gateway.contextScopeType === "issue" &&
+-    gateway.contextScopeId &&
+-    gateway.contextScopeId !== issueId
+-  )
+-    return false;
+-  return true;
+-}
+ 
+ async function gatewayConnectionIds(input: {
+   db: Db;
+--- /dev/null
++++ b/server/src/services/managed-mcp-gateway-scope.test.ts
+@@ -0,0 +1,33 @@
++import { describe, expect, it } from "vitest";
++import { gatewayAppliesToRun } from "./managed-mcp-gateway-scope.js";
++
++const run = { agentId: "agent-a", projectId: "project-a", issueId: "issue-a" };
++const gateway = {
++  agentId: null, projectId: null, issueId: null,
++  contextScopeType: "company", contextScopeId: "company-a", metadata: null,
++};
++
++describe("managed MCP gateway scope", () => {
++  it("keeps company gateways and matching explicit scopes", () => {
++    expect(gatewayAppliesToRun({ ...run, gateway })).toBe(true);
++    expect(gatewayAppliesToRun({ ...run, gateway: { ...gateway, agentId: run.agentId } })).toBe(true);
++  });
++  it("keeps the current agent's legacy native assignment", () => {
++    expect(gatewayAppliesToRun({ ...run, gateway: { ...gateway,
++      metadata: { nativeRuntimeAssignmentDigest: "digest", agentId: run.agentId },
++    } })).toBe(true);
++  });
++  it.each(["agent-b", null, undefined])("excludes native assignments with foreign or missing owner %s", (owner) => {
++    expect(gatewayAppliesToRun({ ...run, gateway: { ...gateway,
++      metadata: { nativeRuntimeAssignmentDigest: "digest", agentId: owner },
++    } })).toBe(false);
++  });
++  it.each([
++    { agentId: "agent-b" }, { projectId: "project-b" }, { issueId: "issue-b" },
++    { contextScopeType: "agent", contextScopeId: "agent-b" },
++    { contextScopeType: "project", contextScopeId: "project-b" },
++    { contextScopeType: "issue", contextScopeId: "issue-b" },
++  ])("preserves explicit scope rejection %j", (scope) => {
++    expect(gatewayAppliesToRun({ ...run, gateway: { ...gateway, ...scope } })).toBe(false);
++  });
++});
