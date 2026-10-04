@@ -439,7 +439,24 @@ services:
     restart: unless-stopped
 
   paperclip:
-    image: ghcr.io/paperclipai/paperclip:latest
+    # Pinned per-commit, NOT `latest`.
+    #
+    # v2026.1001.0 (= 8f8a0ab7, revision of `latest` as of 2026-10-04) writes
+    # managed Codex MCP servers with `headers = { ... }`. Codex 0.159.x rejects
+    # that field name, so every governed MCP server in the managed config block
+    # fails to load: paperclip-projects, paperclip-connections,
+    # paperclip-assigned, and all native-* gateways. Upstream fixed it in
+    # 18dac1e1 (#13942) with `http_headers`, which is still unreleased.
+    #
+    # 8f8a0ab7 also predates c46e41e8 (#14914, "validate native MCP gateway
+    # ownership"): native gateways recorded the owner only in metadata and left
+    # `agentId` null, so another agent's native gateway passed the managed
+    # selection filter and its named-gateway auth accepted a foreign run token.
+    #
+    # sha-c46e41e is the smallest upstream revision carrying both fixes. Move
+    # back to a released tag (and re-enable Watchtower below) once upstream cuts
+    # a stable that includes #13942 and #14914.
+    image: ghcr.io/paperclipai/paperclip:sha-c46e41e
     # Permit the nested Codex namespace sandbox; keep default capabilities.
     # Load infra/paperclip/paperclip-codex.apparmor on the host before startup.
     security_opt:
@@ -459,13 +476,19 @@ services:
       - PAPERCLIP_ALLOWED_HOSTNAMES=bots.balkanbit.app
       - CODEX_HOME=/paperclip/codex-home
       - TRUST_PROXY=true
+    # Watchtower off for this service. It runs `--label-enable` with no
+    # monitor-only mode, so any new upstream `latest` would silently recreate
+    # this container and apply every pending Drizzle migration to the company
+    # database with no backup gate and no in-flight job check. The pin above
+    # only holds while this label stays false. Re-enable together with a
+    # released tag, after a pg_dump is verified.
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.paperclip.rule=Host(`bots.balkanbit.app`)"
       - "traefik.http.routers.paperclip.entrypoints=websecure"
       - "traefik.http.routers.paperclip.tls.certresolver=myresolver"
       - "traefik.http.services.paperclip.loadbalancer.server.port=3100"
-      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.centurylinklabs.watchtower.enable=false"
     networks:
       - app-network
     volumes:
