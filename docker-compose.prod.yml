@@ -155,6 +155,14 @@ services:
       # Two worker containers share one pgbouncer pool — give the worker a
       # real pool size (src/db.ts reads DB_CONNECTION_LIMIT).
       - DB_CONNECTION_LIMIT=4
+      # SLA-560: GET /metrics with the fallback-backlog gauges
+      # (slashloop src/worker/metrics.ts) that QueueFallbackBacklogStuck /
+      # QueueFallbackSweepStale in slashloop deploy/queue-alerts.yml read.
+      # app-network only: no `ports:`, no Traefik labels. Set on THIS worker
+      # only — it is the one whose sweep the alerts describe.
+      - WORKER_METRICS_PORT=9464
+    expose:
+      - "9464"
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
     networks:

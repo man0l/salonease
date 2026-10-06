@@ -148,6 +148,16 @@ EXPECTED_TOP_LEVEL_VOLUMES = ["slashloop_queue_pgdata", "slashloop_queue_backups
 
 QUEUE_SERVICES = ("queue-db", "queue-api", "queue-backup")
 
+# SLA-560: the maintenance worker serves the fallback-backlog gauges on an
+# internal-only /metrics listener. The listener has no auth, so the property
+# that matters is reachability: app-network only, never a published port or a
+# Traefik route. It is also set on this one worker only: the alerts in
+# slashloop deploy/queue-alerts.yml describe its sweep.
+WORKER_METRICS_SERVICE = "slashloop-worker-maintenance"
+WORKER_METRICS_ENV = "WORKER_METRICS_PORT=9464"
+EXPECTED_WORKER_METRICS_EXPOSE = ["9464"]
+WORKERS_WITHOUT_METRICS = ("slashloop-worker", "slashloop-worker-scraper")
+
 # ---------------------------------------------------------------------------
 # Watchtower coverage sweep.
 #
@@ -497,6 +507,36 @@ def check_depends_on(doc: Doc, report: Report, name: str, span: tuple[int, int])
     report.equals(doc.scalar(condition), "service_healthy", condition + 1, f"`{name}` depends_on condition")
 
 
+def env_list(doc: Doc, span: tuple[int, int]) -> list[str]:
+    """`environment:` in `- KEY=VALUE` list form, as the workers declare it."""
+    at, end = span
+    env = doc.find(at + 1, end, 4, "environment")
+    return doc.items(env + 1, doc.block_end(env, end, 4), 6) if env is not None else []
+
+
+def check_worker_metrics(doc: Doc, report: Report) -> None:
+    span = check_service_exists(doc, report, WORKER_METRICS_SERVICE)
+    if span is not None:
+        at, end = span
+        name = WORKER_METRICS_SERVICE
+        report.exactly_once(env_list(doc, span), WORKER_METRICS_ENV, at + 1, f"`{name}` sets {WORKER_METRICS_ENV}")
+        check_expose(doc, report, name, span, EXPECTED_WORKER_METRICS_EXPOSE)
+        check_no_published_ports(doc, report, name, span)
+        labels = doc.find(at + 1, end, 4, "labels")
+        routed = (
+            [item for item in doc.items(labels + 1, doc.block_end(labels, end, 4), 6) if item.startswith("traefik.")]
+            if labels is not None
+            else []
+        )
+        report.check(not routed, at + 1, f"`{name}` has no Traefik route", f"found {routed!r}")
+    for other in WORKERS_WITHOUT_METRICS:
+        other_span = check_service_exists(doc, report, other)
+        if other_span is None:
+            continue
+        set_here = [item for item in env_list(doc, other_span) if item.startswith("WORKER_METRICS_PORT=")]
+        report.check(not set_here, other_span[0] + 1, f"`{other}` does not set WORKER_METRICS_PORT", f"found {set_here!r}")
+
+
 def is_ci_mutable_image(image: str) -> bool:
     """True when this repo's Actions can overwrite the image tag in place."""
     if not image or not image.startswith(CI_IMAGE_PREFIX):
@@ -577,6 +617,8 @@ def run(text: str) -> Report:
 
     check_depends_on(doc, report, "queue-api", spans["queue-api"])
     check_depends_on(doc, report, "queue-backup", spans["queue-backup"])
+
+    check_worker_metrics(doc, report)
 
     check_watchtower_coverage(doc, report)
 
@@ -725,6 +767,27 @@ MUTATIONS = [
     ),
     # A third-party image on a mutable tag is not this repo's to update, so it
     # must NOT trip the sweep. See NEGATIVE_MUTATIONS below.
+    # SLA-560: the unauthenticated worker /metrics listener stays internal.
+    (
+        "worker metrics port published to the host",
+        '    expose:\n      - "9464"',
+        '    ports:\n      - "9464:9464"\n    expose:\n      - "9464"',
+    ),
+    (
+        "worker metrics routed through Traefik",
+        '    expose:\n      - "9464"\n    labels:\n',
+        '    expose:\n      - "9464"\n    labels:\n      - "traefik.enable=true"\n',
+    ),
+    (
+        "worker metrics listener dropped",
+        "      - WORKER_METRICS_PORT=9464\n",
+        "",
+    ),
+    (
+        "worker metrics listener enabled on the analyze worker",
+        "      - WORKER_KINDS=analyze,fetch,thumb\n",
+        "      - WORKER_KINDS=analyze,fetch,thumb\n      - WORKER_METRICS_PORT=9464\n",
+    ),
 ]
 
 
