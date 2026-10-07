@@ -28,66 +28,70 @@ services:
       - app-network
     restart: unless-stopped
 
-  frontend:
-    image: ghcr.io/man0l/salonease:frontend-latest
-    env_file:
-      - path: ./salonease-mvp/frontend/.env
-        required: false
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`zenmanager.eu`) && !PathPrefix(`/api`) && !PathPrefix(`/uploads`)"
-      - "traefik.http.routers.frontend.entrypoints=websecure"
-      - "traefik.http.routers.frontend.tls.certresolver=myresolver"
-      - "traefik.http.services.frontend.loadbalancer.server.port=80"
-      - "com.centurylinklabs.watchtower.enable=true"
-    networks:
-      - app-network
-    depends_on:
-      - backend
-    restart: unless-stopped
+  # SLA-667: disabled (commented out). Re-enable by uncommenting this block,
+  # then `docker compose -f docker-compose.prod.yml up -d frontend`.
+  # frontend:
+  #   image: ghcr.io/man0l/salonease:frontend-latest
+  #   env_file:
+  #     - path: ./salonease-mvp/frontend/.env
+  #       required: false
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.frontend.rule=Host(`zenmanager.eu`) && !PathPrefix(`/api`) && !PathPrefix(`/uploads`)"
+  #     - "traefik.http.routers.frontend.entrypoints=websecure"
+  #     - "traefik.http.routers.frontend.tls.certresolver=myresolver"
+  #     - "traefik.http.services.frontend.loadbalancer.server.port=80"
+  #     - "com.centurylinklabs.watchtower.enable=true"
+  #   networks:
+  #     - app-network
+  #   depends_on:
+  #     - backend
+  #   restart: unless-stopped
 
-  backend:
-    image: ghcr.io/man0l/salonease:backend-latest
-    env_file:
-      - path: ./salonease-mvp/backend/.env
-        required: false
-    environment:
-      - NODE_ENV=production
-      - FRONTEND_URL=https://zenmanager.eu
-      - CORS_ORIGIN=https://zenmanager.eu
-      - PORT=5000
-    labels:
-      - "traefik.enable=true"
-      # Main API router
-      - "traefik.http.routers.backend.rule=Host(`zenmanager.eu`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.backend.entrypoints=websecure"
-      - "traefik.http.routers.backend.tls.certresolver=myresolver"
+  # SLA-667: disabled (commented out). Re-enable by uncommenting this block,
+  # then `docker compose -f docker-compose.prod.yml up -d backend`.
+  # backend:
+  #   image: ghcr.io/man0l/salonease:backend-latest
+  #   env_file:
+  #     - path: ./salonease-mvp/backend/.env
+  #       required: false
+  #   environment:
+  #     - NODE_ENV=production
+  #     - FRONTEND_URL=https://zenmanager.eu
+  #     - CORS_ORIGIN=https://zenmanager.eu
+  #     - PORT=5000
+  #   labels:
+  #     - "traefik.enable=true"
+  #     # Main API router
+  #     - "traefik.http.routers.backend.rule=Host(`zenmanager.eu`) && PathPrefix(`/api`)"
+  #     - "traefik.http.routers.backend.entrypoints=websecure"
+  #     - "traefik.http.routers.backend.tls.certresolver=myresolver"
       
-      # Static files router for uploads
-      - "traefik.http.routers.backend-uploads.rule=Host(`zenmanager.eu`) && PathPrefix(`/uploads`)"
-      - "traefik.http.routers.backend-uploads.entrypoints=websecure"
-      - "traefik.http.routers.backend-uploads.tls.certresolver=myresolver"
-      - "traefik.http.routers.backend-uploads.service=backend-service"
+  #     # Static files router for uploads
+  #     - "traefik.http.routers.backend-uploads.rule=Host(`zenmanager.eu`) && PathPrefix(`/uploads`)"
+  #     - "traefik.http.routers.backend-uploads.entrypoints=websecure"
+  #     - "traefik.http.routers.backend-uploads.tls.certresolver=myresolver"
+  #     - "traefik.http.routers.backend-uploads.service=backend-service"
       
-      - "traefik.http.services.backend.loadbalancer.server.port=5000"
-      - "traefik.http.middlewares.strip-api.stripprefix.prefixes=/api"
-      - "traefik.http.middlewares.cors.headers.accesscontrolallowmethods=GET,POST,PUT,DELETE,OPTIONS"
-      - "traefik.http.middlewares.cors.headers.accesscontrolalloworiginlist=https://zenmanager.eu"
-      - "traefik.http.middlewares.cors.headers.accesscontrolallowheaders=*"
-      - "traefik.http.middlewares.cors.headers.accesscontrolmaxage=100"
-      - "traefik.http.middlewares.cors.headers.addvaryheader=true"
-      - "traefik.http.services.backend-service.loadbalancer.server.port=5000"
-      - "traefik.http.services.backend-service.loadbalancer.passHostHeader=true"
-      - "traefik.http.routers.backend.service=backend-service"
-      - "com.centurylinklabs.watchtower.enable=true"
-    networks:
-      - app-network
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: unless-stopped
-    volumes:
-      - ./salonease-mvp/backend/uploads:/app/uploads
+  #     - "traefik.http.services.backend.loadbalancer.server.port=5000"
+  #     - "traefik.http.middlewares.strip-api.stripprefix.prefixes=/api"
+  #     - "traefik.http.middlewares.cors.headers.accesscontrolallowmethods=GET,POST,PUT,DELETE,OPTIONS"
+  #     - "traefik.http.middlewares.cors.headers.accesscontrolalloworiginlist=https://zenmanager.eu"
+  #     - "traefik.http.middlewares.cors.headers.accesscontrolallowheaders=*"
+  #     - "traefik.http.middlewares.cors.headers.accesscontrolmaxage=100"
+  #     - "traefik.http.middlewares.cors.headers.addvaryheader=true"
+  #     - "traefik.http.services.backend-service.loadbalancer.server.port=5000"
+  #     - "traefik.http.services.backend-service.loadbalancer.passHostHeader=true"
+  #     - "traefik.http.routers.backend.service=backend-service"
+  #     - "com.centurylinklabs.watchtower.enable=true"
+  #   networks:
+  #     - app-network
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./salonease-mvp/backend/uploads:/app/uploads
 
   # python-runner:
   #   image: ghcr.io/man0l/cold-email-ninja:prod
@@ -278,41 +282,43 @@ services:
     networks:
       - app-network
     restart: unless-stopped
-  n8n:
-    image: n8nio/n8n:latest
-    env_file:
-      - path: ./salonease-mvp/backend/.env
-        required: false
-    environment:
-      - DB_TYPE=postgresdb
-      - N8N_HOST=n8n.zenmanager.eu
-      - N8N_PROTOCOL=https
-      - N8N_PORT=5678
-      - WEBHOOK_URL=https://n8n.zenmanager.eu/
-      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
-      - N8N_PROXY_HOPS=1
-      - NODE_FUNCTION_ALLOW_EXTERNAL=uuid
-      - NODE_FUNCTION_ALLOW_BUILTIN=*
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.n8n.rule=Host(`n8n.zenmanager.eu`)"
-      - "traefik.http.routers.n8n.entrypoints=websecure"
-      - "traefik.http.routers.n8n.tls.certresolver=myresolver"
-      - "traefik.http.services.n8n.loadbalancer.server.port=5678"
+  # SLA-667: disabled (commented out). Re-enable by uncommenting this block,
+  # then `docker compose -f docker-compose.prod.yml up -d n8n`.
+  # n8n:
+  #   image: n8nio/n8n:latest
+  #   env_file:
+  #     - path: ./salonease-mvp/backend/.env
+  #       required: false
+  #   environment:
+  #     - DB_TYPE=postgresdb
+  #     - N8N_HOST=n8n.zenmanager.eu
+  #     - N8N_PROTOCOL=https
+  #     - N8N_PORT=5678
+  #     - WEBHOOK_URL=https://n8n.zenmanager.eu/
+  #     - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+  #     - N8N_PROXY_HOPS=1
+  #     - NODE_FUNCTION_ALLOW_EXTERNAL=uuid
+  #     - NODE_FUNCTION_ALLOW_BUILTIN=*
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.n8n.rule=Host(`n8n.zenmanager.eu`)"
+  #     - "traefik.http.routers.n8n.entrypoints=websecure"
+  #     - "traefik.http.routers.n8n.tls.certresolver=myresolver"
+  #     - "traefik.http.services.n8n.loadbalancer.server.port=5678"
       
-      # WebSocket support middleware
-      #- "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Origin=n8n.zenmanager.eu"
-      #- "traefik.http.routers.n8n.middlewares=websocket-headers"
+  #     # WebSocket support middleware
+  #     #- "traefik.http.middlewares.websocket-headers.headers.customrequestheaders.Origin=n8n.zenmanager.eu"
+  #     #- "traefik.http.routers.n8n.middlewares=websocket-headers"
       
-      - "com.centurylinklabs.watchtower.enable=true"
-    networks:
-      - app-network
-    depends_on:
-      db:
-        condition: service_healthy
-    volumes:
-      - n8n_data:/home/node/.n8n
-    restart: unless-stopped
+  #     - "com.centurylinklabs.watchtower.enable=true"
+  #   networks:
+  #     - app-network
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   volumes:
+  #     - n8n_data:/home/node/.n8n
+  #   restart: unless-stopped
 
 
   midjourney-db:
@@ -507,77 +513,79 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  openclaw-gateway:
-    build:
-      context: ./openclaw
-      dockerfile: Dockerfile
-    image: openclaw-gateway:2026.9.6-opencode
-    restart: unless-stopped
-    init: true
-    # OpenClaw uses a 330s gateway shutdown policy and a persistent owner
-    # lease. Compose's default ~10s SIGTERM window force-kills the gateway
-    # before it can release that lease, making the next container crash-loop
-    # until the stale lease expires.
-    stop_grace_period: 340s
-    expose:
-      - "18789"
-    env_file:
-      - path: ./openclaw/.env
-        required: true
-    # Fail visibly instead of starting with an unusable model provider.
-    command:
-      [
-        "/bin/sh",
-        "-ec",
-        "test -n \"$${OPENCLAW_GATEWAY_TOKEN:-}\" && test -n \"$${OPENROUTER_API_KEY:-}\" && exec node dist/index.js gateway --bind lan --port 18789",
-      ]
-    environment:
-      OPENCLAW_CONFIG_PATH: /home/node/.openclaw/openclaw.prod.json
-      OPENCLAW_STATE_DIR: /home/node/.openclaw
-      OPENCLAW_CONFIG_READONLY: "1"
-      CODEX_HOME: /home/node/.openclaw/agents/main/agent/codex-home
-      OPENCODE_CONFIG: /home/node/.openclaw/opencode.json
-      XDG_CONFIG_HOME: /home/node/.openclaw/opencode/config
-      XDG_DATA_HOME: /home/node/.openclaw/opencode/share
-      XDG_CACHE_HOME: /home/node/.openclaw/opencode/cache
-    volumes:
-      - openclaw_state:/home/node/.openclaw
-      - ./openclaw/openclaw.prod.json:/home/node/.openclaw/openclaw.prod.json:ro
-      - ./openclaw/opencode.json:/home/node/.openclaw/opencode.json:ro
-      - /root/salonease/openclaw/codex-home:/home/node/.openclaw/agents/main/agent/codex-home
-      - /root/salonease/paperclip/codex-home/models.json:/paperclip/codex-home/models.json:ro
-    networks:
-      - app-network
-    cap_drop:
-      - NET_RAW
-      - NET_ADMIN
-    security_opt:
-      - no-new-privileges:true
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "dist/docker-healthcheck.js",
-        ]
-      interval: 30s
-      timeout: 30s
-      retries: 5
-      start_period: 300s
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 2G
-        reservations:
-          memory: 256M
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
-    labels:
-      - "com.centurylinklabs.watchtower.enable=false"
+  # SLA-667: disabled (commented out). Re-enable by uncommenting this block,
+  # then `docker compose -f docker-compose.prod.yml up -d openclaw-gateway`.
+  # openclaw-gateway:
+  #   build:
+  #     context: ./openclaw
+  #     dockerfile: Dockerfile
+  #   image: openclaw-gateway:2026.9.6-opencode
+  #   restart: unless-stopped
+  #   init: true
+  #   # OpenClaw uses a 330s gateway shutdown policy and a persistent owner
+  #   # lease. Compose's default ~10s SIGTERM window force-kills the gateway
+  #   # before it can release that lease, making the next container crash-loop
+  #   # until the stale lease expires.
+  #   stop_grace_period: 340s
+  #   expose:
+  #     - "18789"
+  #   env_file:
+  #     - path: ./openclaw/.env
+  #       required: true
+  #   # Fail visibly instead of starting with an unusable model provider.
+  #   command:
+  #     [
+  #       "/bin/sh",
+  #       "-ec",
+  #       "test -n \"$${OPENCLAW_GATEWAY_TOKEN:-}\" && test -n \"$${OPENROUTER_API_KEY:-}\" && exec node dist/index.js gateway --bind lan --port 18789",
+  #     ]
+  #   environment:
+  #     OPENCLAW_CONFIG_PATH: /home/node/.openclaw/openclaw.prod.json
+  #     OPENCLAW_STATE_DIR: /home/node/.openclaw
+  #     OPENCLAW_CONFIG_READONLY: "1"
+  #     CODEX_HOME: /home/node/.openclaw/agents/main/agent/codex-home
+  #     OPENCODE_CONFIG: /home/node/.openclaw/opencode.json
+  #     XDG_CONFIG_HOME: /home/node/.openclaw/opencode/config
+  #     XDG_DATA_HOME: /home/node/.openclaw/opencode/share
+  #     XDG_CACHE_HOME: /home/node/.openclaw/opencode/cache
+  #   volumes:
+  #     - openclaw_state:/home/node/.openclaw
+  #     - ./openclaw/openclaw.prod.json:/home/node/.openclaw/openclaw.prod.json:ro
+  #     - ./openclaw/opencode.json:/home/node/.openclaw/opencode.json:ro
+  #     - /root/salonease/openclaw/codex-home:/home/node/.openclaw/agents/main/agent/codex-home
+  #     - /root/salonease/paperclip/codex-home/models.json:/paperclip/codex-home/models.json:ro
+  #   networks:
+  #     - app-network
+  #   cap_drop:
+  #     - NET_RAW
+  #     - NET_ADMIN
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   healthcheck:
+  #     test:
+  #       [
+  #         "CMD",
+  #         "node",
+  #         "dist/docker-healthcheck.js",
+  #       ]
+  #     interval: 30s
+  #     timeout: 30s
+  #     retries: 5
+  #     start_period: 300s
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: "1.0"
+  #         memory: 2G
+  #       reservations:
+  #         memory: 256M
+  #   logging:
+  #     driver: json-file
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "3"
+  #   labels:
+  #     - "com.centurylinklabs.watchtower.enable=false"
 
   # Hermes gateway (internal, Paperclip `hermes_gateway` adapter).
   # No Traefik route on purpose — Paperclip reaches it over Docker DNS at
@@ -591,72 +599,74 @@ services:
   #   cp hermes/.env.example hermes/.env && openssl rand -hex 32 ...
   # Resources are conservative: the VPS runs ~4.2 GiB used of 5.9 GiB with
   # Paperclip (~1.9 GiB, unbounded) and OpenClaw (2G limit) as heavy tenants.
-  hermes-gateway:
-    build:
-      context: ./hermes
-      dockerfile: Dockerfile
-    image: hermes-gateway:0.17.0
-    restart: unless-stopped
-    init: true
-    expose:
-      - "8642"
-    env_file:
-      - path: ./hermes/.env
-        required: true
-    # Fail visibly instead of starting with an unusable gateway key/provider.
-    command:
-      [
-        "/bin/sh",
-        "-ec",
-        "test -n \"$${API_SERVER_KEY:-}\" && test -n \"$${OPENCODE_ZEN_API_KEY:-}\" && test -n \"$${OPENROUTER_API_KEY:-}\" && exec hermes gateway run --replace --accept-hooks",
-      ]
-    environment:
-      API_SERVER_ENABLED: "true"
-      API_SERVER_HOST: 0.0.0.0
-      API_SERVER_PORT: "8642"
-    volumes:
-      - hermes_state:/home/hermes/.hermes
-      - ./hermes/config.yaml:/home/hermes/.hermes/config.yaml:ro
-      # Bind only the dotenv file into the default Hermes secrets location.
-      # env_file alone injects process variables but Hermes skills/config read
-      # this hard path directly. Keep it read-only from the container.
-      - /root/salonease/hermes/.env:/home/hermes/.hermes/.env:ro
-      # Paperclip does not sync skills to the hermes_gateway adapter yet, so
-      # mount the reviewed bundled-skill snapshot directly into Hermes' skill
-      # discovery path. The nested bind overrides the writable state volume.
-      - ./hermes/skills:/home/hermes/.hermes/skills:ro
-      # Hermes hard-codes mutable hub metadata through skills/.hub, which the
-      # snapshot symlinks to the sibling hub directory. The named volume gives
-      # that resolved path a writable target while every reviewed skill under
-      # the parent snapshot remains read-only. The image pre-creates the mount
-      # point with Hermes' UID so the first-use named volume is writable.
-      - hermes_hub:/home/hermes/.hermes/hub
-    networks:
-      - app-network
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -fsS --max-time 10 -H \"Authorization: Bearer $${API_SERVER_KEY}\" http://localhost:8642/health > /dev/null || exit 1",
-        ]
-      interval: 30s
-      timeout: 15s
-      retries: 5
-      start_period: 120s
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 768M
-        reservations:
-          memory: 128M
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
-    labels:
-      - "com.centurylinklabs.watchtower.enable=false"
+  # SLA-667: disabled (commented out). Re-enable by uncommenting this block,
+  # then `docker compose -f docker-compose.prod.yml up -d hermes-gateway`.
+  # hermes-gateway:
+  #   build:
+  #     context: ./hermes
+  #     dockerfile: Dockerfile
+  #   image: hermes-gateway:0.17.0
+  #   restart: unless-stopped
+  #   init: true
+  #   expose:
+  #     - "8642"
+  #   env_file:
+  #     - path: ./hermes/.env
+  #       required: true
+  #   # Fail visibly instead of starting with an unusable gateway key/provider.
+  #   command:
+  #     [
+  #       "/bin/sh",
+  #       "-ec",
+  #       "test -n \"$${API_SERVER_KEY:-}\" && test -n \"$${OPENCODE_ZEN_API_KEY:-}\" && test -n \"$${OPENROUTER_API_KEY:-}\" && exec hermes gateway run --replace --accept-hooks",
+  #     ]
+  #   environment:
+  #     API_SERVER_ENABLED: "true"
+  #     API_SERVER_HOST: 0.0.0.0
+  #     API_SERVER_PORT: "8642"
+  #   volumes:
+  #     - hermes_state:/home/hermes/.hermes
+  #     - ./hermes/config.yaml:/home/hermes/.hermes/config.yaml:ro
+  #     # Bind only the dotenv file into the default Hermes secrets location.
+  #     # env_file alone injects process variables but Hermes skills/config read
+  #     # this hard path directly. Keep it read-only from the container.
+  #     - /root/salonease/hermes/.env:/home/hermes/.hermes/.env:ro
+  #     # Paperclip does not sync skills to the hermes_gateway adapter yet, so
+  #     # mount the reviewed bundled-skill snapshot directly into Hermes' skill
+  #     # discovery path. The nested bind overrides the writable state volume.
+  #     - ./hermes/skills:/home/hermes/.hermes/skills:ro
+  #     # Hermes hard-codes mutable hub metadata through skills/.hub, which the
+  #     # snapshot symlinks to the sibling hub directory. The named volume gives
+  #     # that resolved path a writable target while every reviewed skill under
+  #     # the parent snapshot remains read-only. The image pre-creates the mount
+  #     # point with Hermes' UID so the first-use named volume is writable.
+  #     - hermes_hub:/home/hermes/.hermes/hub
+  #   networks:
+  #     - app-network
+  #   healthcheck:
+  #     test:
+  #       [
+  #         "CMD-SHELL",
+  #         "curl -fsS --max-time 10 -H \"Authorization: Bearer $${API_SERVER_KEY}\" http://localhost:8642/health > /dev/null || exit 1",
+  #       ]
+  #     interval: 30s
+  #     timeout: 15s
+  #     retries: 5
+  #     start_period: 120s
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: "0.5"
+  #         memory: 768M
+  #       reservations:
+  #         memory: 128M
+  #   logging:
+  #     driver: json-file
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "3"
+  #   labels:
+  #     - "com.centurylinklabs.watchtower.enable=false"
 
   # =========================================================================
   # SlashLoop queue producer ingress (queue.slashloop.dev) — SLA-15.
