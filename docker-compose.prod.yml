@@ -470,7 +470,14 @@ services:
     # sha-c46e41e is the smallest upstream revision carrying both fixes. Move
     # back to a released tag (and re-enable Watchtower below) once upstream cuts
     # a stable that includes #13942 and #14914.
-    image: ghcr.io/paperclipai/paperclip:sha-c46e41e
+    #
+    # The pin is the FROM line in infra/paperclip/Dockerfile, which adds
+    # procps (pgrep/ps/pkill) for agent shells (SLA-992). Deploy with
+    # `docker compose -f docker-compose.prod.yml up -d --build paperclip`.
+    build:
+      context: ./infra/paperclip
+      dockerfile: Dockerfile
+    image: paperclip-local:sha-c46e41e-procps
     # Permit the nested Codex namespace sandbox; keep default capabilities.
     # Load infra/paperclip/paperclip-codex.apparmor on the host before startup.
     security_opt:
