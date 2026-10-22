@@ -490,6 +490,11 @@ services:
       - PAPERCLIP_ALLOWED_HOSTNAMES=bots.balkanbit.app
       - CODEX_HOME=/paperclip/codex-home
       - TRUST_PROXY=true
+      # Bun lives in the paperclip_data volume (/paperclip/.bun), not the
+      # image, so agent shells only find it if it is on PATH. Keep the image's
+      # default PATH entries after it.
+      - BUN_INSTALL=/paperclip/.bun
+      - PATH=/paperclip/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     # Watchtower off for this service. It runs `--label-enable` with no
     # monitor-only mode, so any new upstream `latest` would silently recreate
     # this container and apply every pending Drizzle migration to the company
