@@ -187,7 +187,7 @@ services:
       - path: ./slashloop-worker/.env
         required: false
     environment:
-      - WORKER_KINDS=refresh,thumb
+      - WORKER_KINDS=tools-profile-lite,tools-profile,tools-video,refresh,thumb
       # Single experiment-tick leader (see SLA-100/SLA-105): the shared
       # ./slashloop-worker/.env parks the tick everywhere
       # (EXPERIMENT_TICK_ENABLED=0); the refresh-draining scraper re-enables
