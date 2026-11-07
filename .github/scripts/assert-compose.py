@@ -801,9 +801,11 @@ NEGATIVE_MUTATIONS = [
         "    image: pgvector/pgvector:latest",
     ),
     (
+        # The frontend service this case used to target was disabled in
+        # SLA-667, which left the anchor matching nothing.
         "CI image moved to a pinned tag",
-        "    image: ghcr.io/man0l/salonease:frontend-latest",
-        "    image: ghcr.io/man0l/salonease:frontend-2026.10.1",
+        "    image: ghcr.io/man0l/midjourney-strapi:latest",
+        "    image: ghcr.io/man0l/midjourney-strapi:2026.10.1",
     ),
     (
         "a new third-party service with no labels at all",

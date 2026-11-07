@@ -453,24 +453,18 @@ services:
     restart: unless-stopped
 
   paperclip:
-    # Pinned per-commit, NOT `latest`.
+    # Pinned to a released tag, NOT `latest`.
     #
-    # v2026.1001.0 (= 8f8a0ab7, revision of `latest` as of 2026-10-04) writes
-    # managed Codex MCP servers with `headers = { ... }`. Codex 0.159.x rejects
-    # that field name, so every governed MCP server in the managed config block
-    # fails to load: paperclip-projects, paperclip-connections,
-    # paperclip-assigned, and all native-* gateways. Upstream fixed it in
-    # 18dac1e1 (#13942) with `http_headers`, which is still unreleased.
+    # 2026.1106.0 (v2026.1106.0) is the first release carrying both fixes the
+    # previous sha-c46e41e pin waited for: 18dac1e1 (#13942, Codex managed MCP
+    # servers use `http_headers`; Codex 0.159.x rejected `headers`) and
+    # c46e41e8 (#14914, native MCP gateways record their owning `agentId`).
+    # Do not go below 2026.1106.0.
     #
-    # 8f8a0ab7 also predates c46e41e8 (#14914, "validate native MCP gateway
-    # ownership"): native gateways recorded the owner only in metadata and left
-    # `agentId` null, so another agent's native gateway passed the managed
-    # selection filter and its named-gateway auth accepted a foreign run token.
-    #
-    # sha-c46e41e is the smallest upstream revision carrying both fixes. Move
-    # back to a released tag (and re-enable Watchtower below) once upstream cuts
-    # a stable that includes #13942 and #14914.
-    image: ghcr.io/paperclipai/paperclip:sha-c46e41e
+    # Upgrades stay manual: pg_dump the paperclip DB, verify it with
+    # pg_restore --list, then bump this tag and recreate only this service.
+    # Migrations are forward-only; rollback means restoring the dump.
+    image: ghcr.io/paperclipai/paperclip:2026.1106.0
     # Permit the nested Codex namespace sandbox; keep default capabilities.
     # Load infra/paperclip/paperclip-codex.apparmor on the host before startup.
     security_opt:
@@ -499,8 +493,7 @@ services:
     # monitor-only mode, so any new upstream `latest` would silently recreate
     # this container and apply every pending Drizzle migration to the company
     # database with no backup gate and no in-flight job check. The pin above
-    # only holds while this label stays false. Re-enable together with a
-    # released tag, after a pg_dump is verified.
+    # only holds while this label stays false.
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.paperclip.rule=Host(`bots.balkanbit.app`)"
