@@ -464,7 +464,12 @@ services:
     # Upgrades stay manual: pg_dump the paperclip DB, verify it with
     # pg_restore --list, then bump this tag and recreate only this service.
     # Migrations are forward-only; rollback means restoring the dump.
-    image: ghcr.io/paperclipai/paperclip:2026.1106.0
+    # 2026.1106.0-p1 is v2026.1106.0 plus the three fix commits of upstream
+    # paperclipai/paperclip#17827 (closed unmerged), which cure the
+    # `Chat tools cannot be inherited by another task` setup failures on
+    # delegated/follow-up issues. Built from the man0l/paperclip fork, branch
+    # release/2026.1106.0-p1. Rollback: re-pin ghcr.io/paperclipai/paperclip:2026.1106.0.
+    image: ghcr.io/man0l/paperclip:2026.1106.0-p1
     # Permit the nested Codex namespace sandbox; keep default capabilities.
     # Load infra/paperclip/paperclip-codex.apparmor on the host before startup.
     security_opt:
