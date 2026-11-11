@@ -437,6 +437,23 @@ services:
   #   docker compose -f docker-compose.prod.yml exec paperclip opencode auth login
   paperclip-db:
     image: postgres:17-alpine
+    # SLA-1505: jit=off is the slowness fix. Paperclip's issue-list query embeds a
+    # per-issue correlated subquery whose cost crosses jit_above_cost, so every
+    # list/poll paid seconds of LLVM compile (9.2s -> 55ms with jit off). Also set
+    # via ALTER DATABASE; this keeps it if the volume is rebuilt. Memory is sized
+    # for the 6 GiB host; pg_stat_statements is for future slow-query triage.
+    command:
+      - postgres
+      - -c
+      - jit=off
+      - -c
+      - shared_buffers=512MB
+      - -c
+      - effective_cache_size=2GB
+      - -c
+      - work_mem=16MB
+      - -c
+      - shared_preload_libraries=pg_stat_statements
     environment:
       - POSTGRES_DB=paperclip
       - POSTGRES_USER=paperclip
