@@ -481,7 +481,9 @@ services:
     # Upgrades stay manual: pg_dump the paperclip DB, verify it with
     # pg_restore --list, then bump this tag and recreate only this service.
     # Migrations are forward-only; rollback means restoring the dump.
-    image: ghcr.io/paperclipai/paperclip:2026.1106.0
+    # Image = upstream 2026.1106.0 + postgresql-client-17 (SLA-1732), so the
+    # built-in backup uses pg_dump (gzip + retention). See infra/paperclip/Dockerfile.
+    image: ghcr.io/man0l/paperclip:2026.1106.0-pg17
     # Permit the nested Codex namespace sandbox; keep default capabilities.
     # Load infra/paperclip/paperclip-codex.apparmor on the host before startup.
     security_opt:
